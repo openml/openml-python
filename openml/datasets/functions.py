@@ -58,11 +58,19 @@ def list_qualities() -> list[str]:
     """Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
-    data qualities that are computed on the datasets uploaded.
+    data qualities that are computed on the datasets uploaded to OpenML.
 
     Returns
     -------
     list
+        A list of quality names.
+
+    Examples
+    --------
+    >>> import openml
+    >>> from openml.datasets import list_qualities
+    >>> qualities = list_qualities()
+    >>> print(qualities[:5])
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
@@ -90,42 +98,53 @@ def list_datasets(
     number_classes: int | str | None = None,
     number_missing_values: int | str | None = None,
 ) -> pd.DataFrame:
-    """Return a dataframe of all dataset which are on OpenML.
+    """Return a dataframe of all datasets on OpenML.
 
-    Supports large amount of results.
+    Supports large amounts of results.
 
     Parameters
     ----------
-    data_id : list, optional
-        A list of data ids, to specify which datasets should be
-        listed
+    data_id : list of int, optional
+        List of dataset ids to specify which datasets should be listed.
     offset : int, optional
-        The number of datasets to skip, starting from the first.
+        Number of datasets to skip, starting from the first.
     size : int, optional
-        The maximum number of datasets to show.
+        Maximum number of datasets to return.
     status : str, optional
-        Should be {active, in_preparation, deactivated}. By
-        default active datasets are returned, but also datasets
-        from another status can be requested.
+        Should be one of {'active', 'in_preparation', 'deactivated'}.
+        By default, active datasets are returned.
     tag : str, optional
+        Tag to filter datasets.
     data_name : str, optional
+        Name of dataset to filter.
     data_version : int, optional
-    number_instances : int | str, optional
-    number_features : int | str, optional
-    number_classes : int | str, optional
-    number_missing_values : int | str, optional
+        Version of dataset to filter.
+    number_instances : int or str, optional
+        Filter datasets by number of instances.
+    number_features : int or str, optional
+        Filter datasets by number of features.
+    number_classes : int or str, optional
+        Filter datasets by number of classes.
+    number_missing_values : int or str, optional
+        Filter datasets by number of missing values.
 
     Returns
     -------
-    datasets: dataframe
-        Each row maps to a dataset
-        Each column contains the following information:
+    pd.DataFrame
+        Each row maps to a dataset.
+        Columns include:
         - dataset id
         - name
         - format
         - status
-        If qualities are calculated for the dataset, some of
-        these are also included as columns.
+        - and additional columns for dataset qualities if available.
+
+    Examples
+    --------
+    >>> import openml
+    >>> from openml.datasets import list_datasets
+    >>> datasets = list_datasets(size=5)
+    >>> print(datasets.head())
     """
     listing_call = partial(
         _list_datasets,
@@ -343,27 +362,37 @@ def get_datasets(
     download_data: bool = False,  # noqa: FBT002
     download_qualities: bool = False,  # noqa: FBT002
 ) -> list[OpenMLDataset]:
-    """Download datasets.
+    """Download datasets from OpenML.
 
-    This function iterates :meth:`openml.datasets.get_dataset`.
+    This function iterates :meth:`openml.datasets.get_dataset`
+    to download multiple datasets at once.
 
     Parameters
     ----------
-    dataset_ids : iterable
-        Integers or strings representing dataset ids or dataset names.
-        If dataset names are specified, the least recent still active dataset version is returned.
+    dataset_ids : list of str or int
+        Dataset ids or names. If dataset names are specified, the least recent still active dataset
+        version is returned.
     download_data : bool, optional
-        If True, also download the data file. Beware that some datasets are large and it might
-        make the operation noticeably slower. Metadata is also still retrieved.
-        If False, create the OpenMLDataset and only populate it with the metadata.
-        The data may later be retrieved through the `OpenMLDataset.get_data` method.
-    download_qualities : bool, optional (default=True)
-        If True, also download qualities.xml file. If False it skip the qualities.xml.
+        If True, download the data file. Some datasets are large
+        and this may slow down the operation.
+        Metadata is always retrieved. If False, only metadata is retrieved;
+        the actual data can later
+        be obtained via `OpenMLDataset.get_data`.
+    download_qualities : bool, optional
+        If True, also download the qualities.xml file. If False, qualities are skipped.
 
     Returns
     -------
-    datasets : list of datasets
-        A list of dataset objects.
+    list of OpenMLDataset
+        A list of OpenMLDataset objects containing metadata (and data/qualities if requested).
+
+    Examples
+    --------
+    >>> import openml
+    >>> from openml.datasets import get_datasets
+    >>> datasets = get_datasets([31, 32])
+    >>> for dataset in datasets:
+    ...     print(dataset.name)
     """
     datasets = []
     for dataset_id in dataset_ids:
@@ -1048,19 +1077,30 @@ def _topic_add_dataset(data_id: int, topic: str) -> int:
 
 def _topic_delete_dataset(data_id: int, topic: str) -> int:
     """
-    Removes a topic from a dataset.
-    This API is not available for all OpenML users and is accessible only by admins.
+    Remove a topic from a dataset on OpenML.
+
+    This API is not available for all users; it is accessible only by admins.
 
     Parameters
     ----------
     data_id : int
-        id of the dataset to be forked
+        ID of the dataset to remove the topic from.
     topic : str
-        Topic to be deleted
+        The topic name to delete from the dataset.
 
     Returns
     -------
-    Dataset id
+    int
+        The dataset ID after the topic removal.
+
+    Examples
+    --------
+    >>> from openml.datasets.functions import _topic_delete_dataset
+    >>> dataset_id = 61
+    >>> topic = "biology"
+    >>> result = _topic_delete_dataset(dataset_id, topic)
+    >>> print(result)
+    61
     """
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
@@ -1446,19 +1486,27 @@ def _get_online_dataset_format(dataset_id: int) -> str:
 
 
 def delete_dataset(dataset_id: int) -> bool:
-    """Delete dataset with id `dataset_id` from the OpenML server.
+    """
+    Delete a dataset from the OpenML server.
 
     This can only be done if you are the owner of the dataset and
-    no tasks are attached to the dataset.
+    no tasks are attached to it.
 
     Parameters
     ----------
     dataset_id : int
-        OpenML id of the dataset
+        OpenML ID of the dataset to delete.
 
     Returns
     -------
     bool
-        True if the deletion was successful. False otherwise.
+        True if the deletion was successful, False otherwise.
+
+    Examples
+    --------
+    >>> import openml
+    >>> success = openml.datasets.delete_dataset(123456)
+    >>> print(success)
+    True
     """
     return openml.utils._delete_entity("data", dataset_id)
