@@ -2,8 +2,10 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
+import time
 import warnings
 from collections import OrderedDict
 from functools import partial
@@ -456,7 +458,7 @@ def get_dataset(  # noqa: C901, PLR0912
 
     if cache_format not in ["feather", "pickle"]:
         raise ValueError(
-            "cache_format must be one of 'feather' or 'pickle. "
+            "cache_format must be one of 'feather' or 'pickle'. "
             f"Invalid format specified: {cache_format}",
         )
 
@@ -1071,6 +1073,9 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     return int(data_id)
 
 
+DESCRIPTION_CACHE_TTL = 86400  # 24 hours
+
+
 def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, Any]:
     """Get the dataset description as xml dictionary.
 
@@ -1090,10 +1095,14 @@ def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, 
         XML Dataset description parsed to a dict.
 
     """
-    # TODO implement a cache for this that invalidates itself after some time
-    # This can be saved on disk, but cannot be cached properly, because
-    # it contains the information on whether a dataset is active.
     description_file = did_cache_dir / "description.xml"
+
+    # Invalidate stale cache
+    if description_file.is_file():
+        file_age = time.time() - description_file.stat().st_mtime
+        if file_age >= DESCRIPTION_CACHE_TTL:
+            with contextlib.suppress(OSError):
+                description_file.unlink()
 
     try:
         with description_file.open(encoding="utf8") as fh:
