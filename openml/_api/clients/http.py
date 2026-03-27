@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import urlencode, urljoin, urlparse
 
+import arff
 import requests
 import xmltodict
 from requests import Response
@@ -98,6 +99,12 @@ class HTTPCache:
         if "text/xml" in content_type:
             return "body.xml"
 
+        try:
+            arff.loads(response.text)
+            return "body.arff"
+        except arff.BadDataFormat:
+            pass
+
         return "body.txt"
 
     def _get_body_filename_from_path(self, path: Path) -> str:
@@ -106,6 +113,9 @@ class HTTPCache:
 
         if (path / "body.xml").exists():
             return "body.xml"
+
+        if (path / "body.arff").exists():
+            return "body.arff"
 
         return "body.txt"
 
@@ -825,3 +835,11 @@ class HTTPClient:
         handler = handler or write_to_file
         handler(response, file_path, encoding)
         return file_path
+
+    def cache_path_from_response(self, response: Response) -> Path:
+        url = response.url
+        url = urljoin(self.server, url)
+
+        key = self.cache.get_key(url, params={})
+        path = self.cache._key_to_path(key)
+        return path / self.cache._get_body_filename_from_response(response)
