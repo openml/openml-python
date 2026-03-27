@@ -842,10 +842,8 @@ class HTTPClient:
         handler(response, file_path, encoding)
         return file_path
 
-    def cache_path_from_response(self, response: Response) -> Path:
-        url = response.url
-        url = urljoin(self.server, url)
-
-        key = self.cache.get_key(url, params={})
+    def cache_path_from_url(self, url: str) -> Path:
+        full_url = urljoin(self.server, url)
+        key = self.cache.get_key(full_url, params={})
         path = self.cache._key_to_path(key)
         return path / self.cache._get_body_filename_from_path(path)

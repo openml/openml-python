@@ -669,8 +669,8 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         -------
         Path
         """
-        response = self._http.get(url_ext, enable_cache=True)
-        return self._http.cache_path_from_response(response)
+        self._http.get(url_ext, enable_cache=True)
+        return self._http.cache_path_from_url(url_ext)
 
     def download_features_file(self, dataset_id: int) -> Path:
         """Download features file.
@@ -776,8 +776,9 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            response = self._http.get(url, enable_cache=True, md5_checksum=md5_checksum_fixture)
-            output_file_path = self._http.cache_path_from_response(response)
+            # save the file in cache and get it's path
+            self._http.get(url, enable_cache=True, md5_checksum=md5_checksum_fixture)
+            output_file_path = self._http.cache_path_from_url(url)
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
@@ -1368,8 +1369,8 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         -------
         Path
         """
-        response = self._http.get(url_ext, enable_cache=True)
-        return self._http.cache_path_from_response(response)
+        self._http.get(url_ext, enable_cache=True)
+        return self._http.cache_path_from_url(url_ext)
 
     def download_features_file(self, dataset_id: int) -> Path:
         """Download features file.
@@ -1471,8 +1472,9 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            response = self._http.get(url, enable_cache=True)
-            output_file_path = self._http.cache_path_from_response(response)
+            # save the file in cache and get it's path
+            self._http.get(url, enable_cache=True)
+            output_file_path = self._http.cache_path_from_url(url)
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
