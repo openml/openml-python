@@ -15,6 +15,8 @@ from typing import ClassVar
 import requests
 
 import openml
+from openml._api import HTTPClient
+from openml.enums import APIVersion
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -52,6 +54,8 @@ class TestBase(unittest.TestCase):
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
+
+    http_client: HTTPClient = HTTPClient(api_version=APIVersion.V1)
 
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
