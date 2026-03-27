@@ -1871,7 +1871,8 @@ def _dataset_features_is_downloaded(did: int):
 def _dataset_data_file_is_downloaded(did: int):
     cache_directory = Path(openml.config.get_cache_directory()) / "minio/datasets/0000/0001"
     TestBase.logger.info(f"Checking for data file in {cache_directory}")
-    TestBase.logger.info(f"Files in cache directory: {[f.name for f in Path(openml.config.get_cache_directory()).iterdir()]}")
+    TestBase.logger.info(f"Files in cache directory: {[f.name for f in (Path(openml.config.get_cache_directory())/'minio').iterdir()]}")
+    TestBase.logger.info(f"Files in cache directory: {[f.name for f in (Path(openml.config.get_cache_directory())/'minio/datatsets').iterdir()]}")
     if not cache_directory.exists():
         return False
     return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
