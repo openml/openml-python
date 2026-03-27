@@ -68,6 +68,9 @@ class OpenMLDatasetTest(TestBase):
             self._iris = openml.datasets.get_dataset(61, download_data=False)
         return self._iris
 
+    def _get_cache_filename(self, id):
+        return self.http_client.cache_path_from_url(f"data/{id}")
+
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
         # create_dataset
@@ -236,16 +239,14 @@ class OpenMLDatasetTest(TestBase):
         assert xy.shape == (150, 5)
 
     def test_lazy_loading_metadata(self):
-        # Initial Setup
-        did_cache_dir = Path(self.http_client.cache_path_from_url("data/2")).parent
-
         _compare_dataset = openml.datasets.get_dataset(
             2,
             download_data=False,
             download_features_meta_data=True,
             download_qualities=True,
         )
-        change_time = os.stat(did_cache_dir).st_mtime
+        did_cache_file = self._get_cache_filename(2)
+        change_time = os.stat(did_cache_file).st_mtime
 
         # Test with cache
         _dataset = openml.datasets.get_dataset(
@@ -254,12 +255,12 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert change_time == os.stat(did_cache_dir).st_mtime
+        assert change_time == os.stat(did_cache_file).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
         # -- Test without cache
-        shutil.rmtree(did_cache_dir)
+        did_cache_file.unlink()
 
         _dataset = openml.datasets.get_dataset(
             2,
@@ -268,8 +269,8 @@ class OpenMLDatasetTest(TestBase):
             download_qualities=False,
         )
 
-        assert "body.xml" in os.listdir(did_cache_dir)
-        assert change_time != os.stat(did_cache_dir).st_mtime
+        assert did_cache_file.exists()
+        assert change_time != os.stat(did_cache_file).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
