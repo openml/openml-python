@@ -205,21 +205,9 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    for _d in ["datasets", "tasks", "runs"]:
+    for _d in ["tasks", "runs"]:
         res_paths.append(_c_root_dir / _d)
 
-    for _id in ["-1", "2"]:
-        tmp_p = _c_root_dir / "datasets" / _id
-        res_paths.extend(
-            [
-                tmp_p / "dataset.arff",
-                tmp_p / "features.xml",
-                tmp_p / "qualities.xml",
-                tmp_p / "description.xml",
-            ]
-        )
-
-    res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
     res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
@@ -238,12 +226,27 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     ])
 
     res_paths.extend([
-        _c_root_dir / "api" / "v1" / "xml" / "datasets",
-        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "-1",
-        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "-1" / "body.xml",
-        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "2",
-        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "2" / "body.xml",
-        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "1"
+        _c_root_dir / "api" / "v1" / "xml" / "data",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "features",
+
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "-1",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "-1" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "-1",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "-1" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "-1",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "-1" / "body.xml",
+        _c_root_dir / "labs" / "beta" / "Projects" / "autoweka" / "datasets" / "dexter.zip" / "body.arff",
+
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "2",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "2" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "2",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "2" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "2",
+        _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "2" / "body.xml",
+        _c_root_dir / "data" / "download" / "1666876" / "phpFsFYVN" / "body.arff",
+
+        _c_root_dir / "datasets" / "30" / "dataset_30.pq",
     ])
 
     return res_paths
