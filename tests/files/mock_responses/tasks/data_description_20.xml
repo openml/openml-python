@@ -1,0 +1,15 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>20</oml:id>
+  <oml:name>diabetes</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>Pima Indians Diabetes dataset.</oml:description>
+  <oml:format>ARFF</oml:format>
+  <oml:upload_date>2014-04-06T23:19:24</oml:upload_date>
+  <oml:licence>Public</oml:licence>
+  <oml:url>https://test.openml.org/data/download/20/dataset_20.arff</oml:url>
+  <oml:file_id>20</oml:file_id>
+  <oml:default_target_attribute>class</oml:default_target_attribute>
+  <oml:visibility>public</oml:visibility>
+  <oml:status>active</oml:status>
+  <oml:md5_checksum>00000000000000000000000000000000</oml:md5_checksum>
+</oml:data_set_description>
