@@ -364,8 +364,10 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
 
         # check that common keys and values are identical
         ignore_fields = server_fields | cache_fields
-        self_keys = set(self.__dict__.keys()) - ignore_fields
-        other_keys = set(other.__dict__.keys()) - ignore_fields
+
+        self_keys = set(self.__dict__) - ignore_fields
+        other_keys = set(other.__dict__) - ignore_fields
+
         return self_keys == other_keys and all(
             self.__dict__[key] == other.__dict__[key] for key in self_keys
         )
@@ -618,7 +620,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             data = pd.read_parquet(data_file)
         except Exception as e:
             raise Exception(f"File: {data_file}") from e
-        categorical = [data[c].dtype.name == "category" for c in data.columns]
+        categorical = [isinstance(data[c].dtype, pd.CategoricalDtype) for c in data.columns]
         attribute_names = list(data.columns)
         return attribute_names, categorical, data
 
