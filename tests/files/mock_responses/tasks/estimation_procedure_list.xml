@@ -1,0 +1,303 @@
+<oml:estimationprocedures xmlns:oml="http://openml.org/openml">
+<oml:estimationprocedure>
+<oml:id>1</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>2</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>5 times 2-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>5</oml:repeats>
+<oml:folds>2</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>3</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>10 times 10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>10</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>4</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>Leave one out</oml:name>
+<oml:type>leaveoneout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>5</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>10% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>6</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>33% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>7</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>8</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>5 times 2-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>5</oml:repeats>
+<oml:folds>2</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>9</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>10 times 10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>10</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>10</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>Leave one out</oml:name>
+<oml:type>leaveoneout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>11</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>10% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>12</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>33% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>13</oml:id>
+<oml:ttid>3</oml:ttid>
+<oml:name>10-fold Learning Curve</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>14</oml:id>
+<oml:ttid>3</oml:ttid>
+<oml:name>10 times 10-fold Learning Curve</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>10</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>15</oml:id>
+<oml:ttid>4</oml:ttid>
+<oml:name>Interleaved Test then Train</oml:name>
+<oml:type>testthentrain</oml:type>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>16</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>Custom Holdout</oml:name>
+<oml:type>customholdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>1</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>17</oml:id>
+<oml:ttid>5</oml:ttid>
+<oml:name>50 times Clustering</oml:name>
+<oml:type>testontrainingdata</oml:type>
+<oml:repeats>50</oml:repeats>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>18</oml:id>
+<oml:ttid>6</oml:ttid>
+<oml:name>Holdout unlabeled</oml:name>
+<oml:type>holdoutunlabeled</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>1</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>19</oml:id>
+<oml:ttid>7</oml:ttid>
+<oml:name>10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>20</oml:id>
+<oml:ttid>7</oml:ttid>
+<oml:name>5 times 2-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>5</oml:repeats>
+<oml:folds>2</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>21</oml:id>
+<oml:ttid>7</oml:ttid>
+<oml:name>10 times 10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>10</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>22</oml:id>
+<oml:ttid>7</oml:ttid>
+<oml:name>Leave one out</oml:name>
+<oml:type>leaveoneout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>23</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>100 times 10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>100</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>24</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>Custom 10-fold Crossvalidation</oml:name>
+<oml:type>customholdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>false</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>25</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>4-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>4</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>26</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>Test on Training Data</oml:name>
+<oml:type>testontrainingdata</oml:type>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>27</oml:id>
+<oml:ttid>2</oml:ttid>
+<oml:name>Test on Training Data</oml:name>
+<oml:type>testontrainingdata</oml:type>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>28</oml:id>
+<oml:ttid>1</oml:ttid>
+<oml:name>20% Holdout (Ordered)</oml:name>
+<oml:type>holdout_ordered</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>1</oml:folds>
+<oml:percentage>20</oml:percentage>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>29</oml:id>
+<oml:ttid>9</oml:ttid>
+<oml:name>10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>30</oml:id>
+<oml:ttid>10</oml:ttid>
+<oml:name>10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>31</oml:id>
+<oml:ttid>10</oml:ttid>
+<oml:name>5 times 2-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>5</oml:repeats>
+<oml:folds>2</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>32</oml:id>
+<oml:ttid>10</oml:ttid>
+<oml:name>10 times 10-fold Crossvalidation</oml:name>
+<oml:type>crossvalidation</oml:type>
+<oml:repeats>10</oml:repeats>
+<oml:folds>10</oml:folds>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>33</oml:id>
+<oml:ttid>10</oml:ttid>
+<oml:name>10% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>34</oml:id>
+<oml:ttid>10</oml:ttid>
+<oml:name>33% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+<oml:estimationprocedure>
+<oml:id>35</oml:id>
+<oml:ttid>11</oml:ttid>
+<oml:name>33% Holdout set</oml:name>
+<oml:type>holdout</oml:type>
+<oml:repeats>1</oml:repeats>
+<oml:percentage>33</oml:percentage>
+<oml:stratified_sampling>true</oml:stratified_sampling>
+</oml:estimationprocedure>
+</oml:estimationprocedures>

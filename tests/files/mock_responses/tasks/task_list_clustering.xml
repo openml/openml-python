@@ -1,0 +1,40 @@
+<oml:tasks xmlns:oml="http://openml.org/openml">
+<oml:task>
+<oml:task_id>1372</oml:task_id>
+<oml:task_type_id>5</oml:task_type_id>
+<oml:task_type>Clustering</oml:task_type>
+<oml:did>113</oml:did>
+<oml:name>fruitfly</oml:name>
+<oml:status>active</oml:status>
+<oml:format>ARFF</oml:format>
+<oml:input name="estimation_procedure">17</oml:input>
+<oml:input name="source_data">113</oml:input>
+<oml:quality name="NumberOfClasses">0.0</oml:quality>
+<oml:quality name="NumberOfFeatures">5.0</oml:quality>
+<oml:quality name="NumberOfInstances">125.0</oml:quality>
+<oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+<oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+<oml:quality name="NumberOfNumericFeatures">3.0</oml:quality>
+<oml:quality name="NumberOfSymbolicFeatures">2.0</oml:quality>
+</oml:task>
+<oml:task>
+<oml:task_id>1618</oml:task_id>
+<oml:task_type_id>5</oml:task_type_id>
+<oml:task_type>Clustering</oml:task_type>
+<oml:did>389</oml:did>
+<oml:name>kr-vs-kp</oml:name>
+<oml:status>active</oml:status>
+<oml:format>ARFF</oml:format>
+<oml:input name="estimation_procedure">17</oml:input>
+<oml:input name="source_data">389</oml:input>
+<oml:quality name="MajorityClassSize">1669.0</oml:quality>
+<oml:quality name="MinorityClassSize">1527.0</oml:quality>
+<oml:quality name="NumberOfClasses">2.0</oml:quality>
+<oml:quality name="NumberOfFeatures">37.0</oml:quality>
+<oml:quality name="NumberOfInstances">3196.0</oml:quality>
+<oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+<oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+<oml:quality name="NumberOfNumericFeatures">0.0</oml:quality>
+<oml:quality name="NumberOfSymbolicFeatures">37.0</oml:quality>
+</oml:task>
+</oml:tasks>
