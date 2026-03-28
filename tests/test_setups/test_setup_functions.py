@@ -7,6 +7,7 @@ import unittest.mock
 import os
 import pandas as pd
 import pytest
+import requests
 import sklearn.base
 import sklearn.naive_bayes
 import sklearn.tree
@@ -147,12 +148,23 @@ class TestSetupFunctions(TestBase):
         for setup_id in setups:
             assert setups[setup_id].flow_id == flow_id
 
-    @pytest.mark.test_server()
     def test_list_setups_empty(self):
-        setups = openml.setups.list_setups(setup=[0])
+        def _mock_get(_url, **_kwargs):
+            response = requests.Response()
+            response.status_code = 412
+            response.headers["Content-Encoding"] = "gzip"
+            response._content = (
+                '<oml:error xmlns:oml="http://openml.org/openml">'
+                "<oml:code>674</oml:code>"
+                "<oml:message>No results</oml:message>"
+                "</oml:error>"
+            ).encode()
+            return response
+
+        with unittest.mock.patch.object(requests.Session, "get", side_effect=_mock_get):
+            setups = openml.setups.list_setups(setup=[0])
         if len(setups) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
-
         assert isinstance(setups, dict)
 
     @pytest.mark.production_server()
@@ -168,19 +180,34 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
-    @pytest.mark.test_server()
     def test_setuplist_offset(self):
         size = 10
-        setups = openml.setups.list_setups(offset=0, size=size)
-        assert len(setups) == size
-        setups2 = openml.setups.list_setups(offset=size, size=size)
-        assert len(setups2) == size
+
+        def _mock_get(url, **_kwargs):
+            start_id = 11 if "offset/10" in url else 1
+            items = "".join(
+                f"<oml:setup><oml:setup_id>{i}</oml:setup_id>"
+                f"<oml:flow_id>1</oml:flow_id></oml:setup>"
+                for i in range(start_id, start_id + size)
+            )
+            response = requests.Response()
+            response.status_code = 200
+            response.headers["Content-Encoding"] = "gzip"
+            response._content = (
+                f'<oml:setups xmlns:oml="http://openml.org/openml">{items}</oml:setups>'
+            ).encode()
+            return response
+
+        with unittest.mock.patch.object(requests.Session, "get", side_effect=_mock_get):
+            setups = openml.setups.list_setups(offset=0, size=size)
+            assert len(setups) == size
+            setups2 = openml.setups.list_setups(offset=size, size=size)
+            assert len(setups2) == size
 
         all = set(setups.keys()).union(setups2.keys())
 
         assert len(all) == size * 2
 
-    @pytest.mark.test_server()
     def test_get_cached_setup(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
 
