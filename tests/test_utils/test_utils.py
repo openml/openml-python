@@ -48,7 +48,6 @@ def min_number_evaluations_on_test_server() -> int:
     return 8
 
 
-
 def _create_mock_listing_call(total_items, item_factory, return_type="dataframe"):
     def mock_listing_call(limit, offset, **kwargs):
         if offset >= total_items:
