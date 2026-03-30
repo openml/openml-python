@@ -51,6 +51,7 @@ def test_v1_list_basic(study_v1, test_server_v1, test_apikey_v1):
 
         studies_df = study_v1.list(limit=5, offset=0)
 
+        mock_request.assert_called_once()
         assert studies_df is not None
         assert isinstance(studies_df, pd.DataFrame)
         assert len(studies_df) == 2
@@ -152,9 +153,10 @@ def test_v1_list_pagination(study_v1, test_server_v1, test_apikey_v1):
         assert len(page1) == 3
         assert len(page2) == 2
         
-        page1_ids = set(page1["id"])
-        page2_ids = set(page2["id"])
-        assert page1_ids.isdisjoint(page2_ids)
+        assert mock_request.call_count == 2
+        call_args_list = mock_request.call_args_list
+        assert "/limit/3/offset/0" in call_args_list[0].kwargs.get("url", "")
+        assert "/limit/3/offset/3" in call_args_list[1].kwargs.get("url", "")
 
 
 def test_v1_publish(study_v1, test_server_v1, test_apikey_v1):
