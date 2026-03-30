@@ -56,7 +56,6 @@ def _create_mock_listing_call(total_items, item_factory, return_type="dataframe"
         items = [item_factory(i) for i in range(offset, offset + size)]
         return pd.DataFrame(items) if return_type == "dataframe" else items
     return mock_listing_call
-
 def _mocked_perform_api_call(call, request_method):
     if call == "data/list/limit/1000/offset/0/data_name/iris/data_version/1":
         return """<oml:data xmlns:oml="http://openml.org/openml">
