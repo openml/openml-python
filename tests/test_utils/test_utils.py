@@ -151,9 +151,19 @@ def test_list_all_for_evaluations(mock_list_evaluations, min_number_evaluations_
     mock_list_evaluations.side_effect = _create_mock_listing_call(
         min_number_evaluations_on_test_server,
         lambda i: OpenMLEvaluation(
-            run_id=i, task_id=1, setup_id=1, flow_id=1, flow_name="flow", data_id=1, data_name="data",
-            function="predictive_accuracy", upload_time="2020-01-01", uploader=1, uploader_name="user",
-            value=0.5, values=None
+            run_id=i,
+            task_id=1,
+            setup_id=1,
+            flow_id=1,
+            flow_name="flow",
+            data_id=1,
+            data_name="data",
+            function="predictive_accuracy",
+            upload_time="2020-01-01",
+            uploader=1,
+            uploader_name="user",
+            value=0.5,
+            values=None,
         ),
         return_type="list"
     )
