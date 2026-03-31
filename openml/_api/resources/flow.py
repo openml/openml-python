@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import Any
+from urllib.parse import quote
 
 import pandas as pd
 import xmltodict
 
-from openml.exceptions import OpenMLServerError, OpenMLServerException
+from openml.exceptions import OpenMLServerException, OpenMLServerNoResult
 from openml.flows.flow import OpenMLFlow
 
 from .base import FlowAPI, ResourceV1API, ResourceV2API
@@ -61,8 +61,11 @@ class FlowV1API(ResourceV1API, FlowAPI):
         if not (isinstance(external_version, str) and len(external_version) > 0):
             raise ValueError("Argument 'version' should be a non-empty string")
 
-        data = {"name": name, "external_version": external_version, "api_key": self._http.api_key}
-        xml_response = self._http.post("flow/exists", data=data).text
+        data: dict[str, str] = {"name": name, "external_version": external_version}
+        if self._http.api_key:
+            data["api_key"] = self._http.api_key
+
+        xml_response = self._http.post("flow/exists", data=data, use_api_key=False).text
         result_dict = xmltodict.parse(xml_response)
         # Detect error payloads and raise
         if "oml:error" in result_dict:
@@ -196,14 +199,20 @@ class FlowV2API(ResourceV2API, FlowAPI):
         if not (isinstance(external_version, str) and len(external_version) > 0):
             raise ValueError("Argument 'version' should be a non-empty string")
 
+        name_path = quote(name, safe="")
+        version_path = quote(external_version, safe="")
+
         try:
-            response = self._http.get(f"flows/exists/{name}/{external_version}/")
+            response = self._http.get(f"flows/exists/{name_path}/{version_path}/")
             result = response.json()
             flow_id: int | bool = result.get("flow_id", False)
             return flow_id
-        except (OpenMLServerError, KeyError):
-            # v2 returns 404 when flow doesn't exist, which raises OpenMLServerError
+        except OpenMLServerNoResult:
             return False
+        except OpenMLServerException as err:
+            if err.code == 404:
+                return False
+            raise
 
     def list(
         self,
@@ -213,9 +222,6 @@ class FlowV2API(ResourceV2API, FlowAPI):
         uploader: str | None = None,  # noqa: ARG002
     ) -> pd.DataFrame:
         self._not_supported(method="list")
-
-    def publish(self, path: str | None = None, files: Mapping[str, Any] | None = None) -> int:  # type: ignore[override]  # noqa: ARG002
-        self._not_supported(method="publish")
 
     @staticmethod
     def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:

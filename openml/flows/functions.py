@@ -2,19 +2,16 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any, cast
+from typing import Any
 
 import dateutil.parser
 import pandas as pd
 import xmltodict
 
 import openml
-import openml._api_calls
 import openml.utils
 
 from . import OpenMLFlow
-
-FLOWS_CACHE_DIR_NAME = "flows"
 
 
 @openml.utils.thread_safe_if_oslo_installed
@@ -182,9 +179,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     if not (isinstance(external_version, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
-    return cast(
-        "int | bool", openml._backend.flow.exists(name=name, external_version=external_version)
-    )
+    return openml._backend.flow.exists(name=name, external_version=external_version)
 
 
 def get_flow_id(
@@ -511,4 +506,4 @@ def delete_flow(flow_id: int) -> bool:
     >>> # Deletes flow 23 if you are the uploader and it's not linked to runs
     >>> openml.flows.delete_flow(23)  # doctest: +SKIP
     """
-    return openml._backend.flow.delete(flow_id)  # type: ignore
+    return openml._backend.flow.delete(flow_id)

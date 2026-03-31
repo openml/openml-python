@@ -329,7 +329,7 @@ class TestFlow(TestBase):
             "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
         ).encode()
         mock_request.return_value = response
-        flow_exists_mock.return_value = None  # Flow doesn't exist yet, so try to publish
+        flow_exists_mock.return_value = False  # Flow doesn't exist yet, so try to publish
         get_flow_mock.return_value = flow
 
         flow.publish()

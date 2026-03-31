@@ -74,7 +74,7 @@ def test_flow_v1_exists_input_validation(flow_v1):
         flow_v1.exists(name="sklearn.tree.DecisionTreeClassifier", external_version="")
 
 
-def test_flow_v1_exists_mocked_success(flow_v1, test_apikey_v1):
+def test_flow_v1_exists_mocked_success(flow_v1):
     flow_name = "sklearn.tree.DecisionTreeClassifier"
     external_version = "1"
 
@@ -90,18 +90,15 @@ def test_flow_v1_exists_mocked_success(flow_v1, test_apikey_v1):
         result = flow_v1.exists(name=flow_name, external_version=external_version)
 
         assert result == 123
-        mock_request.assert_called_once_with(
-            method="POST",
-            url=openml.config.server + "flow/exists",
-            params={},
-            data={
-                "name": flow_name,
-                "external_version": external_version,
-                "api_key": test_apikey_v1,
-            },
-            headers=openml.config._HEADERS,
-            files=None,
-        )
+        mock_request.assert_called_once()
+        _, kwargs = mock_request.call_args
+        assert kwargs["method"] == "POST"
+        assert kwargs["url"] == openml.config.server + "flow/exists"
+        assert kwargs["params"] == {}
+        assert kwargs["headers"] == openml.config._HEADERS
+        assert kwargs["files"] is None
+        assert kwargs["data"]["name"] == flow_name
+        assert kwargs["data"]["external_version"] == external_version
 
 
 def test_flow_v1_exists_mocked_server_error(flow_v1):
