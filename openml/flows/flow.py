@@ -11,6 +11,7 @@ import xmltodict
 
 import openml
 from openml.base import OpenMLBase
+from openml.exceptions import ObjectNotPublishedError
 from openml.extensions import Extension, get_extension_by_flow
 from openml.utils import extract_xml_tags
 
@@ -483,7 +484,11 @@ class OpenMLFlow(OpenMLBase):
             Tag to attach to the flow.
         """
         if self.flow_id is None:
-            raise ValueError("Flow does not have an ID. Please publish the flow before tagging.")
+            raise ObjectNotPublishedError(
+                "Cannot tag a flow that has not been published yet."
+                "Please publish the object first before being able to tag it."
+                f"\n{self}",
+            )
         openml._backend.flow.tag(self.flow_id, tag)
 
     def remove_tag(self, tag: str) -> None:
@@ -495,7 +500,11 @@ class OpenMLFlow(OpenMLBase):
             Tag to remove from the flow.
         """
         if self.flow_id is None:
-            raise ValueError("Flow does not have an ID. Please publish the flow before untagging.")
+            raise ObjectNotPublishedError(
+                "Cannot untag a flow that has not been published yet."
+                "Please publish the object first before being able to untag it."
+                f"\n{self}",
+            )
         openml._backend.flow.untag(self.flow_id, tag)
 
     def get_structure(self, key_item: str) -> dict[str, list[str]]:

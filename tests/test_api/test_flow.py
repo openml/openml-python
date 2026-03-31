@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Iterator
 from unittest.mock import patch
 
 import pytest
@@ -24,7 +25,7 @@ def flow_v2(http_client_v2, minio_client) -> FlowV2API:
 
 
 @pytest.fixture
-def with_v2_server_config(test_server_v1, test_server_v2) -> None:
+def with_v2_server_config(test_server_v1, test_server_v2) -> Iterator[None]:
     old_server = openml.config.servers[APIVersion.V2]["server"]
     derived_v2_server = test_server_v1.replace("/api/v1/xml/", "/api/v2/")
     openml.config.servers[APIVersion.V2]["server"] = test_server_v2 or derived_v2_server
@@ -130,7 +131,7 @@ def test_flow_v1_publish_mocked(flow_v1, test_apikey_v1):
             "</oml:upload_flow>\n"
         ).encode("utf-8")
 
-        result = flow_v1.publish(files=files)
+        result = flow_v1.publish(path="flow", files=files)
 
         assert result == 321
         mock_request.assert_called_once_with(

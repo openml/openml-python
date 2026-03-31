@@ -22,7 +22,6 @@ def get_flow(
     flow_id: int,
     reinstantiate: bool = False,  # noqa: FBT002
     strict_version: bool = True,  # noqa: FBT002
-    ignore_cache: bool = False,  # noqa: FBT002
 ) -> OpenMLFlow:
     """Fetch an OpenMLFlow by its server-assigned ID.
 
@@ -43,10 +42,6 @@ def get_flow(
         When ``reinstantiate`` is True, whether to enforce exact version
         requirements for the extension/model. If False, a new flow may
         be returned when versions differ.
-
-    ignore_cache : bool, default=False
-        Whether to ignore the cache. If ``true`` this will download and overwrite the flow xml
-        even if the requested flow is already cached.
 
     Returns
     -------
@@ -83,7 +78,7 @@ def get_flow(
     >>> flow = openml.flows.get_flow(5)  # doctest: +SKIP
     """
     flow_id = int(flow_id)
-    flow = openml._backend.flow.get(flow_id, reset_cache=ignore_cache)
+    flow = openml._backend.flow.get(flow_id)
 
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(flow, strict_version=strict_version)
@@ -91,8 +86,8 @@ def get_flow(
             # check if we need to return a new flow b/c of version mismatch
             new_flow = flow.extension.model_to_flow(flow.model)
             if new_flow.dependencies != flow.dependencies:
-                return cast("OpenMLFlow", new_flow)
-    return cast("OpenMLFlow", flow)
+                return new_flow
+    return flow
 
 
 def list_flows(

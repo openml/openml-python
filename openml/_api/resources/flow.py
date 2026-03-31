@@ -143,22 +143,6 @@ class FlowV1API(ResourceV1API, FlowAPI):
 
         return pd.DataFrame.from_dict(flows, orient="index")
 
-    def publish(self, path: str | None = None, files: Mapping[str, Any] | None = None) -> int:
-        """Publish a flow on the OpenML server.
-
-        Parameters
-        ----------
-        files : Mapping[str, Any] | None
-            Files to upload (including description).
-
-        Returns
-        -------
-        int
-            The server-assigned flow id.
-        """
-        path = "flow"
-        return super().publish(path, files)
-
 
 class FlowV2API(ResourceV2API, FlowAPI):
     def get(
