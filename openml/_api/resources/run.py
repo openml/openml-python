@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import builtins
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import xmltodict
@@ -195,23 +194,6 @@ class RunV1API(ResourceV1API, RunAPI):
         }
         return pd.DataFrame.from_dict(runs, orient="index")
 
-    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:
-        """Publish a run on the OpenML server.
-
-        Parameters
-        ----------
-        path : str
-            The endpoint path to publish to (e.g., "run").
-        files : Mapping[str, Any], optional
-            The files to publish.
-
-        Returns
-        -------
-        int
-            The ID of the published run.
-        """
-        return super().publish(path=path, files=files)
-
 
 class RunV2API(ResourceV2API, RunAPI):
     """V2 API resource for runs. Currently read-only until V2 server supports POST."""
@@ -266,26 +248,3 @@ class RunV2API(ResourceV2API, RunAPI):
             V2 server API not yet available for this operation.
         """
         self._not_supported(method="list")
-
-    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:  # noqa: ARG002
-        """Publish a run on the V2 server.
-
-        Parameters
-        ----------
-        path : str
-            The endpoint path to publish to.
-        files : Mapping[str, Any], optional
-            The files to publish.
-
-        Returns
-        -------
-        int
-            The ID of the published run.
-
-        Raises
-        ------
-        OpenMLNotSupportedError
-            V2 server does not yet support POST /runs/ endpoint.
-            Expected availability: Q2 2025
-        """
-        self._not_supported(method="publish")
