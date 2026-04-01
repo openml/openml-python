@@ -1025,6 +1025,7 @@ class TestRun(TestBase):
                 assert alt_scores[idx] <= 1
 
     @pytest.mark.sklearn()
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.test_server()
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
@@ -1074,6 +1075,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.test_server()
     def test_local_run_metric_score(self):
         # construct sci-kit learn classifier

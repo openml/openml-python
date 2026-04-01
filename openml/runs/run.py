@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import csv
 import pickle
 import time
 from collections import OrderedDict
@@ -10,7 +9,6 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    cast,
 )
 
 import arff
@@ -163,7 +161,7 @@ class OpenMLRun(OpenMLBase):
                 arff_text = openml._api_calls._download_text_file(self.predictions_url)
                 if arff_text is None:
                     raise RuntimeError("Could not download predictions ARFF content.")
-                arff_dict = self._load_predictions_arff(arff_text)
+                arff_dict = arff.loads(arff_text)
             else:
                 raise RuntimeError("Run has no predictions.")
             self._predictions = pd.DataFrame(
@@ -171,68 +169,6 @@ class OpenMLRun(OpenMLBase):
                 columns=[name for name, _ in arff_dict["attributes"]],
             )
         return self._predictions
-
-    @staticmethod
-    def _load_predictions_arff(arff_text: str) -> dict[str, Any]:
-        try:
-            return cast("dict[str, Any]", arff.loads(arff_text))
-        except arff.ArffException:
-            normalized = arff_text.lstrip("\ufeff \t\r\n")
-            relation_indexes = [
-                idx
-                for idx in [normalized.find("@relation"), normalized.find("@RELATION")]
-                if idx >= 0
-            ]
-            if relation_indexes:
-                arff_candidate = normalized[min(relation_indexes) :]
-                try:
-                    return cast("dict[str, Any]", arff.loads(arff_candidate))
-                except arff.ArffException:
-                    sanitized = OpenMLRun._sanitize_arff_text(arff_candidate)
-                    return cast("dict[str, Any]", arff.loads(sanitized))
-            raise
-
-    @staticmethod
-    def _sanitize_arff_text(arff_text: str) -> str:
-        lines = arff_text.splitlines()
-
-        in_data = False
-        attribute_count = 0
-        cleaned_lines: list[str] = []
-
-        for line in lines:
-            stripped = line.strip()
-            lowered = stripped.lower()
-
-            if not in_data:
-                if lowered.startswith("@attribute"):
-                    attribute_count += 1
-                if lowered.startswith("@data"):
-                    in_data = True
-                cleaned_lines.append(line)
-                continue
-
-            if stripped == "" or stripped.startswith("%"):
-                cleaned_lines.append(line)
-                continue
-
-            if stripped.startswith("{"):
-                cleaned_lines.append(line)
-                continue
-
-            parsed_fields = next(
-                csv.reader(
-                    [line],
-                    delimiter=",",
-                    quotechar="'",
-                    skipinitialspace=True,
-                )
-            )
-
-            if len(parsed_fields) == attribute_count:
-                cleaned_lines.append(line)
-
-        return "\n".join(cleaned_lines) + "\n"
 
     @property
     def id(self) -> int | None:
@@ -603,7 +539,7 @@ class OpenMLRun(OpenMLBase):
             response = openml._api_calls._download_text_file(predictions_file_url)
             if response is None:
                 raise ValueError("Could not download predictions ARFF content.")
-            predictions_arff = self._load_predictions_arff(response)
+            predictions_arff = arff.loads(response)
             # TODO: make this a stream reader
         else:
             raise ValueError(

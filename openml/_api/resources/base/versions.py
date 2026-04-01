@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, cast
+from typing import Any
 from xml.parsers.expat import ExpatError
 
 import xmltodict
@@ -189,7 +189,8 @@ class ResourceV1API(ResourceAPI):
 
     def _parse_xml_response(self, payload: bytes | str, **kwargs: Any) -> Mapping[str, Any]:
         try:
-            return cast("Mapping[str, Any]", xmltodict.parse(payload, **kwargs))
+            parsed_response: Mapping[str, Any] = xmltodict.parse(payload, **kwargs)
+            return parsed_response
         except ExpatError:
             payload_text = (
                 payload.decode("utf-8", errors="ignore") if isinstance(payload, bytes) else payload
@@ -201,12 +202,16 @@ class ResourceV1API(ResourceAPI):
                 raise
 
             xml_text = payload_text[xml_start:]
-            return cast("Mapping[str, Any]", xmltodict.parse(xml_text, **kwargs))
+            parsed_fallback: Mapping[str, Any] = xmltodict.parse(xml_text, **kwargs)
+            return parsed_fallback
 
     def _get_endpoint_name(self) -> str:
         if self.resource_type == ResourceType.DATASET:
             return "data"
-        return cast("str", self.resource_type.value)
+        endpoint_name = self.resource_type.value
+        if not isinstance(endpoint_name, str):
+            raise TypeError(f"Unexpected endpoint type: {type(endpoint_name)}")
+        return endpoint_name
 
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
         """
@@ -280,4 +285,7 @@ class ResourceV2API(ResourceAPI):
         self._not_supported(method="untag")
 
     def _get_endpoint_name(self) -> str:
-        return cast("str", self.resource_type.value)
+        endpoint_name = self.resource_type.value
+        if not isinstance(endpoint_name, str):
+            raise TypeError(f"Unexpected endpoint type: {type(endpoint_name)}")
+        return endpoint_name

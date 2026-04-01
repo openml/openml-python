@@ -6,7 +6,7 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
@@ -816,21 +816,14 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
         even if the requested run is already cached.
 
-    ignore_cache : bool
-        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
-        even if the requested run is already cached.
-
     Returns
     -------
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    return cast(
-        "OpenMLRun",
-        openml._backend.run.get(
-            run_id,
-            reset_cache=ignore_cache,
-        ),
+    return openml._backend.run.get(
+        run_id,
+        reset_cache=ignore_cache,
     )
 
 
@@ -906,15 +899,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     run_details = obtain_field(run, "oml:run_details", from_server=False)
 
     if "oml:input_data" in run:
-        input_data = run["oml:input_data"]
-        if isinstance(input_data, list):
-            input_data = input_data[0]
-
-        dataset_data = input_data["oml:dataset"]
-        if isinstance(dataset_data, list):
-            dataset_data = dataset_data[0]
-
-        dataset_id = int(dataset_data["oml:did"])
+        dataset_id = int(run["oml:input_data"]["oml:dataset"]["oml:did"])
     elif not from_server:
         dataset_id = None
     else:
@@ -1311,4 +1296,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return cast("bool", openml._backend.run.delete(run_id))
+    return openml._backend.run.delete(run_id)

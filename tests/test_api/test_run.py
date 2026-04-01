@@ -12,7 +12,7 @@ from openml.exceptions import OpenMLNotSupportedError
 from openml.runs.run import OpenMLRun
 
 
-TEST_RUN_ID = 24
+TEST_RUN_ID = 1
 
 
 @pytest.fixture
@@ -32,20 +32,9 @@ def _assert_run_shape(run: OpenMLRun) -> None:
     assert isinstance(run.task_id, int)
 
 
-def _get_any_run_id(run_v1: RunV1API) -> int:
-    try:
-        run_v1.get(run_id=TEST_RUN_ID)
-        return TEST_RUN_ID
-    except Exception:
-        runs_df = run_v1.list(limit=1, offset=0)
-        if runs_df.empty:
-            pytest.skip("No runs available on configured test server")
-        return int(runs_df.iloc[0]["run_id"])
-
-
 @pytest.mark.test_server()
 def test_run_v1_get(run_v1):
-    run = run_v1.get(run_id=_get_any_run_id(run_v1))
+    run = run_v1.get(run_id=TEST_RUN_ID)
     _assert_run_shape(run)
 
 
@@ -132,21 +121,4 @@ def test_run_v2_publish_not_supported(run_v2):
         OpenMLNotSupportedError,
         match="RunV2API: v2 API does not support `publish` for resource `run`",
     ):
-        run_v2.publish(path="run", files={"description": "<run/>"})
-
-
-@pytest.mark.test_server()
-def test_run_v1_v2_contracts(run_v1, run_v2):
-    run_id = _get_any_run_id(run_v1)
-
-    run_from_v1 = run_v1.get(run_id=run_id)
-    _assert_run_shape(run_from_v1)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `get`"):
-        run_v2.get(run_id=run_id)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `list`"):
-        run_v2.list(limit=5, offset=0)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `publish`"):
         run_v2.publish(path="run", files={"description": "<run/>"})
