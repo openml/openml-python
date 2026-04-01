@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import builtins
 from abc import abstractmethod
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from openml.enums import ResourceType
@@ -13,6 +15,10 @@ if TYPE_CHECKING:
     from openml.evaluations import OpenMLEvaluation
     from openml.runs.run import OpenMLRun
     from openml.tasks.task import TaskType
+    from openml.estimation_procedures import OpenMLEstimationProcedure
+    from openml.evaluations import OpenMLEvaluation
+    from openml.flows.flow import OpenMLFlow
+    from openml.setups.setup import OpenMLSetup
 
 
 class DatasetAPI(ResourceAPI):
@@ -32,11 +38,17 @@ class EvaluationMeasureAPI(ResourceAPI):
 
     resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
 
+    @abstractmethod
+    def list(self) -> list[str]: ...
+
 
 class EstimationProcedureAPI(ResourceAPI):
     """Abstract API interface for estimation procedure resources."""
 
     resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
+    @abstractmethod
+    def list(self) -> list[OpenMLEstimationProcedure]: ...
 
 
 class EvaluationAPI(ResourceAPI):
@@ -108,3 +120,24 @@ class SetupAPI(ResourceAPI):
     """Abstract API interface for setup resources."""
 
     resource_type: ResourceType = ResourceType.SETUP
+
+    @abstractmethod
+    def list(
+        self,
+        limit: int,
+        offset: int,
+        *,
+        setup: Iterable[int] | None = None,
+        flow: int | None = None,
+        tag: str | None = None,
+    ) -> list[OpenMLSetup]: ...
+
+    @abstractmethod
+    def get(self, setup_id: int) -> OpenMLSetup: ...
+
+    @abstractmethod
+    def exists(
+        self,
+        flow: OpenMLFlow,
+        param_settings: builtins.list[dict[str, Any]],
+    ) -> int | bool: ...
