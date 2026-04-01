@@ -89,6 +89,26 @@ class HTTPCache:
         """
         return self.path.joinpath(key)
 
+    def _get_body_filename_from_response(self, response: Response) -> str:
+        content_type = response.headers.get("Content-Type", "").lower()
+
+        if "application/json" in content_type:
+            return "body.json"
+
+        if "text/xml" in content_type:
+            return "body.xml"
+
+        return "body.txt"
+
+    def _get_body_filename_from_path(self, path: Path) -> str:
+        if (path / "body.json").exists():
+            return "body.json"
+
+        if (path / "body.xml").exists():
+            return "body.xml"
+
+        return "body.txt"
+
     def load(self, key: str) -> Response:
         """
         Load a cached HTTP response from disk.
@@ -112,31 +132,26 @@ class HTTPCache:
         """
         path = self._key_to_path(key)
 
-        if not path.exists():
-            raise FileNotFoundError(f"Cache entry not found: {path}")
-
         meta_path = path / "meta.json"
+        meta_raw = meta_path.read_bytes() if meta_path.exists() else "{}"
+        meta = json.loads(meta_raw)
+
         headers_path = path / "headers.json"
-        body_path = path / "body.bin"
+        headers_raw = headers_path.read_bytes() if headers_path.exists() else "{}"
+        headers = json.loads(headers_raw)
 
-        if not (meta_path.exists() and headers_path.exists() and body_path.exists()):
-            raise FileNotFoundError(f"Incomplete cache at {path}")
-
-        with meta_path.open("r", encoding="utf-8") as f:
-            meta = json.load(f)
-
-        with headers_path.open("r", encoding="utf-8") as f:
-            headers = json.load(f)
-
+        body_path = path / self._get_body_filename_from_path(path)
+        if not body_path.exists():
+            raise FileNotFoundError(f"Incomplete cache at {body_path}")
         body = body_path.read_bytes()
 
         response = Response()
-        response.status_code = meta["status_code"]
-        response.url = meta["url"]
-        response.reason = meta["reason"]
         response.headers = headers
         response._content = body
-        response.encoding = meta["encoding"]
+        response.status_code = meta.get("status_code")
+        response.url = meta.get("url")
+        response.reason = meta.get("reason")
+        response.encoding = meta.get("encoding")
 
         return response
 
@@ -160,7 +175,9 @@ class HTTPCache:
         path = self._key_to_path(key)
         path.mkdir(parents=True, exist_ok=True)
 
-        (path / "body.bin").write_bytes(response.content)
+        body_filename = self._get_body_filename_from_response(response)
+        with (path / body_filename).open("wb") as f:
+            f.write(response.content)
 
         with (path / "headers.json").open("w", encoding="utf-8") as f:
             json.dump(dict(response.headers), f)
