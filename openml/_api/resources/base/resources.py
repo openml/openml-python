@@ -12,13 +12,12 @@ from .base import ResourceAPI
 if TYPE_CHECKING:
     import pandas as pd
 
-    from openml.evaluations import OpenMLEvaluation
-    from openml.runs.run import OpenMLRun
-    from openml.tasks.task import TaskType
     from openml.estimation_procedures import OpenMLEstimationProcedure
     from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
+    from openml.runs.run import OpenMLRun
     from openml.setups.setup import OpenMLSetup
+    from openml.tasks.task import TaskType
 
 
 class DatasetAPI(ResourceAPI):
