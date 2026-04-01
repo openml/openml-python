@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from typing import Any
-from xml.parsers.expat import ExpatError
 
 import xmltodict
 
@@ -72,7 +71,7 @@ class ResourceV1API(ResourceAPI):
             If the server returns an error during upload.
         """
         response = self._http.post(path, files=files)
-        parsed_response = self._parse_xml_response(response.content)
+        parsed_response = xmltodict.parse(response.content)
         return self._extract_id_from_upload(parsed_response)
 
     def delete(self, resource_id: int) -> bool:
@@ -107,7 +106,7 @@ class ResourceV1API(ResourceAPI):
         path = f"{endpoint_name}/{resource_id}"
         try:
             response = self._http.delete(path)
-            result = self._parse_xml_response(response.content)
+            result = xmltodict.parse(response.content)
             return f"oml:{endpoint_name}_delete" in result
         except OpenMLServerException as e:
             self._handle_delete_exception(endpoint_name, e)
@@ -144,7 +143,7 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        parsed_response = self._parse_xml_response(response.content, force_list={"oml:tag"})
+        parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
         result = parsed_response[f"oml:{endpoint_name}_tag"]
         tags: list[str] = result.get("oml:tag", [])
 
@@ -181,29 +180,11 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        parsed_response = self._parse_xml_response(response.content, force_list={"oml:tag"})
+        parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
         result = parsed_response[f"oml:{endpoint_name}_untag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
-
-    def _parse_xml_response(self, payload: bytes | str, **kwargs: Any) -> Mapping[str, Any]:
-        try:
-            parsed_response: Mapping[str, Any] = xmltodict.parse(payload, **kwargs)
-            return parsed_response
-        except ExpatError:
-            payload_text = (
-                payload.decode("utf-8", errors="ignore") if isinstance(payload, bytes) else payload
-            )
-            xml_start = payload_text.find("<?xml")
-            if xml_start == -1:
-                xml_start = payload_text.find("<oml:")
-            if xml_start == -1:
-                raise
-
-            xml_text = payload_text[xml_start:]
-            parsed_fallback: Mapping[str, Any] = xmltodict.parse(xml_text, **kwargs)
-            return parsed_fallback
 
     def _get_endpoint_name(self) -> str:
         if self.resource_type == ResourceType.DATASET:
