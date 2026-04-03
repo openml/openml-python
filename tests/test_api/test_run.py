@@ -119,18 +119,3 @@ def test_run_v2_publish_not_supported(run_v2):
         match="RunV2API: v2 API does not support `publish` for resource `run`",
     ):
         run_v2.publish(path="run", files={"description": "<run/>"})
-
-
-@pytest.mark.test_server()
-def test_run_v1_v2_contracts(run_v1, run_v2):
-    run_from_v1 = run_v1.get(run_id=1)
-    _assert_run_shape(run_from_v1)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `get`"):
-        run_v2.get(run_id=1)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `list`"):
-        run_v2.list(limit=5, offset=0)
-
-    with pytest.raises(OpenMLNotSupportedError, match="does not support `publish`"):
-        run_v2.publish(path="run", files={"description": "<run/>"})
