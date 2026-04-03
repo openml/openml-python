@@ -1660,14 +1660,19 @@ class TestRun(TestBase):
             assert len(row) == 12
 
     @pytest.mark.test_server()
-    def test_get_cached_run(self):
+    @mock.patch.object(requests.Session, "request")
+    def test_get_cached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.runs.functions._get_cached_run(1)
+        mock_request.side_effect = Exception("Mocked Exception")
+        openml.runs.get_run(1)
 
-    def test_get_uncached_run(self):
+    @pytest.mark.test_server()
+    @mock.patch.object(requests.Session, "request")
+    def test_get_uncached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.runs.functions._get_cached_run(10)
+        mock_request.side_effect = Exception("Mocked Exception")
+        with pytest.raises(Exception, match="Mocked Exception"):
+            openml.runs.get_run(10)
 
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
