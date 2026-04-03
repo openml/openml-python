@@ -114,6 +114,21 @@ class RunAPI(ResourceAPI):
         task_type: TaskType | int | None = None,
     ) -> pd.DataFrame: ...
 
+    @abstractmethod
+    def download_text_file(
+        self,
+        source: str,
+        *,
+        md5_checksum: str | None = None,
+    ) -> str: ...
+
+    @abstractmethod
+    def file_id_to_url(
+        self,
+        file_id: int,
+        filename: str | None = None,
+    ) -> str: ...
+
 
 class SetupAPI(ResourceAPI):
     """Abstract API interface for setup resources."""

@@ -16,7 +16,6 @@ import numpy as np
 import pandas as pd
 
 import openml
-import openml._api_calls
 from openml.base import OpenMLBase
 from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow, get_flow
@@ -158,9 +157,7 @@ class OpenMLRun(OpenMLBase):
             if self.data_content:
                 arff_dict = self._generate_arff_dict()
             elif self.predictions_url:
-                arff_text = openml._api_calls._download_text_file(self.predictions_url)
-                if arff_text is None:
-                    raise RuntimeError("Could not download predictions ARFF content.")
+                arff_text = openml._backend.run.download_text_file(self.predictions_url)
                 arff_dict = arff.loads(arff_text)
             else:
                 raise RuntimeError("Run has no predictions.")
@@ -532,14 +529,12 @@ class OpenMLRun(OpenMLBase):
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif (self.output_files is not None) and ("predictions" in self.output_files):
-            predictions_file_url = openml._api_calls._file_id_to_url(
+            predictions_file_url = openml._backend.run.file_id_to_url(
                 self.output_files["predictions"],
                 "predictions.arff",
             )
-            response = openml._api_calls._download_text_file(predictions_file_url)
-            if response is None:
-                raise ValueError("Could not download predictions ARFF content.")
-            predictions_arff = arff.loads(response)
+            predictions_text = openml._backend.run.download_text_file(predictions_file_url)
+            predictions_arff = arff.loads(predictions_text)
             # TODO: make this a stream reader
         else:
             raise ValueError(

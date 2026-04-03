@@ -194,6 +194,30 @@ class RunV1API(ResourceV1API, RunAPI):
         }
         return pd.DataFrame.from_dict(runs, orient="index")
 
+    def download_text_file(
+        self,
+        source: str,
+        *,
+        md5_checksum: str | None = None,
+    ) -> str:
+        response = self._http.get(
+            source,
+            use_api_key=False,
+            md5_checksum=md5_checksum,
+        )
+        return response.text
+
+    def file_id_to_url(
+        self,
+        file_id: int,
+        filename: str | None = None,
+    ) -> str:
+        server_base = self._http.server.split("/api/", 1)[0].rstrip("/")
+        url = f"{server_base}/data/download/{file_id}"
+        if filename is not None:
+            url += f"/{filename}"
+        return url
+
 
 class RunV2API(ResourceV2API, RunAPI):
     """V2 API resource for runs. Currently read-only until V2 server supports POST."""
@@ -248,3 +272,18 @@ class RunV2API(ResourceV2API, RunAPI):
             V2 server API not yet available for this operation.
         """
         self._not_supported(method="list")
+
+    def download_text_file(
+        self,
+        source: str,  # noqa: ARG002
+        *,
+        md5_checksum: str | None = None,  # noqa: ARG002
+    ) -> str:
+        self._not_supported(method="download_text_file")
+
+    def file_id_to_url(
+        self,
+        file_id: int,  # noqa: ARG002
+        filename: str | None = None,  # noqa: ARG002
+    ) -> str:
+        self._not_supported(method="file_id_to_url")
