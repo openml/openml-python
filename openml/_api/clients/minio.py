@@ -40,10 +40,6 @@ class MinIOClient:
     def path(self) -> Path:
         return Path(openml.config.get_cache_directory())
 
-    def _get_path(self, url: str) -> Path:
-        parsed_url = urllib.parse.urlparse(url)
-        return self.path / "minio" / parsed_url.path.lstrip("/")
-
     def download_minio_file(
         self,
         source: str,
@@ -66,7 +62,11 @@ class MinIOClient:
             automatically find the proxy to use. Pass None or the environment variable
             ``no_proxy="*"`` to disable proxies.
         """
-        destination = self._get_path(source) if destination is None else Path(destination)
+        destination = (
+            Path(openml.config.get_minio_download_path(source))
+            if destination is None
+            else Path(destination)
+        )
         parsed_url = urllib.parse.urlparse(source)
 
         # expect path format: /BUCKET/path/to/file.ext
@@ -119,7 +119,11 @@ class MinIOClient:
         destination : str | Path
             Path to a directory to store the bucket content in.
         """
-        destination = self._get_path(source) if destination is None else Path(destination)
+        destination = (
+            Path(openml.config.get_minio_download_path(source))
+            if destination is None
+            else Path(destination)
+        )
         parsed_url = urllib.parse.urlparse(source)
         if destination.suffix:
             destination = destination.parent
