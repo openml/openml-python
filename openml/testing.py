@@ -15,7 +15,7 @@ from typing import ClassVar
 import requests
 
 import openml
-from openml._api import HTTPClient
+from openml._api import HTTPClient, MinIOClient
 from openml.enums import APIVersion
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
@@ -56,6 +56,7 @@ class TestBase(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     http_client: HTTPClient = HTTPClient(api_version=APIVersion.V1)
+    minio_client = MinIOClient()
 
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.

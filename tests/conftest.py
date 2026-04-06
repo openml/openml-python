@@ -246,7 +246,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "2" / "body.xml",
         _c_root_dir / "data" / "download" / "1666876" / "phpFsFYVN" / "body.arff",
 
-        _c_root_dir / "datasets" / "30" / "dataset_30.pq",
+        _c_root_dir / "minio" / "dataset30" / "dataset_30.pq"
     ])
 
     return res_paths

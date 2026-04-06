@@ -240,7 +240,7 @@ class TestOpenMLDataset(TestBase):
         dids = ["anneal", "kr-vs-kp"]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server()
     def test_get_datasets_by_mixed(self):
@@ -248,21 +248,21 @@ class TestOpenMLDataset(TestBase):
         dids = ["anneal", 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server()
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server()
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
         assert dataset.dataset_id == 1
-        _assert_datasets_retrieved_successfully([1])
+        _assert_datasets_retrieved_successfully([dataset])
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
@@ -1868,21 +1868,24 @@ def _dataset_features_is_downloaded(did: int):
     return (cache_directory / str(did) / "body.xml").exists()
 
 
-def _dataset_data_file_is_downloaded(did: int):
+def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
     #TODO to be updated after minio paths is fixed
-    cache_directory = Path(openml.config.get_cache_directory()) / "minio/datasets/0000/0001"
-    if not cache_directory.exists():
-        return False
-    return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
+    pq_directory = Path(openml.config.get_cache_directory()) / openml.config.get_minio_download_path(dataset._parquet_url)
+    arff_directory = Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
+    if pq_directory.exists():
+        return any(f.suffix == ".pq" for f in pq_directory.iterdir())
+    if arff_directory.exists():
+        return any(f.suffix == ".arff" for f in arff_directory.iterdir())
+    return False
 
 
 def _assert_datasets_retrieved_successfully(
-    dids: Iterable[int],
+    datasets: Iterable[OpenMLDataset],
     with_qualities: bool = False,
     with_features: bool = False,
     with_data: bool = False,
 ):
-    """Checks that all files for the given dids have been downloaded.
+    """Checks that all files for the given datasets have been downloaded.
 
     This includes:
         - description
@@ -1890,16 +1893,16 @@ def _assert_datasets_retrieved_successfully(
         - features
         - absence of data arff if metadata_only, else it must be present too.
     """
-    for did in dids:
-        assert _dataset_description_is_downloaded(did)
+    for dataset in datasets:
+        assert _dataset_description_is_downloaded(dataset)
 
-        has_qualities = _dataset_qualities_is_downloaded(did)
+        has_qualities = _dataset_qualities_is_downloaded(dataset.id)
         assert has_qualities if with_qualities else not has_qualities
 
-        has_features = _dataset_features_is_downloaded(did)
+        has_features = _dataset_features_is_downloaded(dataset.id)
         assert has_features if with_features else not has_features
 
-        has_data = _dataset_data_file_is_downloaded(did)
+        has_data = _dataset_data_file_is_downloaded(dataset)
         assert has_data if with_data else not has_data
 
 
@@ -1930,7 +1933,7 @@ def test_get_dataset_lazy_behavior(
     assert dataset.name == "anneal"
 
     _assert_datasets_retrieved_successfully(
-        [1],
+        [dataset],
         with_qualities=with_qualities,
         with_features=with_features,
         with_data=with_data,
@@ -1939,7 +1942,7 @@ def test_get_dataset_lazy_behavior(
     assert dataset.qualities, "Qualities should be downloaded on-demand if not during get_dataset"
     assert dataset.get_data(), "Data should be downloaded on-demand if not during get_dataset"
     _assert_datasets_retrieved_successfully(
-        [1], with_qualities=True, with_features=True, with_data=True
+        [dataset], with_qualities=True, with_features=True, with_data=True
     )
 
 
