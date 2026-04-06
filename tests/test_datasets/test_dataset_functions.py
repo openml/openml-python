@@ -1868,7 +1868,7 @@ def _dataset_features_is_downloaded(did: int):
 def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
     #TODO to be updated after minio paths is fixed
     if dataset._parquet_url is not None:
-        pq_directory = Path(openml.config.get_cache_directory()) / Path(openml.config.get_minio_download_path(dataset._parquet_url))
+        pq_directory = Path(openml.config.get_cache_directory()) / Path(openml.config.get_minio_download_path(dataset._parquet_url)).parent
         if pq_directory.exists():
             return any(f.suffix == ".pq" for f in pq_directory.iterdir())
     arff_directory = Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
