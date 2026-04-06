@@ -4,7 +4,6 @@ from __future__ import annotations
 import itertools
 import os
 import random
-import shutil
 import time
 import uuid
 from itertools import product
@@ -17,8 +16,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
-import requests_mock
-from requests_mock import ANY
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -1870,10 +1867,11 @@ def _dataset_features_is_downloaded(did: int):
 
 def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
     #TODO to be updated after minio paths is fixed
-    pq_directory = Path(openml.config.get_cache_directory()) / openml.config.get_minio_download_path(dataset._parquet_url)
+    if dataset._parquet_url is not None:
+        pq_directory = Path(openml.config.get_cache_directory()) / Path(openml.config.get_minio_download_path(dataset._parquet_url))
+        if pq_directory.exists():
+            return any(f.suffix == ".pq" for f in pq_directory.iterdir())
     arff_directory = Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
-    if pq_directory.exists():
-        return any(f.suffix == ".pq" for f in pq_directory.iterdir())
     if arff_directory.exists():
         return any(f.suffix == ".arff" for f in arff_directory.iterdir())
     return False
@@ -1894,7 +1892,7 @@ def _assert_datasets_retrieved_successfully(
         - absence of data arff if metadata_only, else it must be present too.
     """
     for dataset in datasets:
-        assert _dataset_description_is_downloaded(dataset)
+        assert _dataset_description_is_downloaded(dataset.id)
 
         has_qualities = _dataset_qualities_is_downloaded(dataset.id)
         assert has_qualities if with_qualities else not has_qualities

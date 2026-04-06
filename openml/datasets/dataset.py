@@ -954,11 +954,11 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         self.dataset_id = int(xml_response["oml:upload_data_set"]["oml:id"])
 
     def publish(self) -> OpenMLDataset:
-        """Publish this flow to OpenML server.
+        """Publish this dataset to the OpenML server.
 
         Returns
         -------
-        self : OpenMLFlow
+        self : OpenMLDataset
         """
         file_elements = self._get_file_elements()
         if "description" not in file_elements:

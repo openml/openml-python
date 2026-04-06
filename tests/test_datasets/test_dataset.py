@@ -2,19 +2,14 @@
 from __future__ import annotations
 
 import os
-import unittest.mock
-from pathlib import Path
-import shutil
 from time import time
 
 import numpy as np
 import pandas as pd
 import pytest
-from scipy import sparse
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
-from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
 import pytest
