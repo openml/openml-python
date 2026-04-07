@@ -6,15 +6,15 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-if TYPE_CHECKING:
-    import pandas as pd
-
-    from openml.datasets.dataset import OpenMLDataFeature, OpenMLDataset
 from openml.enums import ResourceType
 
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    import pandas as pd
+
+    from openml.datasets.data_feature import OpenMLDataFeature
+    from openml.datasets.dataset import OpenMLDataset
     from openml.estimation_procedures import OpenMLEstimationProcedure
     from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
@@ -88,12 +88,12 @@ class DatasetAPI(ResourceAPI):
 
     @abstractmethod
     def parse_features_file(
-        self, features_file: Path, features_pickle_file: Path
+        self, features_file: Path, features_pickle_file: Path | None = None
     ) -> dict[int, OpenMLDataFeature]: ...
 
     @abstractmethod
     def parse_qualities_file(
-        self, qualities_file: Path, qualities_pickle_file: Path
+        self, qualities_file: Path, qualities_pickle_file: Path | None = None
     ) -> dict[str, float]: ...
 
     @abstractmethod

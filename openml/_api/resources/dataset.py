@@ -1505,7 +1505,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         """
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
         # build a dict from the json and get the format from the dataset description
-        return dataset_json["data_set_description"]["format"].lower()  # type: ignore
+        return dataset_json["format"].lower()  # type: ignore
 
     def get_online_dataset_arff(self, dataset_id: int) -> str | None:
         """Download the ARFF file for a given dataset id
