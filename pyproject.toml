@@ -126,6 +126,7 @@ version = {attr = "openml.__version__.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
+log_level="DEBUG"
 testpaths = ["tests"]
 minversion = "7.0"
 xfail_strict = true
@@ -133,10 +134,10 @@ filterwarnings=[
     "ignore:the matrix subclass:PendingDeprecationWarning"
 ]
 markers = [
-  "server: anything that connects to a server",
   "upload: anything that uploads to a server",
-  "production: any interaction with the production server",
+  "production_server: any interaction with the production server",
   "cache: anything that interacts with the (test) cache",
+  "test_server: tests that require the OpenML test server",
 ]
 
 # https://github.com/charliermarsh/ruff

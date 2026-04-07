@@ -2,20 +2,20 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
-import json
 from functools import partial
 from itertools import chain
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Literal
 from typing_extensions import overload
 
 import numpy as np
 import pandas as pd
-import xmltodict
 
 import openml
 import openml._api_calls
 import openml.utils
-from openml.evaluations import OpenMLEvaluation
+
+if TYPE_CHECKING:
+    from openml.evaluations import OpenMLEvaluation
 
 
 @overload
@@ -120,7 +120,7 @@ def list_evaluations(
         per_fold_str = str(per_fold).lower()
 
     listing_call = partial(
-        _list_evaluations,
+        openml._backend.evaluation.list,
         function=function,
         tasks=tasks,
         setups=setups,
@@ -142,137 +142,6 @@ def list_evaluations(
     return {e.run_id: e for e in flattened}
 
 
-def _list_evaluations(  # noqa: C901
-    limit: int,
-    offset: int,
-    *,
-    function: str,
-    tasks: list | None = None,
-    setups: list | None = None,
-    flows: list | None = None,
-    runs: list | None = None,
-    uploaders: list | None = None,
-    study: int | None = None,
-    sort_order: str | None = None,
-    **kwargs: Any,
-) -> list[OpenMLEvaluation]:
-    """
-    Perform API call ``/evaluation/function{function}/{filters}``
-
-    Parameters
-    ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-
-    limit : int
-        the number of evaluations to return
-    offset : int
-        the number of evaluations to skip, starting from the first
-    function : str
-        the evaluation function. e.g., predictive_accuracy
-
-    tasks : list[int,str], optional
-        the list of task IDs
-    setups: list[int,str], optional
-        the list of setup IDs
-    flows : list[int,str], optional
-        the list of flow IDs
-    runs :list[int,str], optional
-        the list of run IDs
-    uploaders : list[int,str], optional
-        the list of uploader IDs
-
-    study : int, optional
-
-    kwargs: dict, optional
-        Legal filter operators: tag, per_fold
-
-    sort_order : str, optional
-        order of sorting evaluations, ascending ("asc") or descending ("desc")
-
-    Returns
-    -------
-    list of OpenMLEvaluation objects
-    """
-    api_call = f"evaluation/list/function/{function}"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-    if tasks is not None:
-        api_call += f"/task/{','.join([str(int(i)) for i in tasks])}"
-    if setups is not None:
-        api_call += f"/setup/{','.join([str(int(i)) for i in setups])}"
-    if flows is not None:
-        api_call += f"/flow/{','.join([str(int(i)) for i in flows])}"
-    if runs is not None:
-        api_call += f"/run/{','.join([str(int(i)) for i in runs])}"
-    if uploaders is not None:
-        api_call += f"/uploader/{','.join([str(int(i)) for i in uploaders])}"
-    if study is not None:
-        api_call += f"/study/{study}"
-    if sort_order is not None:
-        api_call += f"/sort_order/{sort_order}"
-
-    return __list_evaluations(api_call)
-
-
-def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
-    """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",))
-    # Minimalistic check if the XML is useful
-    if "oml:evaluations" not in evals_dict:
-        raise ValueError(
-            f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
-        )
-
-    assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
-        evals_dict["oml:evaluations"],
-    )
-
-    uploader_ids = list(
-        {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
-    )
-    api_users = "user/list/user_id/" + ",".join(uploader_ids)
-    xml_string_user = openml._api_calls._perform_api_call(api_users, "get")
-
-    users = xmltodict.parse(xml_string_user, force_list=("oml:user",))
-    user_dict = {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
-
-    evals = []
-    for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
-        run_id = int(eval_["oml:run_id"])
-        value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
-        values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
-        array_data = eval_.get("oml:array_data")
-
-        evals.append(
-            OpenMLEvaluation(
-                run_id=run_id,
-                task_id=int(eval_["oml:task_id"]),
-                setup_id=int(eval_["oml:setup_id"]),
-                flow_id=int(eval_["oml:flow_id"]),
-                flow_name=eval_["oml:flow_name"],
-                data_id=int(eval_["oml:data_id"]),
-                data_name=eval_["oml:data_name"],
-                function=eval_["oml:function"],
-                upload_time=eval_["oml:upload_time"],
-                uploader=int(eval_["oml:uploader"]),
-                uploader_name=user_dict[eval_["oml:uploader"]],
-                value=value,
-                values=values,
-                array_data=array_data,
-            )
-        )
-
-    return evals
-
-
 def list_evaluation_measures() -> list[str]:
     """Return list of evaluation measures available.
 
@@ -284,17 +153,7 @@ def list_evaluation_measures() -> list[str]:
     list
 
     """
-    api_call = "evaluationmeasure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"))
-    # Minimalistic check if the XML is useful
-    if "oml:evaluation_measures" not in qualities:
-        raise ValueError('Error in return XML, does not contain "oml:evaluation_measures"')
-
-    if not isinstance(qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:measure" as a list')
-
-    return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
+    return openml._backend.evaluation_measure.list()
 
 
 def list_estimation_procedures() -> list[str]:
@@ -307,24 +166,8 @@ def list_estimation_procedures() -> list[str]:
     -------
     list
     """
-    api_call = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    api_results = xmltodict.parse(xml_string)
-
-    # Minimalistic check if the XML is useful
-    if "oml:estimationprocedures" not in api_results:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedures"')
-
-    if "oml:estimationprocedure" not in api_results["oml:estimationprocedures"]:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedure"')
-
-    if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:estimationprocedure" as a list')
-
-    return [
-        prod["oml:name"]
-        for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
-    ]
+    result = openml._backend.estimation_procedure.list()
+    return [i.name for i in result]
 
 
 def list_evaluations_setups(

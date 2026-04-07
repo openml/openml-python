@@ -34,6 +34,8 @@ import shutil
 from pathlib import Path
 import pytest
 import openml_sklearn
+from openml._api import HTTPClient, MinIOClient
+from openml.enums import APIVersion
 
 import openml
 from openml.testing import TestBase
@@ -97,8 +99,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.user_key
+    openml.config.use_test_servers()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -204,7 +205,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    for _d in ["datasets", "tasks", "runs", "setups"]:
+    for _d in ["datasets", "tasks", "runs"]:
         res_paths.append(_c_root_dir / _d)
 
     for _id in ["-1", "2"]:
@@ -220,7 +221,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
 
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
     res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
-    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
@@ -230,6 +230,12 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
                 tmp_p / "task.xml",
             ]
         )
+
+    res_paths.extend([
+        _c_root_dir / "api" / "v1" / "xml" / "setup",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1" / "body.xml",
+    ])
 
     return res_paths
 
@@ -250,8 +256,23 @@ def test_files_directory() -> Path:
 
 
 @pytest.fixture(scope="session")
-def test_api_key() -> str:
-    return TestBase.user_key
+def test_server_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["apikey"]
+
+
+@pytest.fixture(scope="session")
+def test_server_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -272,24 +293,32 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    if "production" in request.keywords:
-        openml.config.server = "https://www.openml.org/api/v1/xml"
-        openml.config.apikey = None
+    openml.config.set_api_version(APIVersion.V1)
+
+    if "production_server" in request.keywords:
+        openml.config.use_production_servers()
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = TestBase.user_key
+
+    openml.config.use_test_servers()
     yield
 
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
@@ -307,3 +336,18 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()

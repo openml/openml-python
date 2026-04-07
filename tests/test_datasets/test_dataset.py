@@ -18,7 +18,7 @@ from openml.testing import TestBase
 import pytest
 
 
-@pytest.mark.production()
+@pytest.mark.production_server()
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
 
@@ -102,21 +102,24 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(data, pd.DataFrame)
         assert data.shape[1] == len(self.titanic.features)
         assert data.shape[0] == 1309
+        # Dynamically detect what this version of Pandas calls string columns.
+        str_dtype = data["name"].dtype.name
+
         col_dtype = {
             "pclass": "uint8",
             "survived": "category",
-            "name": "object",
+            "name": str_dtype,
             "sex": "category",
             "age": "float64",
             "sibsp": "uint8",
             "parch": "uint8",
-            "ticket": "object",
+            "ticket": str_dtype,
             "fare": "float64",
-            "cabin": "object",
+            "cabin": str_dtype,
             "embarked": "category",
-            "boat": "object",
+            "boat": str_dtype,
             "body": "float64",
-            "home.dest": "object",
+            "home.dest": str_dtype,
         }
         for col_name in data.columns:
             assert data[col_name].dtype.name == col_dtype[col_name]
@@ -278,7 +281,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertNotEqual(self.titanic, "Wrong_object")
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_tagging():
     dataset = openml.datasets.get_dataset(125, download_data=False)
 
@@ -295,7 +298,7 @@ def test_tagging():
     datasets = openml.datasets.list_datasets(tag=tag)
     assert datasets.empty
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_get_feature_with_ontology_data_id_11():
     # test on car dataset, which has built-in ontology references
     dataset = openml.datasets.get_dataset(11)
@@ -304,7 +307,7 @@ def test_get_feature_with_ontology_data_id_11():
     assert len(dataset.features[2].ontologies) >= 1
     assert len(dataset.features[3].ontologies) >= 1   
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_add_remove_ontology_to_dataset():
     did = 1
     feature_index = 1
@@ -312,7 +315,7 @@ def test_add_remove_ontology_to_dataset():
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
     openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_add_same_ontology_multiple_features():
     did = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
@@ -321,7 +324,7 @@ def test_add_same_ontology_multiple_features():
         openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_add_illegal_long_ontology():
     did = 1
     ontology = "http://www.google.com/" + ("a" * 257)
@@ -333,7 +336,7 @@ def test_add_illegal_long_ontology():
     
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_add_illegal_url_ontology():
     did = 1
     ontology = "not_a_url" + str(time())
@@ -344,7 +347,7 @@ def test_add_illegal_url_ontology():
         assert e.code == 1106
 
 
-@pytest.mark.production()
+@pytest.mark.production_server()
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
 
@@ -357,7 +360,7 @@ class OpenMLDatasetTestSparse(TestBase):
     def test_get_sparse_dataset_dataframe_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
         assert isinstance(X, pd.DataFrame)
-        assert isinstance(X.dtypes[0], pd.SparseDtype)
+        assert isinstance(X.dtypes.iloc[0], pd.SparseDtype)
         assert X.shape == (600, 20000)
 
         assert isinstance(y, pd.Series)
@@ -405,7 +408,7 @@ class OpenMLDatasetTestSparse(TestBase):
         assert len(feature.nominal_values) == 25
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test__read_features(mocker, workdir, static_cache_dir):
     """Test we read the features from the xml if no cache pickle is available.
     This test also does some simple checks to verify that the features are read correctly
@@ -437,7 +440,7 @@ def test__read_features(mocker, workdir, static_cache_dir):
     assert pickle_mock.dump.call_count == 1
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test__read_qualities(static_cache_dir, workdir, mocker):
     """Test we read the qualities from the xml if no cache pickle is available.
     This test also does some minor checks to ensure that the qualities are read correctly.

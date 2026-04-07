@@ -12,6 +12,7 @@ from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
+import os
 import pandas as pd
 import pytest
 import requests
@@ -41,12 +42,13 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flow["full_name"], str)
         assert isinstance(flow["version"], str)
         # There are some runs on openml.org that can have an empty external version
+        ext_version = flow["external_version"]
         ext_version_str_or_none = (
-            isinstance(flow["external_version"], str) or flow["external_version"] is None
+            isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
         )
         assert ext_version_str_or_none
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -57,7 +59,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_output_format(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -66,13 +68,13 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flows, pd.DataFrame)
         assert len(flows) >= 1500
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_empty(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_by_tag(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="weka")
@@ -80,7 +82,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_paginate(self):
         self.use_production_server()
         size = 10
@@ -279,7 +281,7 @@ class TestFlowFunctions(TestBase):
         reason="OrdinalEncoder introduced in 0.20. "
         "No known models with list of lists parameters in older versions.",
     )
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
@@ -300,7 +302,7 @@ class TestFlowFunctions(TestBase):
         assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
         assert server_flow.model.categories == flow.model.categories
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow1(self):
         # Regression test for issue #305
         # Basically, this checks that a flow without an external version can be loaded
@@ -309,7 +311,7 @@ class TestFlowFunctions(TestBase):
         assert flow.external_version is None
 
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -321,7 +323,7 @@ class TestFlowFunctions(TestBase):
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
         self.assertRaisesRegex(
@@ -337,7 +339,7 @@ class TestFlowFunctions(TestBase):
         Version(sklearn.__version__) == Version("0.19.1"),
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175
@@ -358,7 +360,7 @@ class TestFlowFunctions(TestBase):
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
@@ -372,7 +374,7 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
@@ -384,7 +386,7 @@ class TestFlowFunctions(TestBase):
         Version(sklearn.__version__) > Version("0.23"),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
@@ -392,7 +394,7 @@ class TestFlowFunctions(TestBase):
         assert "sklearn==0.19.1" not in flow.dependencies
 
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
@@ -427,7 +429,7 @@ class TestFlowFunctions(TestBase):
             pytest.skip(reason="Not sure why there should only be one version of this flow.")
             assert flow_ids_exact_version_True == flow_ids_exact_version_False
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_delete_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -451,8 +453,7 @@ class TestFlowFunctions(TestBase):
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_flow_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -465,14 +466,13 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = test_server_v1 + "flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_flow_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -485,14 +485,13 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = test_server_v1 + "flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_subflow(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -505,14 +504,13 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = test_server_v1 + "flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_flow_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -522,15 +520,14 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     success = openml.flows.delete_flow(33364)
     assert success
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/33364"
+    flow_url = test_server_v1 + "flow/33364"
     assert flow_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
-def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_unknown_flow(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -543,6 +540,6 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(9_999_999)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/9999999"
+    flow_url = test_server_v1 + "flow/9999999"
     assert flow_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
