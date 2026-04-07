@@ -229,7 +229,7 @@ def create_study(
     >>> import openml
     >>> study = openml.study.create_study(  # doctest: +SKIP
     ...     name="My Study",
-    ...     description="A study on classification tasks",
+    ...     description="A study on decision trees",
     ...     run_ids=[1, 2, 3],
     ... )
     """
