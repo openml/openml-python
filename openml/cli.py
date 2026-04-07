@@ -6,11 +6,14 @@ import argparse
 import string
 import sys
 from collections.abc import Callable
+from dataclasses import fields
 from pathlib import Path
+from typing import cast
 from urllib.parse import urlparse
 
-from openml import config
+import openml
 from openml.__version__ import __version__
+from openml.enums import APIVersion
 
 
 def is_hex(string_: str) -> bool:
@@ -59,17 +62,17 @@ def wait_until_valid_input(
 
 
 def print_configuration() -> None:
-    file = config.determine_config_file_path()
+    file = openml.config.determine_config_file_path()
     header = f"File '{file}' contains (or defaults to):"
     print(header)
 
-    max_key_length = max(map(len, config.get_config_as_dict()))
-    for field, value in config.get_config_as_dict().items():
+    max_key_length = max(map(len, openml.config.get_config_as_dict()))
+    for field, value in openml.config.get_config_as_dict().items():
         print(f"{field.ljust(max_key_length)}: {value}")
 
 
 def verbose_set(field: str, value: str) -> None:
-    config.set_field_in_config_file(field, value)
+    openml.config.set_field_in_config_file(field, value)
     print(f"{field} set to '{value}'.")
 
 
@@ -82,7 +85,7 @@ def configure_apikey(value: str) -> None:
         return ""
 
     instructions = (
-        f"Your current API key is set to: '{config.apikey}'. "
+        f"Your current API key is set to: '{openml.config.apikey}'. "
         "You can get an API key at https://new.openml.org. "
         "You must create an account if you don't have one yet:\n"
         "  1. Log in with the account.\n"
@@ -109,9 +112,9 @@ def configure_server(value: str) -> None:
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
-            return f"{config.TEST_SERVER_URL}/api/v1/xml"
+            return cast("str", openml.config.get_test_servers()[APIVersion.V1]["server"])
         if server == "production_server":
-            return "https://www.openml.org/api/v1/xml"
+            return cast("str", openml.config.get_production_servers()[APIVersion.V1]["server"])
         return server
 
     configure_field(
@@ -347,7 +350,9 @@ def main() -> None:
         "'https://openml.github.io/openml-python/main/usage.html#configuration'.",
     )
 
-    configurable_fields = [f for f in config._defaults if f not in ["max_retries"]]
+    configurable_fields = [
+        f.name for f in fields(openml._config.OpenMLConfig) if f.name not in ["max_retries"]
+    ]
 
     parser_configure.add_argument(
         "field",
