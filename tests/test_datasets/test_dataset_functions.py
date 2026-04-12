@@ -157,7 +157,6 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
-        openml.config.server = self.test_server
 
     @pytest.mark.test_server()
     def test_illegal_character_tag(self):
@@ -185,7 +184,6 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
-        openml.config.server = self.test_server
 
     @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active(self):
@@ -530,10 +528,6 @@ class TestOpenMLDataset(TestBase):
         datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_publish_dataset(self):
         arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
@@ -570,10 +564,6 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
@@ -697,10 +687,6 @@ class TestOpenMLDataset(TestBase):
             with pytest.raises(ValueError, match=err_msg):
                 attributes_arff_from_df(df)
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
@@ -735,10 +721,6 @@ class TestOpenMLDataset(TestBase):
         ), "Uploaded arff does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_create_dataset_list(self):
         data = [
@@ -794,10 +776,6 @@ class TestOpenMLDataset(TestBase):
         ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_create_dataset_sparse(self):
         # test the scipy.sparse.coo_matrix
@@ -946,10 +924,6 @@ class TestOpenMLDataset(TestBase):
             dataset_id
         ), "The format of the ARFF files is different"
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_create_dataset_pandas(self):
         data = [
@@ -1175,10 +1149,6 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_publish_fetch_ignore_attribute(self):
         """Test to upload and retrieve dataset and check ignore_attributes"""
@@ -1298,10 +1268,6 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
@@ -1470,10 +1436,6 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
@@ -1526,10 +1488,6 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
@@ -1592,7 +1550,6 @@ class TestOpenMLDataset(TestBase):
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
-        openml.config.server = self.test_server
         assert len(datasets_a) == len(datasets_b)
 
 
@@ -1767,7 +1724,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
@@ -1782,13 +1739,13 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
@@ -1803,13 +1760,13 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
     )
@@ -1821,13 +1778,13 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
+def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
@@ -1842,9 +1799,9 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/9999999"
+    dataset_url = test_server_v1 + "data/9999999"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
@@ -2036,14 +1993,14 @@ def test_read_features_from_xml_with_whitespace() -> None:
 
 
 @pytest.mark.test_server()
-def test_get_dataset_parquet(requests_mock, test_files_directory):
+def test_get_dataset_parquet(requests_mock, test_files_directory, test_server_v1):
     # Parquet functionality is disabled on the test server
     # There is no parquet-copy of the test server yet.
     content_file = (
             test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     # While the mocked example is from production, unit tests by default connect to the test server.
-    requests_mock.get(f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/61", text=content_file.read_text())
+    requests_mock.get(test_server_v1 + "data/61", text=content_file.read_text())
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None
