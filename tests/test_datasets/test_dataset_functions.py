@@ -184,7 +184,7 @@ class TestOpenMLDataset(TestBase):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
         self.use_production_server()
         # /d/1 was deactivated
-        assert openml.datasets.functions._name_to_id("anneal") == 2
+        assert openml.datasets.functions._name_to_id("anneal",version=1) == 2
 
     @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active(self):
