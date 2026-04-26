@@ -18,9 +18,11 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from . import (
     _api_calls,
-    config,
+    _config as _config_module,
     datasets,
     evaluations,
     exceptions,
@@ -34,6 +36,7 @@ from . import (
     utils,
 )
 from .__version__ import __version__
+from ._api import _backend
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
@@ -50,6 +53,11 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
+
+if TYPE_CHECKING:
+    from ._config import OpenMLConfigManager
+
+config: OpenMLConfigManager = _config_module.__config
 
 
 def populate_cache(
@@ -111,6 +119,7 @@ __all__ = [
     "OpenMLTask",
     "__version__",
     "_api_calls",
+    "_backend",
     "config",
     "datasets",
     "evaluations",
