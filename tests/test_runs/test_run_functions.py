@@ -1098,6 +1098,7 @@ class TestRun(TestBase):
         self._test_local_evaluations(run)
 
     @pytest.mark.sklearn()
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1586")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1126,6 +1127,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1825,7 +1827,6 @@ class TestRun(TestBase):
         self.assertListEqual(res, [0] * 5)
 
 
-
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1870,7 +1871,7 @@ class TestRun(TestBase):
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
+def test_delete_run_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1883,13 +1884,13 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/40000"
+    run_url = test_server_v1 + "run/40000"
     assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
+def test_delete_run_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -1899,13 +1900,13 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/10591880"
+    run_url = test_server_v1 + "run/10591880"
     assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
+def test_delete_unknown_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1918,9 +1919,9 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/9999999"
+    run_url = test_server_v1 + "run/9999999"
     assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @pytest.mark.sklearn()
@@ -2074,6 +2075,7 @@ def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
         n_jobs=n_jobs,
     )
     from openml_sklearn import SklearnExtension
+
     extension = SklearnExtension()
     with parallel_backend(backend, n_jobs=n_jobs):
         res = openml.runs.functions._run_task_get_arffcontent(
