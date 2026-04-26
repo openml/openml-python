@@ -35,6 +35,7 @@ from . import (
     utils,
 )
 from .__version__ import __version__
+from ._api import _backend
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .datasets.functions import get_dataset, list_datasets
 from .evaluations import OpenMLEvaluation
@@ -120,6 +121,7 @@ __all__ = [
     "OpenMLTask",
     "__version__",
     "_api_calls",
+    "_backend",
     "config",
     "datasets",
     "evaluations",
