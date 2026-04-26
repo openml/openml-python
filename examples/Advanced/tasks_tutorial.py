@@ -24,13 +24,15 @@ from openml.tasks import TaskType
 #
 # We will start by simply listing only *supervised classification* tasks.
 #
-# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
-# request a
+# **openml.list_all("task")** (or **openml.tasks.list_tasks()**) returns a dictionary of
+# dictionaries by default, but we request a
 # [pandas dataframe](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
 # instead to have better visualization capabilities and easier access:
 
 # %%
-tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
+tasks = openml.list_all("task", task_type=TaskType.SUPERVISED_CLASSIFICATION)
+# Legacy path still works:
+# tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
 print(tasks.columns)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
@@ -66,7 +68,9 @@ print(len(filtered_tasks))
 # Similar to listing tasks by task type, we can list tasks by tags:
 
 # %%
-tasks = openml.tasks.list_tasks(tag="OpenML100")
+tasks = openml.list_all("task", tag="OpenML100")
+# Legacy path still works:
+# tasks = openml.tasks.list_tasks(tag="OpenML100")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
@@ -74,7 +78,9 @@ print(tasks.head())
 # Furthermore, we can list tasks based on the dataset id:
 
 # %%
-tasks = openml.tasks.list_tasks(data_id=1471)
+tasks = openml.list_all("task", data_id=1471)
+# Legacy path still works:
+# tasks = openml.tasks.list_tasks(data_id=1471)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
@@ -82,7 +88,9 @@ print(tasks.head())
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
 # %%
-tasks = openml.tasks.list_tasks(size=10, offset=50)
+tasks = openml.list_all("task", size=10, offset=50)
+# Legacy path still works:
+# tasks = openml.tasks.list_tasks(size=10, offset=50)
 print(tasks)
 
 # %% [markdown]
@@ -98,7 +106,9 @@ print(tasks)
 # Finally, it is also possible to list all tasks on OpenML with:
 
 # %%
-tasks = openml.tasks.list_tasks()
+tasks = openml.list_all("task")
+# Legacy path still works:
+# tasks = openml.tasks.list_tasks()
 print(len(tasks))
 
 # %% [markdown]
@@ -118,7 +128,9 @@ tasks.query('name=="eeg-eye-state"')
 
 # %%
 task_id = 31
-task = openml.tasks.get_task(task_id)
+task = openml.get(task_id, object_type="task")
+# Legacy path still works:
+# task = openml.tasks.get_task(task_id)
 
 # %%
 # Properties of the task are stored as member variables:
