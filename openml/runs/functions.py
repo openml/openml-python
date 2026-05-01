@@ -15,7 +15,6 @@ import xmltodict
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml._api_calls
 import openml.utils
 from openml.exceptions import (
     OpenMLRunsExistError,
@@ -349,7 +348,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call(f"run/trace/{run_id}", "get")
+    trace_xml = openml._backend.run.download_text_file(f"run/trace/{run_id}")
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
