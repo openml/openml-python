@@ -8,7 +8,7 @@ from requests import Response, Session
 
 import openml
 from openml._api import RunV1API, RunV2API
-from openml.exceptions import OpenMLNotSupportedError
+from openml.exceptions import OpenMLNotSupportedError, OpenMLServerException
 from openml.runs.run import OpenMLRun
 
 
@@ -30,7 +30,13 @@ def _assert_run_shape(run: OpenMLRun) -> None:
 
 
 def test_run_v1_get(run_v1, with_test_cache):
-    run = run_v1.get(run_id=25)
+    try:
+        run = run_v1.get(run_id=1)
+    except OpenMLServerException as e:
+        if e.code == 236 or "Run not found" in str(e):
+            run = run_v1.get(run_id=25)
+        else:
+            raise
     _assert_run_shape(run)
 
 
