@@ -30,7 +30,7 @@ def _assert_run_shape(run: OpenMLRun) -> None:
 
 
 def test_run_v1_get(run_v1, with_test_cache):
-    run = run_v1.get(run_id=1)
+    run = run_v1.get(run_id=25)
     _assert_run_shape(run)
 
 
