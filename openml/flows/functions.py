@@ -48,15 +48,12 @@ def get_flow(
 
     Raises
     ------
-    OpenMLCacheException
-        When cached flow files are corrupted or cannot be read.
     OpenMLServerException
         When the REST API call fails.
 
     Side Effects
     ------------
-    - Writes to ``openml.config.cache_directory/flows/{flow_id}/flow.xml``
-      when the flow is downloaded from the server.
+    - Caches the retrieved flow using the HTTP client's caching mechanism.
 
     Preconditions
     -------------

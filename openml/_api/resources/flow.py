@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, NoReturn
 from urllib.parse import quote
 
 import pandas as pd
@@ -220,11 +220,11 @@ class FlowV2API(ResourceV2API, FlowAPI):
         offset: int | None = None,  # noqa: ARG002
         tag: str | None = None,  # noqa: ARG002
         uploader: str | None = None,  # noqa: ARG002
-    ) -> pd.DataFrame:
+    ) -> NoReturn:
         self._not_supported(method="list")
 
     @staticmethod
-    def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:
+    def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, Any]:
         """Convert v2 JSON response to v1 XML-dict format for OpenMLFlow._from_dict().
 
         Parameters

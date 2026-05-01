@@ -106,35 +106,21 @@ class TestFlow(TestBase):
 
     @pytest.mark.test_server()
     def test_tagging(self):
-        flow_id = openml.flows.flow_exists("weka.ZeroR", "Weka_3.9.0_12024")
-        if not flow_id:
-            pytest.skip("No stable flow available for tagging test on configured test server")
+        flows = openml.flows.list_flows(size=1)
+        flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
-        unique_indicator = uuid.uuid4().hex[:16]
+        unique_indicator = str(time.time()).replace(".", "")
         tag = f"test_tag_TestFlow_{unique_indicator}"
         flows = openml.flows.list_flows(tag=tag)
-        if len(flows) != 0:
-            pytest.skip("Tag filter returned stale/non-empty results for a unique tag")
-        try:
-            flow.push_tag(tag)
-        except openml.exceptions.OpenMLServerException as e:
-            if e.code == 105 and "document missing" in e.message.lower():
-                pytest.skip("Test server index is inconsistent for flow tagging")
-            raise
+        assert len(flows) == 0
+        flow.push_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
-        if len(flows) == 0:
-            pytest.skip("Tag index not updated yet on test server")
+        assert len(flows) == 1
         assert flow_id in flows["id"].values
-        try:
-            flow.remove_tag(tag)
-        except openml.exceptions.OpenMLServerException as e:
-            if e.code == 105 and "document missing" in e.message.lower():
-                pytest.skip("Test server index is inconsistent for flow untagging")
-            raise
+        flow.remove_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
-        if len(flows) != 0 and flow_id in flows["id"].values:
-            pytest.skip("Tag removal not reflected yet by test server index")
+        assert len(flows) == 0
 
     @pytest.mark.test_server()
     def test_from_xml_to_xml(self):
@@ -321,19 +307,21 @@ class TestFlow(TestBase):
     def test_publish_error(self, mock_request, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
-        
+
         # Create mock response directly
         response = requests.Response()
         response.status_code = 200
         response._content = (
-            "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
+            '<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
+            "    <oml:id>1</oml:id>\n"
+            "</oml:upload_flow>"
         ).encode()
         mock_request.return_value = response
         flow_exists_mock.return_value = False  # Flow doesn't exist yet, so try to publish
         get_flow_mock.return_value = flow
 
         flow.publish()
-        # Not collecting flow_id for deletion since this is a test for failed upload
+        # The first publish succeeds, so we don't collect flow_id for deletion since this is a mocked test.
 
         assert mock_request.call_count == 1
         assert get_flow_mock.call_count == 1

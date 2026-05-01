@@ -24,13 +24,7 @@ def flow_v2(http_client_v2, minio_client) -> FlowV2API:
     return FlowV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.fixture
-def with_v2_server_config(test_server_v1, test_server_v2) -> Iterator[None]:
-    old_server = openml.config.servers[APIVersion.V2]["server"]
-    derived_v2_server = test_server_v1.replace("/api/v1/xml/", "/api/v2/")
-    openml.config.servers[APIVersion.V2]["server"] = test_server_v2 or derived_v2_server
-    yield
-    openml.config.servers[APIVersion.V2]["server"] = old_server
+
 
 
 def _assert_flow_shape(flow: OpenMLFlow) -> None:
@@ -41,11 +35,13 @@ def _assert_flow_shape(flow: OpenMLFlow) -> None:
     assert len(flow.name) > 0
 
 
+@pytest.mark.test_server()
 def test_flow_v1_get(flow_v1):
     flow = flow_v1.get(flow_id=1)
     _assert_flow_shape(flow)
 
 
+@pytest.mark.test_server()
 def test_flow_v1_list(flow_v1):
     limit = 5
     flows_df = flow_v1.list(limit=limit)
@@ -59,6 +55,7 @@ def test_flow_v1_list(flow_v1):
     assert "uploader" in flows_df.columns
 
 
+@pytest.mark.test_server()
 def test_flow_v1_list_with_offset(flow_v1):
     limit = 5
     flows_df = flow_v1.list(limit=limit, offset=10)
@@ -166,33 +163,13 @@ def test_flow_v1_delete_mocked(flow_v1, test_apikey_v1):
         )
 
 
-def test_flow_v2_get(flow_v2, with_v2_server_config):
-    v2_payload = {
-        "id": 1,
-        "uploader": 1,
-        "name": "weka.SMO",
-        "version": "1",
-        "external_version": "3.8.6",
-        "description": "SMO classifier",
-        "upload_date": "2020-01-01T00:00:00",
-        "language": "English",
-        "dependencies": "weka==3.8.6",
-        "class_name": "weka.SMO",
-        "custom_name": "weka.SMO",
-    }
-
-    with patch.object(Session, "request") as mock_request:
-        mock_request.return_value = Response()
-        mock_request.return_value.status_code = 200
-        mock_request.return_value._content = b"{}"
-        mock_request.return_value.json = lambda: v2_payload
-
-        flow = flow_v2.get(flow_id=1)
-
+@pytest.mark.test_server()
+def test_flow_v2_get(flow_v2):
+    flow = flow_v2.get(flow_id=1)
     _assert_flow_shape(flow)
 
 
-def test_flow_v2_exists_nonexistent(flow_v2, with_v2_server_config):
+def test_flow_v2_exists_nonexistent(flow_v2):
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -223,29 +200,10 @@ def test_flow_v2_publish_not_supported(flow_v2):
         flow_v2.publish(path="flow", files={"description": "<flow/>"})
 
 
-def test_flow_v1_v2_get_output_match(flow_v1, flow_v2, with_v2_server_config):
+@pytest.mark.test_server()
+def test_flow_v1_v2_get_output_match(flow_v1, flow_v2):
     flow_from_v1 = flow_v1.get(flow_id=1)
-
-    v2_payload = {
-        "id": flow_from_v1.flow_id,
-        "uploader": flow_from_v1.uploader,
-        "name": flow_from_v1.name,
-        "version": flow_from_v1.version,
-        "external_version": flow_from_v1.external_version,
-        "description": flow_from_v1.description,
-        "upload_date": "2020-01-01T00:00:00",
-        "language": flow_from_v1.language,
-        "dependencies": flow_from_v1.dependencies,
-        "class_name": flow_from_v1.class_name,
-        "custom_name": flow_from_v1.custom_name,
-    }
-
-    with patch.object(Session, "request") as mock_request:
-        mock_request.return_value = Response()
-        mock_request.return_value.status_code = 200
-        mock_request.return_value._content = b"{}"
-        mock_request.return_value.json = lambda: v2_payload
-        flow_from_v2 = flow_v2.get(flow_id=1)
+    flow_from_v2 = flow_v2.get(flow_id=1)
 
     assert flow_from_v1.flow_id == flow_from_v2.flow_id
     assert flow_from_v1.name == flow_from_v2.name
