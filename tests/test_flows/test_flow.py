@@ -7,11 +7,11 @@ import hashlib
 import re
 import os
 import time
-import uuid
 from packaging.version import Version
 from unittest import mock
 
 import pytest
+import requests
 import scipy.stats
 import sklearn
 import sklearn.datasets
@@ -31,8 +31,8 @@ from openml_sklearn import SklearnExtension
 import openml
 import openml.exceptions
 import openml.utils
-import requests
-from openml.testing import SimpleImputer, TestBase, create_request_response
+
+from openml.testing import SimpleImputer, TestBase
 
 
 class TestFlow(TestBase):
@@ -117,7 +117,7 @@ class TestFlow(TestBase):
         flow.push_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 1
-        assert flow_id in flows["id"].values
+        assert flow_id in flows["id"]
         flow.remove_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
@@ -299,7 +299,6 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
-    
     @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
@@ -307,7 +306,7 @@ class TestFlow(TestBase):
     def test_publish_error(self, mock_request, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
-
+        
         # Create mock response directly
         response = requests.Response()
         response.status_code = 200

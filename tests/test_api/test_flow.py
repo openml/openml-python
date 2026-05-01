@@ -20,7 +20,12 @@ def flow_v1(http_client_v1, minio_client) -> FlowV1API:
 
 
 @pytest.fixture
-def flow_v2(http_client_v2, minio_client) -> FlowV2API:
+def flow_v2(minio_client) -> FlowV2API:
+    from openml.enums import APIVersion
+    if openml.config.servers[APIVersion.V2]["server"] is None:
+        pytest.skip("V2 server is not configured")
+    from openml._api import HTTPClient
+    http_client_v2 = HTTPClient(api_version=APIVersion.V2)
     return FlowV2API(http=http_client_v2, minio=minio_client)
 
 
