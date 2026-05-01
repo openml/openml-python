@@ -29,9 +29,7 @@ def _assert_run_shape(run: OpenMLRun) -> None:
     assert isinstance(run.task_id, int)
 
 
-@pytest.mark.test_server()
-def test_run_v1_get(run_v1, test_files_directory):
-    openml.config.set_root_cache_directory(test_files_directory)
+def test_run_v1_get(run_v1, with_test_cache):
     run = run_v1.get(run_id=1)
     _assert_run_shape(run)
 
