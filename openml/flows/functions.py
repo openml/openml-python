@@ -173,7 +173,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
-    if not (isinstance(external_version, str) and len(external_version) > 0):
+    if not (isinstance(name, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
     return openml._backend.flow.exists(name=name, external_version=external_version)
