@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
 import xmltodict
 
@@ -189,10 +189,7 @@ class ResourceV1API(ResourceAPI):
     def _get_endpoint_name(self) -> str:
         if self.resource_type == ResourceType.DATASET:
             return "data"
-        endpoint_name = self.resource_type.value
-        if not isinstance(endpoint_name, str):
-            raise TypeError(f"Unexpected endpoint type: {type(endpoint_name)}")
-        return endpoint_name
+        return cast("str", self.resource_type.value)
 
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
         """
@@ -223,23 +220,18 @@ class ResourceV1API(ResourceAPI):
         if not isinstance(root_value, Mapping):
             raise ValueError("Unexpected XML structure")
 
-        # 1. Specifically look for keys ending in _id or id (e.g., oml:id, oml:run_id)
-        for k, v in root_value.items():
-            if (
-                (k.endswith(("id", "_id")) or "id" in k.lower())
-                and isinstance(v, (str, int))
-                and str(v).isdigit()
-            ):
-                return int(v)
+        # Look for oml:id directly in the root value
+        if "oml:id" in root_value:
+            id_value = root_value["oml:id"]
+            if isinstance(id_value, (str, int)):
+                return int(id_value)
 
-        # 2. Fallback: check all values for numeric/string IDs, excluding xmlns or URLs
+        # Fallback: check all values for numeric/string IDs
         for v in root_value.values():
             if isinstance(v, (str, int)):
-                val_str = str(v)
-                if val_str.isdigit():
-                    return int(val_str)
+                return int(v)
 
-        raise ValueError(f"No ID found in upload response: {root_value}")
+        raise ValueError("No ID found in upload response")
 
 
 class ResourceV2API(ResourceAPI):
@@ -266,7 +258,4 @@ class ResourceV2API(ResourceAPI):
         self._not_supported(method="untag")
 
     def _get_endpoint_name(self) -> str:
-        endpoint_name = self.resource_type.value
-        if not isinstance(endpoint_name, str):
-            raise TypeError(f"Unexpected endpoint type: {type(endpoint_name)}")
-        return endpoint_name
+        return cast("str", self.resource_type.value)

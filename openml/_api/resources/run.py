@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import builtins
-from typing import TYPE_CHECKING
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import xmltodict
@@ -15,6 +16,43 @@ if TYPE_CHECKING:
 
 
 class RunV1API(ResourceV1API, RunAPI):
+    def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
+        """Publish a run using the V1 API.
+
+        Overrides the base implementation because the run upload response
+        uses ``oml:run_id`` instead of the generic ``oml:id`` field.
+
+        Parameters
+        ----------
+        path : str
+            API endpoint path for the upload.
+        files : Mapping of str to Any or None
+            Files to upload as part of the request payload.
+
+        Returns
+        -------
+        int
+            Identifier of the newly created run.
+        """
+        response = self._http.post(path, files=files)
+        parsed = xmltodict.parse(response.content)
+
+        # xmltodict always gives exactly one root key
+        ((_, root_value),) = parsed.items()
+
+        if not isinstance(root_value, Mapping):
+            raise ValueError("Unexpected XML structure in run upload response")
+
+        # Run responses use oml:run_id
+        if "oml:run_id" in root_value:
+            return int(root_value["oml:run_id"])
+
+        # Fall back to oml:id (as used in the generic base)
+        if "oml:id" in root_value:
+            return int(root_value["oml:id"])
+
+        raise ValueError("No run ID found in upload response")
+
     def get(
         self,
         run_id: int,

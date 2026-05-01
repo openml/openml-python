@@ -47,6 +47,7 @@ def test_run_v1_list(run_v1):
 
 
 def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
+    """Test publish with oml:run_id (actual server response format)."""
     files = {"description": "<run/>"}
 
     with patch.object(Session, "request") as mock_request:
@@ -54,7 +55,7 @@ def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
             '<oml:upload_run xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>456</oml:id>\n"
+            "  <oml:run_id>456</oml:run_id>\n"
             "</oml:upload_run>\n"
         ).encode("utf-8")
 
@@ -69,6 +70,24 @@ def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
             headers=openml.config._HEADERS,
             files=files,
         )
+
+
+def test_run_v1_publish_mocked_oml_id_fallback(run_v1, test_apikey_v1):
+    """Test publish with oml:id fallback (alternative response format)."""
+    files = {"description": "<run/>"}
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:upload_run xmlns:oml="http://openml.org/openml">\n'
+            "  <oml:id>789</oml:id>\n"
+            "</oml:upload_run>\n"
+        ).encode("utf-8")
+
+        result = run_v1.publish(path="run", files=files)
+
+        assert result == 789
 
 
 def test_run_v1_delete_mocked(run_v1, test_apikey_v1):
