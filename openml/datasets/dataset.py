@@ -381,11 +381,9 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         if self._parquet_url is not None and not skip_parquet:
             parquet_file = _get_dataset_parquet(self)
             self.parquet_file = None if parquet_file is None else str(parquet_file)
-            logger.info(f"Downloaded parquet file to: {self.parquet_file}")
 
         if self.parquet_file is None:
             self.data_file = str(_get_dataset_arff(self))
-            logger.info(f"Downloaded ARFF file to: {self.data_file}")
 
     def _get_arff(self, format: str) -> dict:  # noqa: A002
         """Read ARFF file and return decoded arff.
@@ -470,7 +468,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """
         lock_path = str(arff_file_path) + ".lock"
         with FileLock(lock_path):
-            logger.info(f"Reading ARFF file from: {arff_file_path}")
             try:
                 data = self._get_arff(self.format)
             except OSError as e:
@@ -625,7 +622,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         with FileLock(lock_path):
             if not data_file.exists():
                 self._download_data()
-            logger.info(f"Reading parquet file from: {data_file}")
             try:
                 data = pd.read_parquet(data_file)
             except Exception as e:
@@ -640,13 +636,16 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         need_to_create_feather = self.cache_format == "feather" and self.data_feather_file is None
 
         if need_to_create_pickle or need_to_create_feather:
-            if self.data_file is None:
-                self._download_data()
+            cache_file = self.data_pickle_file if need_to_create_pickle else self.data_feather_file
+            lock_path = str(cache_file) + ".lock"
+            with FileLock(lock_path):
+                if self.data_file is None:
+                    self._download_data()
 
-            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
-            assert file_to_load is not None
-            data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
-            return _ensure_dataframe(data, attrs), cats, attrs
+                file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+                assert file_to_load is not None
+                data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
+                return _ensure_dataframe(data, attrs), cats, attrs
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
