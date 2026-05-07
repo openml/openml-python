@@ -381,8 +381,11 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         if self._parquet_url is not None and not skip_parquet:
             parquet_file = _get_dataset_parquet(self)
             self.parquet_file = None if parquet_file is None else str(parquet_file)
+            logger.info(f"Downloaded parquet file to: {self.parquet_file}")
+
         if self.parquet_file is None:
             self.data_file = str(_get_dataset_arff(self))
+            logger.info(f"Downloaded ARFF file to: {self.data_file}")
 
     def _get_arff(self, format: str) -> dict:  # noqa: A002
         """Read ARFF file and return decoded arff.
@@ -467,6 +470,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """
         lock_path = str(arff_file_path) + ".lock"
         with FileLock(lock_path):
+            logger.info(f"Reading ARFF file from: {arff_file_path}")
             try:
                 data = self._get_arff(self.format)
             except OSError as e:
@@ -621,6 +625,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         with FileLock(lock_path):
             if not data_file.exists():
                 self._download_data()
+            logger.info(f"Reading parquet file from: {data_file}")
             try:
                 data = pd.read_parquet(data_file)
             except Exception as e:

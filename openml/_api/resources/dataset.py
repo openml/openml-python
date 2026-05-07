@@ -1084,12 +1084,12 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         """
         api_call = "datasets/qualities/list"
         qualities = self._http.get(api_call).json()
-        # Minimalistic check if the XML is useful
+        # Minimalistic check if the JSON is useful
         if "data_qualities_list" not in qualities:
-            raise ValueError('Error in return XML, does not contain "oml:data_qualities_list"')
+            raise ValueError('Error in return JSON, does not contain "oml:data_qualities_list"')
 
         if not isinstance(qualities["data_qualities_list"]["quality"], list):
-            raise TypeError('Error in return json, does not contain "quality" as a list')
+            raise TypeError('Error  in return JSON, does not contain "quality" as a list')
 
         return qualities["data_qualities_list"]["quality"]
 
