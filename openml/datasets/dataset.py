@@ -610,7 +610,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         if data_file.suffix == ".arff":
             data, categorical, attribute_names = self._parse_data_from_arff(data_file)
         elif data_file.suffix == ".pq":
-            # TODO testing joblib failures
             attribute_names, categorical, data = self._parse_data_from_pq(data_file)
         else:
             raise ValueError(f"Unknown file type for file '{data_file}'.")
@@ -620,8 +619,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
     def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
         lock_path = str(data_file) + ".lock"
         with FileLock(lock_path):
-            if not data_file.exists():
-                self._download_data()
             try:
                 data = pd.read_parquet(data_file)
             except Exception as e:

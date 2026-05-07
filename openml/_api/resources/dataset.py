@@ -1062,7 +1062,6 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
         data: dict[str, str | int] = {"dataset_id": dataset_id, "status": status}
-        # TODO needs fix for api and json
         result = self._http.post(
             f"datasets/status/update/?api_key={self._http.api_key}", json=data, use_api_key=False
         ).json()
