@@ -15,6 +15,7 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
+from filelock import FileLock
 
 import openml
 from openml.base import OpenMLBase
@@ -614,15 +615,17 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         return attribute_names, categorical, data
 
     def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
-        if not data_file.exists():
-            self._download_data()
-        try:
-            data = pd.read_parquet(data_file)
-        except Exception as e:
-            raise Exception(f"File: {data_file}") from e
-        categorical = [data[c].dtype.name == "category" for c in data.columns]
-        attribute_names = list(data.columns)
-        return attribute_names, categorical, data
+        lock_path = str(data_file) + ".lock"
+        with FileLock(lock_path):
+            if not data_file.exists():
+                self._download_data()
+            try:
+                data = pd.read_parquet(data_file)
+            except Exception as e:
+                raise Exception(f"File: {data_file}") from e
+            categorical = [data[c].dtype.name == "category" for c in data.columns]
+            attribute_names = list(data.columns)
+            return attribute_names, categorical, data
 
     def _load_data(self) -> tuple[pd.DataFrame, list[bool], list[str]]:  # noqa: PLR0912, C901, PLR0915
         """Load data from compressed format or arff. Download data if not present on disk."""
