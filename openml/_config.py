@@ -495,6 +495,10 @@ class OpenMLConfigManager:
         reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
         return os.path.join(self._root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
+    def get_minio_download_path(self, url: str) -> str:
+        parsed_url = urlparse(url)
+        return os.path.join(self.get_cache_directory(), "minio", parsed_url.path.lstrip("/"))  #  noqa: PTH118
+
     def set_root_cache_directory(self, root_cache_directory: str | Path) -> None:
         """Set the root cache directory."""
         self._root_cache_directory = Path(root_cache_directory)

@@ -1970,6 +1970,7 @@ def test__run_task_get_arffcontent_2(parallel_mock):
 @pytest.mark.test_server()
 def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
     """Tests evaluation of a run using various joblib backends and n_jobs."""
+
     if backend is None:
         backend = (
             "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"

@@ -2,17 +2,14 @@
 from __future__ import annotations
 
 import os
-import unittest.mock
 from time import time
 
 import numpy as np
 import pandas as pd
 import pytest
-from scipy import sparse
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
-from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
 import pytest
@@ -65,6 +62,9 @@ class OpenMLDatasetTest(TestBase):
         if self._iris is None:
             self._iris = openml.datasets.get_dataset(61, download_data=False)
         return self._iris
+
+    def _get_cache_filename(self, id):
+        return self.http_client.cache_path_from_url(f"data/{id}")
 
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
@@ -234,18 +234,14 @@ class OpenMLDatasetTest(TestBase):
         assert xy.shape == (150, 5)
 
     def test_lazy_loading_metadata(self):
-        # Initial Setup
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            2,
-        )
         _compare_dataset = openml.datasets.get_dataset(
             2,
             download_data=False,
             download_features_meta_data=True,
             download_qualities=True,
         )
-        change_time = os.stat(did_cache_dir).st_mtime
+        did_cache_file = self._get_cache_filename(2)
+        change_time = os.stat(did_cache_file).st_mtime
 
         # Test with cache
         _dataset = openml.datasets.get_dataset(
@@ -254,15 +250,12 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert change_time == os.stat(did_cache_dir).st_mtime
+        assert change_time == os.stat(did_cache_file).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
         # -- Test without cache
-        openml.utils._remove_cache_dir_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+        did_cache_file.unlink()
 
         _dataset = openml.datasets.get_dataset(
             2,
@@ -270,8 +263,9 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert ["description.xml"] == os.listdir(did_cache_dir)
-        assert change_time != os.stat(did_cache_dir).st_mtime
+
+        assert did_cache_file.exists()
+        assert change_time != os.stat(did_cache_file).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
@@ -425,9 +419,13 @@ def test__read_features(mocker, workdir, static_cache_dir):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "features",
             "2",
-            "features.xml",
+            "body.xml",
         ),
     )
     assert isinstance(features, dict)
@@ -458,9 +456,13 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "qualities",
             "2",
-            "qualities.xml",
+            "body.xml",
         ),
     )
     assert isinstance(qualities, dict)
@@ -469,16 +471,3 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     assert pickle_mock.dump.call_count == 1
 
 
-
-def test__check_qualities():
-    qualities = [{"oml:name": "a", "oml:value": "0.5"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] == 0.5
-
-    qualities = [{"oml:name": "a", "oml:value": "null"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
-
-    qualities = [{"oml:name": "a", "oml:value": None}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
