@@ -465,13 +465,15 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             List[bool]: List indicating which columns contain categorical variables.
             List[str]: List of column names.
         """
-        try:
-            data = self._get_arff(self.format)
-        except OSError as e:
-            logger.critical(
-                f"Please check that the data file {arff_file_path} is there and can be read.",
-            )
-            raise e
+        lock_path = str(arff_file_path) + ".lock"
+        with FileLock(lock_path):
+            try:
+                data = self._get_arff(self.format)
+            except OSError as e:
+                logger.critical(
+                    f"Please check that the data file {arff_file_path} is there and can be read.",
+                )
+                raise e
 
         ARFF_DTYPES_TO_PD_DTYPE = {
             "INTEGER": "integer",

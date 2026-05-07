@@ -145,7 +145,7 @@ def test_v1_fork(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
     assert did != result
-    _wait_for_dataset_being_processed(dataset_v1, result, 'in_preparation', n_tries=30)
+    _wait_for_dataset_being_processed(dataset_v1, result, 'active', n_tries=30)
 
     listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result], status="all")
 
