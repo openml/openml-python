@@ -10,10 +10,13 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    import pandas as pd
+
     from openml.estimation_procedures import OpenMLEstimationProcedure
-    from openml.evaluations import OpenMLEvaluation
+    from openml.evaluations.evaluation import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
     from openml.setups.setup import OpenMLSetup
+    from openml.tasks.task import OpenMLTask, TaskType
 
 
 class DatasetAPI(ResourceAPI):
@@ -26,6 +29,49 @@ class TaskAPI(ResourceAPI):
     """Abstract API interface for task resources."""
 
     resource_type: ResourceType = ResourceType.TASK
+
+    @abstractmethod
+    def get(
+        self,
+        task_id: int,
+    ) -> OpenMLTask:
+        """
+        API v1:
+            GET /task/{task_id}
+
+        API v2:
+            GET /tasks/{task_id}
+        """
+        ...
+
+    @abstractmethod
+    def supports_download_splits(self) -> bool:
+        """Return whether the task API implementation supports split downloads."""
+        ...
+
+    # Task listing (V1 only)
+    @abstractmethod
+    def list(
+        self,
+        limit: int,
+        offset: int,
+        task_type: TaskType | int | None = None,
+        **kwargs: Any,
+    ) -> pd.DataFrame:
+        """
+        List tasks with filters.
+
+        API v1:
+            GET /task/list
+
+        API v2:
+            Not available.
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
+        ...
 
 
 class EvaluationMeasureAPI(ResourceAPI):
