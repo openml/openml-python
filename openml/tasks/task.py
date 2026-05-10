@@ -187,7 +187,7 @@ class OpenMLTask(OpenMLBase):
         # TODO(eddiebergman): Can this every be `None`?
         assert self.task_id is not None
         cache_dir = _create_cache_directory_for_id("tasks", self.task_id)
-        cached_split_file = cache_dir / "datasplits.arff"
+        cached_split_file = cache_dir / "body.arff"
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)

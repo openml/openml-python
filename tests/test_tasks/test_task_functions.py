@@ -153,13 +153,13 @@ class TestTask(TestBase):
 
         assert not os.path.exists(
             os.path.join(
-                openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff"
+                openml.config.get_cache_directory(), "tasks", "2", "body.arff"
             )
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
             os.path.join(
-                openml.config.get_cache_directory(), "datasets", "2", "dataset.arff"
+                openml.config.get_cache_directory(), "datasets", "2", "body.arff"
             )
         )
 
@@ -169,7 +169,7 @@ class TestTask(TestBase):
             
         assert os.path.exists(
             os.path.join(
-                openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff"
+                openml.config.get_cache_directory(), "tasks", "2", "body.arff"
             )
         )
 
@@ -220,7 +220,7 @@ class TestTask(TestBase):
         assert type(split) == OpenMLSplit
         assert os.path.exists(
             os.path.join(
-                openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff"
+                openml.config.get_cache_directory(), "tasks", "1", "body.arff"
             )
         )
 

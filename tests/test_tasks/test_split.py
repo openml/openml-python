@@ -33,7 +33,7 @@ class OpenMLSplitTest(TestBase):
         # Use a unique temp directory for each test to avoid race conditions
         # when running tests in parallel (see issue #1641)
         self._temp_dir = tempfile.TemporaryDirectory()
-        self.arff_filepath = Path(self._temp_dir.name) / "datasplits.arff"
+        self.arff_filepath = Path(self._temp_dir.name) / "body.arff"
         shutil.copy(source_arff, self.arff_filepath)
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
