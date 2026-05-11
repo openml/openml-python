@@ -55,12 +55,6 @@ def _validate_flow_dict(flow: dict[str, Any]) -> None:
     )
     assert ext_version_str_or_none
 
-
-# ---------------------------------------------------------------------------
-# V1 tests
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.test_server()
 def test_flow_v1_get(flow_v1):
     flow = flow_v1.get(flow_id=1)
@@ -240,11 +234,6 @@ def test_flow_v1_untag_mocked(flow_v1, test_apikey_v1):
             headers=openml.config._HEADERS,
             files=None,
         )
-
-
-# ---------------------------------------------------------------------------
-# V2 tests
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.test_server()
