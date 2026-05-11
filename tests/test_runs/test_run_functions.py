@@ -167,7 +167,12 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        # TODO: assert holdout task
+        task = openml.tasks.get_task(run.task_id)
+        assert task.estimation_procedure["type"] == "holdout", (
+            f"Expected holdout estimation procedure for task {run.task_id}, "
+            f"but got '{task.estimation_procedure['type']}'. "
+            "_rerun_model_and_compare_predictions is designed for holdout tasks only."
+        )
 
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
@@ -283,13 +288,40 @@ class TestRun(TestBase):
         assert run_ == run
         assert isinstance(run.dataset_id, int)
 
-        # This is only a smoke check right now
-        # TODO add a few asserts here
-        run._to_xml()
+        xml_output = run._to_xml()
+        assert xml_output is not None, "run._to_xml() must not return None"
+        assert isinstance(xml_output, str), (
+            f"run._to_xml() must return a str, got {type(xml_output)}"
+        )
+        assert len(xml_output) > 0, "run._to_xml() must not return an empty string"
+        assert "oml:run" in xml_output, (
+            "run._to_xml() output must contain the 'oml:run' XML element"
+        )
+        assert "oml:flow_id" in xml_output, (
+            "run._to_xml() output must contain the 'oml:flow_id' element"
+        )
+        assert "oml:task_id" in xml_output, (
+            "run._to_xml() output must contain the 'oml:task_id' element"
+        )
+
         if run.trace is not None:
-            # This is only a smoke check right now
-            # TODO add a few asserts here
-            run.trace.trace_to_arff()
+            trace_arff = run.trace.trace_to_arff()
+            assert trace_arff is not None, "trace_to_arff() must not return None"
+            assert isinstance(trace_arff, dict), (
+                f"trace_to_arff() must return a dict, got {type(trace_arff)}"
+            )
+            assert "data" in trace_arff, (
+                "trace_to_arff() result must contain a 'data' key"
+            )
+            assert "attributes" in trace_arff, (
+                "trace_to_arff() result must contain an 'attributes' key"
+            )
+            assert len(trace_arff["data"]) > 0, (
+                "trace_to_arff()['data'] must be non-empty when trace is present"
+            )
+            assert len(trace_arff["attributes"]) > 0, (
+                "trace_to_arff()['attributes'] must be non-empty when trace is present"
+            )
 
         # check arff output
         assert len(run.data_content) == num_instances
@@ -338,12 +370,28 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(run_.run_id)
         assert "openml-python" in downloaded.tags
 
-        # TODO make sure that these attributes are instantiated when
-        # downloading a run? Or make sure that the trace object is created when
-        # running a flow on a task (and not only the arff object is created,
-        # so that the two objects can actually be compared):
-        # downloaded_run_trace = downloaded._generate_trace_arff_dict()
-        # self.assertEqual(run_trace, downloaded_run_trace)
+        assert downloaded.run_id == run_.run_id, (
+            "Downloaded run_id must match the published run_id"
+        )
+        assert downloaded.task_id == run.task_id, (
+            "Downloaded task_id must match the original run task_id"
+        )
+        assert isinstance(downloaded.dataset_id, int), (
+            "Downloaded run must have an integer dataset_id"
+        )
+        assert downloaded.flow_id is not None, "Downloaded run must have a flow_id"
+        assert downloaded.setup_id is not None, "Downloaded run must have a setup_id"
+
+        if run.trace is not None:
+            downloaded_run_trace = downloaded._generate_trace_arff_dict()
+            assert downloaded_run_trace is not None, (
+                "Downloaded run must expose trace ARFF data when original run had a trace"
+            )
+            local_trace_arff = run.trace.trace_to_arff()
+            assert len(downloaded_run_trace["data"]) == len(local_trace_arff["data"]), (
+                "Number of trace rows in downloaded run must match the locally produced trace"
+            )
+
         return run
 
     def _check_sample_evaluations(
@@ -552,7 +600,24 @@ class TestRun(TestBase):
                 create_task_obj=False,
             )
 
-        # todo: check if runtime is present
+        # Assert that the expected runtime measures are present in fold_evaluations.
+        # These keys are populated by the local evaluation machinery and must always
+        # be present so that the downstream _check_fold_timing_evaluations call has
+        # values to validate.
+        expected_runtime_keys = [
+            "usercpu_time_millis_testing",
+            "usercpu_time_millis_training",
+            "usercpu_time_millis",
+            "wall_clock_time_millis_testing",
+            "wall_clock_time_millis_training",
+            "wall_clock_time_millis",
+        ]
+        for runtime_key in expected_runtime_keys:
+            assert runtime_key in run.fold_evaluations, (
+                f"Expected runtime measure '{runtime_key}' to be present in "
+                f"run.fold_evaluations, but found only: {list(run.fold_evaluations.keys())}"
+            )
+
         self._check_fold_timing_evaluations(
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
