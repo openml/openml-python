@@ -10,6 +10,8 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    import pandas as pd
+
     from openml.estimation_procedures import OpenMLEstimationProcedure
     from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
@@ -79,6 +81,17 @@ class StudyAPI(ResourceAPI):
     """Abstract API interface for study resources."""
 
     resource_type: ResourceType = ResourceType.STUDY
+
+    @abstractmethod
+    def list(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> pd.DataFrame: ...
 
 
 class RunAPI(ResourceAPI):
