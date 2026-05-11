@@ -76,6 +76,21 @@ class FlowAPI(ResourceAPI):
 
     resource_type: ResourceType = ResourceType.FLOW
 
+    @abstractmethod
+    def get(self, flow_id: int, *, reset_cache: bool = False) -> OpenMLFlow: ...
+
+    @abstractmethod
+    def list(
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        tag: str | None = None,
+        uploader: str | None = None,
+    ) -> pd.DataFrame: ...
+
+    @abstractmethod
+    def exists(self, name: str, external_version: str) -> int | bool: ...
+
 
 class StudyAPI(ResourceAPI):
     """Abstract API interface for study resources."""

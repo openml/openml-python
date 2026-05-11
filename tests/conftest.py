@@ -345,6 +345,8 @@ def http_client_v1() -> HTTPClient:
 
 @pytest.fixture
 def http_client_v2() -> HTTPClient:
+    if openml.config.servers[APIVersion.V2]["server"] is None:
+        pytest.skip("V2 server is not configured")
     return HTTPClient(api_version=APIVersion.V2)
 
 
