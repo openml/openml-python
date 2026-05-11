@@ -485,7 +485,7 @@ class OpenMLFlow(OpenMLBase):
         """
         if self.flow_id is None:
             raise ObjectNotPublishedError(
-                "Cannot tag a flow that has not been published yet."
+                "Cannot tag a flow that has not been published yet. "
                 "Please publish the object first before being able to tag it."
                 f"\n{self}",
             )
@@ -501,7 +501,7 @@ class OpenMLFlow(OpenMLBase):
         """
         if self.flow_id is None:
             raise ObjectNotPublishedError(
-                "Cannot untag a flow that has not been published yet."
+                "Cannot untag a flow that has not been published yet. "
                 "Please publish the object first before being able to untag it."
                 f"\n{self}",
             )
