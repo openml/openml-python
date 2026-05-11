@@ -26,6 +26,7 @@ def flow_v2(minio_client) -> FlowV2API:
         pytest.skip("V2 server is not configured")
     from openml._api import HTTPClient
     http_client_v2 = HTTPClient(api_version=APIVersion.V2)
+def flow_v2(http_client_v2, minio_client) -> FlowV2API:
     return FlowV2API(http=http_client_v2, minio=minio_client)
 
 
