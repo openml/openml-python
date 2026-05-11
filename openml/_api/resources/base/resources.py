@@ -97,6 +97,17 @@ class StudyAPI(ResourceAPI):
 
     resource_type: ResourceType = ResourceType.STUDY
 
+    @abstractmethod
+    def list(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> pd.DataFrame: ...
+
 
 class RunAPI(ResourceAPI):
     """Abstract API interface for run resources."""
