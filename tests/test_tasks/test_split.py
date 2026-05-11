@@ -38,11 +38,7 @@ class OpenMLSplitTest(TestBase):
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        # Clean up the entire temp directory
-        try:
-            self._temp_dir.cleanup()
-        except (OSError, FileNotFoundError):
-            pass
+        self._temp_dir.cleanup()
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
