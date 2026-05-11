@@ -28,7 +28,7 @@ def flow_v2(http_client_v2, minio_client) -> FlowV2API:
     return FlowV2API(http=http_client_v2, minio=minio_client)
 
 
-def _assert_flow_shape(flow: OpenMLFlow) -> None:
+def _validate_flow(flow: OpenMLFlow) -> None:
     assert isinstance(flow, OpenMLFlow)
     assert isinstance(flow.flow_id, int)
     assert isinstance(flow.name, str)
