@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from collections.abc import Iterator
 from unittest.mock import patch
 
 import pytest
@@ -9,7 +8,6 @@ from requests import Response, Session
 
 import openml
 from openml._api import FlowV1API, FlowV2API
-from openml.enums import APIVersion
 from openml.exceptions import OpenMLNotSupportedError, OpenMLServerException
 from openml.flows.flow import OpenMLFlow
 
@@ -20,17 +18,12 @@ def flow_v1(http_client_v1, minio_client) -> FlowV1API:
 
 
 @pytest.fixture
-def flow_v2(minio_client) -> FlowV2API:
+def flow_v2(http_client_v2, minio_client) -> FlowV2API:
     from openml.enums import APIVersion
+
     if openml.config.servers[APIVersion.V2]["server"] is None:
         pytest.skip("V2 server is not configured")
-    from openml._api import HTTPClient
-    http_client_v2 = HTTPClient(api_version=APIVersion.V2)
-def flow_v2(http_client_v2, minio_client) -> FlowV2API:
     return FlowV2API(http=http_client_v2, minio=minio_client)
-
-
-
 
 
 def _assert_flow_shape(flow: OpenMLFlow) -> None:
@@ -39,6 +32,11 @@ def _assert_flow_shape(flow: OpenMLFlow) -> None:
     assert flow.flow_id > 0
     assert isinstance(flow.name, str)
     assert len(flow.name) > 0
+
+
+# ---------------------------------------------------------------------------
+# V1 tests
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.test_server()
@@ -167,6 +165,74 @@ def test_flow_v1_delete_mocked(flow_v1, test_apikey_v1):
             headers=openml.config._HEADERS,
             files=None,
         )
+
+
+def test_flow_v1_tag_mocked(flow_v1, test_apikey_v1):
+    """Test V1 tagging a flow."""
+    flow_id = 42
+    tag_name = "my-test-tag"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:flow_tag xmlns:oml="http://openml.org/openml">'
+            f"<oml:id>{flow_id}</oml:id>"
+            f"<oml:tag>{tag_name}</oml:tag>"
+            "</oml:flow_tag>"
+        ).encode("utf-8")
+
+        tags = flow_v1.tag(flow_id, tag_name)
+
+        assert tag_name in tags
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + "flow/tag",
+            params={},
+            data={
+                "api_key": test_apikey_v1,
+                "flow_id": flow_id,
+                "tag": tag_name,
+            },
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+def test_flow_v1_untag_mocked(flow_v1, test_apikey_v1):
+    """Test V1 untagging a flow."""
+    flow_id = 42
+    tag_name = "my-test-tag"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:flow_untag xmlns:oml="http://openml.org/openml">'
+            f"<oml:id>{flow_id}</oml:id>"
+            "</oml:flow_untag>"
+        ).encode("utf-8")
+
+        tags = flow_v1.untag(flow_id, tag_name)
+
+        assert tag_name not in tags
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + "flow/untag",
+            params={},
+            data={
+                "api_key": test_apikey_v1,
+                "flow_id": flow_id,
+                "tag": tag_name,
+            },
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+# ---------------------------------------------------------------------------
+# V2 tests
+# ---------------------------------------------------------------------------
 
 
 @pytest.mark.test_server()
