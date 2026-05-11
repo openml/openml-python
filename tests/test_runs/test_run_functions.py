@@ -40,7 +40,6 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-#from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
     _run_task_get_arffcontent,
     delete_run,
@@ -1659,14 +1658,19 @@ class TestRun(TestBase):
             assert len(row) == 12
 
     @pytest.mark.test_server()
-    def test_get_cached_run(self):
+    @mock.patch.object(requests.Session, "request")
+    def test_get_cached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.runs.functions._get_cached_run(1)
+        mock_request.side_effect = Exception("Mocked Exception")
+        openml.runs.get_run(1)
 
-    def test_get_uncached_run(self):
+    @pytest.mark.test_server()
+    @mock.patch.object(requests.Session, "request")
+    def test_get_uncached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.runs.functions._get_cached_run(10)
+        mock_request.side_effect = Exception("Mocked Exception")
+        with pytest.raises(Exception, match="Mocked Exception"):
+            openml.runs.get_run(10)
 
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
@@ -1812,10 +1816,10 @@ class TestRun(TestBase):
         _ = openml.runs.initialize_model_from_run(run_id=1, strict_version=False)
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_run_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_run_not_owned(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -1827,14 +1831,15 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_server_v1,
         openml.runs.delete_run(40_000)
 
     run_url = test_server_v1 + "run/40000"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_run_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_run_success(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
     )
@@ -1843,14 +1848,15 @@ def test_delete_run_success(mock_delete, test_files_directory, test_server_v1, t
     assert success
 
     run_url = test_server_v1 + "run/10591880"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_unknown_run(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -1862,8 +1868,9 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_server_v1, t
         openml.runs.delete_run(9_999_999)
 
     run_url = test_server_v1 + "run/9999999"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @pytest.mark.sklearn()

@@ -16,7 +16,6 @@ import numpy as np
 import pandas as pd
 
 import openml
-import openml._api_calls
 from openml.base import OpenMLBase
 from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow, get_flow
@@ -154,10 +153,11 @@ class OpenMLRun(OpenMLBase):
     def predictions(self) -> pd.DataFrame:
         """Return a DataFrame with predictions for this run"""
         if self._predictions is None:
+            arff_dict: dict[str, Any]
             if self.data_content:
                 arff_dict = self._generate_arff_dict()
             elif self.predictions_url:
-                arff_text = openml._api_calls._download_text_file(self.predictions_url)
+                arff_text = openml._backend.run.download_text_file(self.predictions_url)
                 arff_dict = arff.loads(arff_text)
             else:
                 raise RuntimeError("Run has no predictions.")
@@ -343,6 +343,37 @@ class OpenMLRun(OpenMLBase):
 
         return run
 
+    def publish(self) -> OpenMLRun:
+        """Publish the run object on the OpenML server."""
+        file_elements = self._get_file_elements()
+
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+
+        result = openml._backend.run.publish(path="run", files=file_elements)
+        self.run_id = result
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Push a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot tag a run that has not been published yet."
+                " Please publish the run first before being able to tag it.",
+            )
+
+        openml._backend.run.tag(self.run_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Remove a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot untag a run that has not been published yet."
+                " Please publish the run first before being able to untag it.",
+            )
+
+        openml._backend.run.untag(self.run_id, tag)
+
     def to_filesystem(
         self,
         directory: str | Path,
@@ -494,15 +525,16 @@ class OpenMLRun(OpenMLBase):
             metric results
         """
         kwargs = kwargs if kwargs else {}
+        predictions_arff: dict[str, Any]
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif (self.output_files is not None) and ("predictions" in self.output_files):
-            predictions_file_url = openml._api_calls._file_id_to_url(
+            predictions_file_url = openml._backend.run.file_id_to_url(
                 self.output_files["predictions"],
                 "predictions.arff",
             )
-            response = openml._api_calls._download_text_file(predictions_file_url)
-            predictions_arff = arff.loads(response)
+            predictions_text = openml._backend.run.download_text_file(predictions_file_url)
+            predictions_arff = arff.loads(predictions_text)
             # TODO: make this a stream reader
         else:
             raise ValueError(

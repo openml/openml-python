@@ -6,7 +6,6 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -16,10 +15,8 @@ import xmltodict
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml._api_calls
 import openml.utils
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLRunsExistError,
     OpenMLServerException,
     PyOpenMLError,
@@ -49,7 +46,6 @@ if TYPE_CHECKING:
 
 # get_dict is in run.py to avoid circular imports
 
-RUNS_CACHE_DIR_NAME = "runs"
 ERROR_CODE = 512
 
 
@@ -352,7 +348,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call(f"run/trace/{run_id}", "get")
+    trace_xml = openml._backend.run.download_text_file(f"run/trace/{run_id}")
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
@@ -819,30 +815,15 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
         even if the requested run is already cached.
 
-    ignore_cache
-
     Returns
     -------
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
-    run_file = run_dir / "description.xml"
-
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    try:
-        if not ignore_cache:
-            return _get_cached_run(run_id)
-
-        raise OpenMLCacheException(message="dummy")
-
-    except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call(f"run/{run_id}", "get")
-        with run_file.open("w", encoding="utf8") as fh:
-            fh.write(run_xml)
-
-    return _create_run_from_xml(run_xml)
+    return openml._backend.run.get(
+        run_id,
+        reset_cache=ignore_cache,
+    )
 
 
 def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
@@ -1032,17 +1013,6 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     )
 
 
-def _get_cached_run(run_id: int) -> OpenMLRun:
-    """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = run_cache_dir / "description.xml"
-    try:
-        with run_file.open(encoding="utf8") as fh:
-            return _create_run_from_xml(xml=fh.read())
-    except OSError as e:
-        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
-
-
 def list_runs(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
@@ -1103,8 +1073,8 @@ def list_runs(  # noqa: PLR0913
         raise TypeError("uploader must be of type list.")
 
     listing_call = partial(
-        _list_runs,
-        id=id,
+        openml._backend.run.list,
+        ids=id,
         task=task,
         setup=setup,
         flow=flow,
@@ -1119,125 +1089,6 @@ def list_runs(  # noqa: PLR0913
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_runs(  # noqa: PLR0913, C901
-    limit: int,
-    offset: int,
-    *,
-    id: list | None = None,  # noqa: A002
-    task: list | None = None,
-    setup: list | None = None,
-    flow: list | None = None,
-    uploader: list | None = None,
-    study: int | None = None,
-    tag: str | None = None,
-    display_errors: bool = False,
-    task_type: TaskType | int | None = None,
-) -> pd.DataFrame:
-    """
-    Perform API call `/run/list/{filters}'
-    <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
-
-    Parameters
-    ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-    display_errors is also separated from the kwargs since it has a
-    default value.
-
-    id : list, optional
-
-    task : list, optional
-
-    setup: list, optional
-
-    flow : list, optional
-
-    tag: str, optional
-
-    uploader : list, optional
-
-    study : int, optional
-
-    display_errors : bool, optional (default=None)
-        Whether to list runs which have an error (for example a missing
-        prediction file).
-
-    task_type : str, optional
-
-    Returns
-    -------
-    dict, or dataframe
-        List of found runs.
-    """
-    api_call = "run/list"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if id is not None:
-        api_call += f"/run/{','.join([str(int(i)) for i in id])}"
-    if task is not None:
-        api_call += f"/task/{','.join([str(int(i)) for i in task])}"
-    if setup is not None:
-        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
-    if flow is not None:
-        api_call += f"/flow/{','.join([str(int(i)) for i in flow])}"
-    if uploader is not None:
-        api_call += f"/uploader/{','.join([str(int(i)) for i in uploader])}"
-    if study is not None:
-        api_call += f"/study/{study}"
-    if display_errors:
-        api_call += "/show_errors/true"
-    if tag is not None:
-        api_call += f"/tag/{tag}"
-    if task_type is not None:
-        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
-        api_call += f"/task_type/{tvalue}"
-    return __list_runs(api_call=api_call)
-
-
-def __list_runs(api_call: str) -> pd.DataFrame:
-    """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
-    # Minimalistic check if the XML is useful
-    if "oml:runs" not in runs_dict:
-        raise ValueError(f'Error in return XML, does not contain "oml:runs": {runs_dict}')
-
-    if "@xmlns:oml" not in runs_dict["oml:runs"]:
-        raise ValueError(
-            f'Error in return XML, does not contain "oml:runs"/@xmlns:oml: {runs_dict}'
-        )
-
-    if runs_dict["oml:runs"]["@xmlns:oml"] != "http://openml.org/openml":
-        raise ValueError(
-            "Error in return XML, value of  "
-            '"oml:runs"/@xmlns:oml is not '
-            f'"http://openml.org/openml": {runs_dict}',
-        )
-
-    if not isinstance(runs_dict["oml:runs"]["oml:run"], list):
-        raise TypeError(
-            f"Expected runs_dict['oml:runs']['oml:run'] to be a list, "
-            f"got {type(runs_dict['oml:runs']['oml:run']).__name__}"
-        )
-
-    runs = {
-        int(r["oml:run_id"]): {
-            "run_id": int(r["oml:run_id"]),
-            "task_id": int(r["oml:task_id"]),
-            "setup_id": int(r["oml:setup_id"]),
-            "flow_id": int(r["oml:flow_id"]),
-            "uploader": int(r["oml:uploader"]),
-            "task_type": TaskType(int(r["oml:task_type_id"])),
-            "upload_time": str(r["oml:upload_time"]),
-            "error_message": str((r["oml:error_message"]) or ""),
-        }
-        for r in runs_dict["oml:runs"]["oml:run"]
-    }
-    return pd.DataFrame.from_dict(runs, orient="index")
 
 
 def format_prediction(  # noqa: PLR0913
@@ -1325,4 +1176,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("run", run_id)
+    return openml._backend.run.delete(run_id)

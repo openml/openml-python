@@ -15,7 +15,9 @@ if TYPE_CHECKING:
     from openml.estimation_procedures import OpenMLEstimationProcedure
     from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
+    from openml.runs.run import OpenMLRun
     from openml.setups.setup import OpenMLSetup
+    from openml.tasks.task import TaskType
 
 
 class DatasetAPI(ResourceAPI):
@@ -98,6 +100,45 @@ class RunAPI(ResourceAPI):
     """Abstract API interface for run resources."""
 
     resource_type: ResourceType = ResourceType.RUN
+
+    @abstractmethod
+    def get(
+        self,
+        run_id: int,
+        *,
+        reset_cache: bool = False,
+    ) -> OpenMLRun: ...
+
+    def list(  # type: ignore[valid-type]  # noqa: PLR0913
+        self,
+        limit: int,
+        offset: int,
+        *,
+        ids: builtins.list[int] | None = None,
+        task: builtins.list[int] | None = None,
+        setup: builtins.list[int] | None = None,
+        flow: builtins.list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
+        study: int | None = None,
+        tag: str | None = None,
+        display_errors: bool = False,
+        task_type: TaskType | int | None = None,
+    ) -> pd.DataFrame: ...
+
+    @abstractmethod
+    def download_text_file(
+        self,
+        source: str,
+        *,
+        md5_checksum: str | None = None,
+    ) -> str: ...
+
+    @abstractmethod
+    def file_id_to_url(
+        self,
+        file_id: int,
+        filename: str | None = None,
+    ) -> str: ...
 
 
 class SetupAPI(ResourceAPI):
