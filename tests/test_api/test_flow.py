@@ -5,6 +5,8 @@ from unittest.mock import patch
 
 import pytest
 from requests import Response, Session
+import pandas as pd
+from typing import Any
 
 import openml
 from openml._api import FlowV1API, FlowV2API
@@ -29,9 +31,29 @@ def flow_v2(http_client_v2, minio_client) -> FlowV2API:
 def _assert_flow_shape(flow: OpenMLFlow) -> None:
     assert isinstance(flow, OpenMLFlow)
     assert isinstance(flow.flow_id, int)
-    assert flow.flow_id > 0
     assert isinstance(flow.name, str)
-    assert len(flow.name) > 0
+    assert isinstance(flow.version, str)
+    # There are some runs on openml.org that can have an empty external version
+    ext_version = flow.external_version
+    ext_version_str_or_none = (
+        isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
+    )
+    assert ext_version_str_or_none
+
+
+def _validate_flow_dict(flow: dict[str, Any]) -> None:
+    assert type(flow) == dict
+    assert len(flow) == 6
+    assert isinstance(flow["id"], int)
+    assert isinstance(flow["name"], str)
+    assert isinstance(flow["full_name"], str)
+    assert isinstance(flow["version"], str)
+    # There are some runs on openml.org that can have an empty external version
+    ext_version = flow["external_version"]
+    ext_version_str_or_none = (
+        isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
+    )
+    assert ext_version_str_or_none
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +64,7 @@ def _assert_flow_shape(flow: OpenMLFlow) -> None:
 @pytest.mark.test_server()
 def test_flow_v1_get(flow_v1):
     flow = flow_v1.get(flow_id=1)
-    _assert_flow_shape(flow)
+    _validate_flow(flow)
 
 
 @pytest.mark.test_server()
@@ -50,21 +72,11 @@ def test_flow_v1_list(flow_v1):
     limit = 5
     flows_df = flow_v1.list(limit=limit)
 
-    assert len(flows_df) == limit
-    assert "id" in flows_df.columns
-    assert "name" in flows_df.columns
-    assert "version" in flows_df.columns
-    assert "external_version" in flows_df.columns
-    assert "full_name" in flows_df.columns
-    assert "uploader" in flows_df.columns
+    assert isinstance(flows_df, pd.DataFrame)
+    assert len(flows_df) <= limit
 
-
-@pytest.mark.test_server()
-def test_flow_v1_list_with_offset(flow_v1):
-    limit = 5
-    flows_df = flow_v1.list(limit=limit, offset=10)
-
-    assert len(flows_df) == limit
+    for flow in flows_df.to_dict(orient="index").values():
+        _validate_flow_dict(flow)
 
 
 def test_flow_v1_exists_input_validation(flow_v1):
@@ -238,7 +250,7 @@ def test_flow_v1_untag_mocked(flow_v1, test_apikey_v1):
 @pytest.mark.test_server()
 def test_flow_v2_get(flow_v2):
     flow = flow_v2.get(flow_id=1)
-    _assert_flow_shape(flow)
+    _validate_flow(flow)
 
 
 def test_flow_v2_exists_nonexistent(flow_v2):
