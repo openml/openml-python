@@ -107,6 +107,48 @@ $env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
 
+#### Running Tests Against Local Services (Docker)
+
+The CI now runs tests against a local OpenML server using Docker instead of the remote test server.
+You can replicate this setup locally:
+
+1. **Clone the services repository** (from the parent directory of `openml-python`):
+   ```bash
+   git clone --depth 1 https://github.com/openml/services.git
+   cd services
+   ```
+
+2. **Set file permissions** required by the containers:
+   ```bash
+   chmod -R a+rw ./data
+   chmod -R a+rw ./logs
+   ```
+
+3. **Start the Docker services**:
+   ```bash
+   docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+   ```
+
+4. **Wait for the API to become healthy**:
+   ```bash
+   timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
+   ```
+
+5. **Run the tests** with the local services environment variable:
+   ```bash
+   export OPENML_USE_LOCAL_SERVICES="true"
+   pytest -n 4 --durations=20 --dist load -sv -m "not production_server"
+   ```
+
+6. **Cleanup** after testing:
+   ```bash
+   cd services
+   docker compose --profile rest-api --profile minio --profile evaluation-engine down
+   ```
+
+For more details, see the [Developer Setup Guide](https://openml.github.io/openml-python/main/developer_setup.html).
+
+
 ### Pull Request Checklist
 
 You can go to the `openml-python` GitHub repository to create the pull request by [comparing the branch](https://github.com/openml/openml-python/compare) from your fork with the `main` branch of the `openml-python` repository. When creating a pull request, make sure to follow the comments and structured provided by the template on GitHub.
