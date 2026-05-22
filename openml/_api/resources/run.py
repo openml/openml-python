@@ -206,7 +206,12 @@ class RunV1API(ResourceV1API, RunAPI):
                 f'"http://openml.org/openml": {runs_dict}',
             )
 
-        assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
+        if not isinstance(runs_dict["oml:runs"]["oml:run"], list):
+            raise TypeError(
+                "Error in return XML, 'oml:runs/oml:run' is expected to be a list, "
+                f"but got {type(runs_dict['oml:runs']['oml:run']).__name__}: "
+                f"{runs_dict['oml:runs']['oml:run']}"
+            )
 
         runs = {
             int(r["oml:run_id"]): {
