@@ -29,6 +29,12 @@ def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
     -------
     OpenMLSuite
         The OpenML suite object
+
+    Examples
+    --------
+    >>> import openml
+    >>> suite = openml.study.get_suite(99)  # doctest: +SKIP
+    >>> suite = openml.study.get_suite("OpenML-CC18")  # doctest: +SKIP
     """
     study = _get_study(suite_id, entity_type="task")
     assert isinstance(study, OpenMLBenchmarkSuite)
@@ -58,6 +64,11 @@ def get_study(
     -------
     OpenMLStudy
         The OpenML study object
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.get_study(1)  # doctest: +SKIP
     """
     if study_id == "OpenML100":
         message = (
@@ -108,7 +119,10 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     tags = []
     if "oml:tag" in result_dict:
         for tag in result_dict["oml:tag"]:
-            current_tag = {"name": tag["oml:name"], "write_access": tag["oml:write_access"]}
+            current_tag = {
+                "name": tag["oml:name"],
+                "write_access": tag["oml:write_access"],
+            }
             if "oml:window_start" in tag:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
@@ -209,6 +223,15 @@ def create_study(
     -------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.create_study(  # doctest: +SKIP
+    ...     name="My Study",
+    ...     description="A study on decision trees",
+    ...     run_ids=[1, 2, 3],
+    ... )
     """
     return OpenMLStudy(
         study_id=None,
