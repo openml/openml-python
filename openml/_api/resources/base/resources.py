@@ -109,6 +109,7 @@ class RunAPI(ResourceAPI):
         reset_cache: bool = False,
     ) -> OpenMLRun: ...
 
+    @abstractmethod
     def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
         limit: int,

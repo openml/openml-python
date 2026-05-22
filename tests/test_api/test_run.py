@@ -8,7 +8,7 @@ from requests import Response, Session
 
 import openml
 from openml._api import RunV1API, RunV2API
-from openml.exceptions import OpenMLNotSupportedError, OpenMLServerException
+from openml.exceptions import OpenMLNotSupportedError
 from openml.runs.run import OpenMLRun
 
 
@@ -30,13 +30,11 @@ def _assert_run_shape(run: OpenMLRun) -> None:
 
 
 def test_run_v1_get(run_v1, with_test_cache):
-    try:
-        run = run_v1.get(run_id=1)
-    except OpenMLServerException as e:
-        if e.code == 236 or "Run not found" in str(e):
-            run = run_v1.get(run_id=25)
-        else:
-            raise
+    import os
+
+    # Run 1 exists on the remote test server; the local docker server only seeds run 25.
+    run_id = 25 if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true" else 1
+    run = run_v1.get(run_id=run_id)
     _assert_run_shape(run)
 
 
@@ -77,23 +75,6 @@ def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
             files=files,
         )
 
-
-def test_run_v1_publish_mocked_oml_id_fallback(run_v1, test_apikey_v1):
-    """Test publish with oml:id fallback (alternative response format)."""
-    files = {"description": "<run/>"}
-
-    with patch.object(Session, "request") as mock_request:
-        mock_request.return_value = Response()
-        mock_request.return_value.status_code = 200
-        mock_request.return_value._content = (
-            '<oml:upload_run xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>789</oml:id>\n"
-            "</oml:upload_run>\n"
-        ).encode("utf-8")
-
-        result = run_v1.publish(path="run", files=files)
-
-        assert result == 789
 
 
 def test_run_v1_delete_mocked(run_v1, test_apikey_v1):

@@ -38,13 +38,9 @@ class RunV1API(ResourceV1API, RunAPI):
         if not isinstance(root_value, Mapping):
             raise ValueError("Unexpected XML structure in run upload response")
 
-        # Run responses use oml:run_id
+        # Run responses always use oml:run_id
         if "oml:run_id" in root_value:
             return int(root_value["oml:run_id"])
-
-        # Fall back to generic oml:id (used by other resources)
-        if "oml:id" in root_value:
-            return int(root_value["oml:id"])
 
         raise ValueError("No run ID found in upload response")
 
