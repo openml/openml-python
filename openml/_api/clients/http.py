@@ -111,10 +111,7 @@ class HTTPCache:
         return "body.txt"
 
     def _get_body_filename_from_path(self, path: Path) -> str:
-        candidates = []
-        for p in path.iterdir():
-            if p.name.startswith("body.") and len(p.suffixes) == 1:
-                candidates.append(p)
+        candidates = [p for p in path.glob("body.*") if len(p.suffixes) == 1]
 
         if not candidates:
             raise FileNotFoundError(f"No body file found in path: {path}")
