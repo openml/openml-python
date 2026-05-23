@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import urlencode, urljoin, urlparse
 
-import arff
 import requests
 import xmltodict
 from requests import Response
@@ -93,20 +92,27 @@ class HTTPCache:
     def _get_body_filename_from_response(self, response: Response) -> str:
         content_type = response.headers.get("Content-Type", "").lower()
 
+        # check for .json
         if "application/json" in content_type:
             return "body.json"
 
+        # check for .xml
         if "text/xml" in content_type:
             return "body.xml"
 
+        # check for .zip
         if response.content.startswith(b"PK\x03\x04"):
             return "body.zip"
 
-        try:
-            arff.loads(response.text)
-            return "body.arff"
-        except arff.ArffException:
-            pass
+        # check for .arff
+        for raw_line in response.text.splitlines():
+            stripped_line = raw_line.strip()
+            # skip empty lines and comments
+            if not stripped_line or stripped_line.startswith("%"):
+                continue
+            if stripped_line.lower().startswith("@relation"):
+                return "body.arff"
+            break
 
         return "body.txt"
 
