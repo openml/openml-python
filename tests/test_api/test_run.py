@@ -29,12 +29,9 @@ def _assert_run_shape(run: OpenMLRun) -> None:
     assert isinstance(run.task_id, int)
 
 
-def test_run_v1_get(run_v1, with_test_cache):
-    import os
-
-    # Run 1 exists on the remote test server; the local docker server only seeds run 25.
-    run_id = 25 if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true" else 1
-    run = run_v1.get(run_id=run_id)
+def test_run_v1_get(run_v1, test_files_directory):
+    openml.config.set_root_cache_directory(test_files_directory)
+    run = run_v1.get(run_id=1)
     _assert_run_shape(run)
 
 
