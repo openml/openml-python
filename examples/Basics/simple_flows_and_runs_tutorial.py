@@ -2,9 +2,8 @@
 # A simple tutorial on how to upload results from a machine learning experiment to OpenML.
 
 # %%
-import sklearn
 from sklearn.neighbors import KNeighborsClassifier
-
+import sklearn
 import openml
 
 # %% [markdown]
@@ -54,28 +53,43 @@ y_pred_proba = clf.predict_proba(X_test)
 
 # %% [markdown]
 # ## Upload the machine learning experiments to OpenML
-# First, create a fow and fill it with metadata about the machine learning model.
+#
+# ### Option A: Automatic publishing (simplified)
+# The publish function automatically detects the model type and creates the flow:
 
 # %%
-knn_flow = openml.flows.OpenMLFlow(
-    # Metadata
-    model=clf,  # or None, if you do not want to upload the model object.
-    name="CustomKNeighborsClassifier",
-    description="A custom KNeighborsClassifier flow for OpenML.",
-    external_version=f"{sklearn.__version__}",
-    language="English",
-    tags=["openml_tutorial_knn"],
-    dependencies=f"{sklearn.__version__}",
-    # Hyperparameters
-    parameters={k: str(v) for k, v in knn_parameters.items()},
-    parameters_meta_info={
-        "n_neighbors": {"description": "number of neighbors to use", "data_type": "int"}
-    },
-    # If you have a pipeline with subcomponents, such as preprocessing, add them here.
-    components={},
-)
-knn_flow.publish()
-print(f"knn_flow was published with the ID {knn_flow.flow_id}")
+knn_flow = openml.publish(clf, tags=["openml_tutorial_knn"])
+print(f"Flow was auto-published with ID {knn_flow.flow_id}")
+
+# %% [markdown]
+# ### Option B: Manual flow construction (full control, alternative)
+# For advanced use cases, you can manually construct the flow.
+# This block is intentionally left as a commented alternative to avoid
+# uploading a second flow in this tutorial run.
+
+# %%
+# knn_flow_manual = openml.flows.OpenMLFlow(
+#     # Metadata
+#     model=clf,  # or None, if you do not want to upload the model object.
+#     name="CustomKNeighborsClassifier",
+#     description="A custom KNeighborsClassifier flow for OpenML.",
+#     external_version=f"{sklearn.__version__}",
+#     language="English",
+#     tags=["openml_tutorial_knn"],
+#     dependencies=f"{sklearn.__version__}",
+#     # Hyperparameters
+#     parameters={k: str(v) for k, v in knn_parameters.items()},
+#     parameters_meta_info={
+#         "n_neighbors": {"description": "number of neighbors to use", "data_type": "int"}
+#     },
+#     # If you have a pipeline with subcomponents, such as preprocessing, add them here.
+#     components={},
+# )
+# knn_flow_manual.publish()
+# print(f"knn_flow_manual was published with the ID {knn_flow_manual.flow_id}")
+
+# %% [markdown]
+# Now we'll use the auto-published flow to create and upload a run.
 
 # %% [markdown]
 # Second, we create a run to store the results associated with the flow.

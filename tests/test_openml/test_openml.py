@@ -3,8 +3,30 @@ from __future__ import annotations
 
 from unittest import mock
 
+import pytest
+
 import openml
+from openml.base import OpenMLBase
 from openml.testing import TestBase
+
+
+class DummyOpenMLObject(OpenMLBase):
+    def __init__(self, tags: list[str] | None = None, name: str = "orig") -> None:
+        self.tags = tags or []
+        self.name = name
+
+    @property
+    def id(self):
+        return None
+
+    def _get_repr_body_fields(self):
+        return [("name", self.name)]
+
+    def _to_dict(self):
+        return {"oml:dummy": {}}
+
+    def _parse_publish_response(self, xml_response):
+        return None
 
 
 class TestInit(TestBase):
@@ -41,3 +63,32 @@ class TestInit(TestBase):
         assert task_mock.call_count == 2
         for argument, fixture in zip(task_mock.call_args_list, [(1,), (2,)]):
             assert argument[0] == fixture
+
+    @mock.patch("openml.base.OpenMLBase.publish", autospec=True)
+    def test_openml_publish(self, publish_mock):
+        obj = DummyOpenMLObject(tags=["a"])
+        publish_mock.return_value = obj
+
+        result = openml.publish(obj, name="new", tags=["b", "a"])
+
+        publish_mock.assert_called_once()
+        assert publish_mock.call_args[0][0] is obj
+        assert result is obj
+        assert obj.name == "new"
+        assert obj.tags == ["a", "b"]
+
+    @pytest.mark.sklearn()
+    @mock.patch("openml.flows.flow.OpenMLFlow.publish", autospec=True)
+    def test_openml_publish_ext(self, publish_mock):
+        from sklearn.dummy import DummyClassifier
+
+        publish_mock.return_value = mock.sentinel.published
+
+        result = openml.publish(DummyClassifier(), name="n", tags=["x"])
+
+        publish_mock.assert_called_once()
+        published_obj = publish_mock.call_args[0][0]
+        assert isinstance(published_obj, OpenMLBase)
+        assert published_obj.name == "n"
+        assert "x" in published_obj.tags
+        assert result is mock.sentinel.published
