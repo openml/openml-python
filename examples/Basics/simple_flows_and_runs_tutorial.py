@@ -25,11 +25,24 @@ import openml
 openml.config.start_using_configuration_for_example()
 
 # %% [markdown]
+# ## Quick: list flows and runs via unified entrypoints
+
+# %%
+flows_df = openml.list_all("flow", size=3)
+print(flows_df.head())
+
+runs_df = openml.list_all("run", size=3)
+print(runs_df.head())
+
+# %% [markdown]
 # ## Train a machine learning model and evaluate it
 # NOTE: We are using task 119 from the test server: https://test.openml.org/d/20
 
 # %%
-task = openml.tasks.get_task(119)
+task = openml.get(119, object_type="task")
+
+# Legacy path still works:
+# task = openml.tasks.get_task(119)
 
 # Get the data
 dataset = task.get_dataset()
