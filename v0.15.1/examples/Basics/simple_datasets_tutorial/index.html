@@ -4394,7 +4394,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=76aadf88">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3fe00f3f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4409,7 +4409,7 @@ the datasets directly.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36c97062">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c822cd45">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4437,7 +4437,7 @@ import openml</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=30bea629">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5385f11f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4448,7 +4448,7 @@ import openml</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=60fb9725">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eb45b56d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4466,10 +4466,16 @@ import openml</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">datasets_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># New: top-level convenience alias</span>
+<span class="n">datasets_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">()</span>
+<span class="c1"># Old path still works for backwards compatibility:</span>
+<span class="c1"># datasets_df = openml.datasets.list_datasets()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">datasets_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">datasets_df = openml.datasets.list_datasets()
+<div class="clipboard-copy-txt" id="cell-2"># New: top-level convenience alias
+datasets_df = openml.list_datasets()
+# Old path still works for backwards compatibility:
+# datasets_df = openml.datasets.list_datasets()
 print(datasets_df.head(n=10))</div>
 </div>
 </div>
@@ -4477,7 +4483,7 @@ print(datasets_df.head(n=10))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ab3a1d4d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=651694d8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4488,7 +4494,7 @@ print(datasets_df.head(n=10))</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=31c0beed">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1218d1af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4507,7 +4513,10 @@ print(datasets_df.head(n=10))</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Iris dataset https://www.openml.org/d/61</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
+<span class="c1"># New: top-level convenience alias</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="o">=</span><span class="mi">61</span><span class="p">)</span>
+<span class="c1"># Old path still works:</span>
+<span class="c1"># dataset = openml.datasets.get_dataset(dataset_id=61)</span>
 
 <span class="c1"># Print a summary</span>
 <span class="nb">print</span><span class="p">(</span>
@@ -4517,7 +4526,10 @@ print(datasets_df.head(n=10))</div>
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Iris dataset https://www.openml.org/d/61
-dataset = openml.datasets.get_dataset(dataset_id=61)
+# New: top-level convenience alias
+dataset = openml.get_dataset(dataset_id=61)
+# Old path still works:
+# dataset = openml.datasets.get_dataset(dataset_id=61)
 
 # Print a summary
 print(
@@ -4531,7 +4543,7 @@ print(dataset.description[:500])</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f57cd605">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bf7dd57">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4549,7 +4561,7 @@ target feature (y)</li>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2184fbc4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=af691285">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4580,7 +4592,7 @@ target feature (y)</li>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=768f38f1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0c698d33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4591,7 +4603,7 @@ target feature (y)</li>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=341ad30e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7cc3a38f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
