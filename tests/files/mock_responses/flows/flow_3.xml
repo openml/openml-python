@@ -1,0 +1,14 @@
+<oml:flow xmlns:oml="http://openml.org/openml">
+	<oml:id>3</oml:id>
+	<oml:name>weka.ZeroR</oml:name>
+	<oml:version>1</oml:version>
+	<oml:external_version>Weka_3.7.5</oml:external_version>
+	<oml:description>ZeroR classifier</oml:description>
+	<oml:upload_date>2014-04-23 18:00:36</oml:upload_date>
+	<oml:language>English</oml:language>
+	<oml:dependencies>Weka_3.7.5</oml:dependencies>
+	<oml:parameter>
+		<oml:name>-D</oml:name>
+		<oml:default_value>false</oml:default_value>
+	</oml:parameter>
+</oml:flow>
