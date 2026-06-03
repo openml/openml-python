@@ -7,6 +7,7 @@ import random
 import time
 import unittest
 import warnings
+from collections import OrderedDict
 
 from openml_sklearn import SklearnExtension, cat, cont
 from packaging.version import Version
@@ -42,7 +43,9 @@ from openml.exceptions import (
 )
 #from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
+    _create_run_from_results,
     _run_task_get_arffcontent,
+    _sync_flow_with_server,
     delete_run,
     format_prediction,
     run_exists,
@@ -110,6 +113,61 @@ class TestRun(TestBase):
     def setUp(self):
         super().setUp()
         self.extension = SklearnExtension()
+
+    def test_sync_flow_with_server_returns_early_without_sync_flags(self):
+        flow = mock.MagicMock()
+        flow.name = "dummy-flow"
+        flow.external_version = "1"
+        flow.flow_id = None
+        task = mock.MagicMock()
+
+        with mock.patch("openml.runs.functions.flow_exists") as flow_exists_mock:
+            flow_id = _sync_flow_with_server(
+                flow=flow,
+                task=task,
+                upload_flow=False,
+                avoid_duplicate_runs=False,
+            )
+
+        assert flow_id is None
+        flow_exists_mock.assert_not_called()
+
+    def test_create_run_from_results_keeps_required_constructor_fields(self):
+        model = object()
+        flow = mock.MagicMock()
+        flow.model = model
+        flow.name = "dummy-flow"
+        flow.flow_id = None
+        flow.extension.create_setup_string.return_value = "dummy-setup-string"
+
+        task = mock.MagicMock()
+        task.task_id = 123
+        task.task_type_id = TaskType.SUPERVISED_CLASSIFICATION
+        dataset = mock.MagicMock()
+        dataset.dataset_id = 456
+        task.get_dataset.return_value = dataset
+
+        run = _create_run_from_results(
+            task=task,
+            flow=flow,
+            flow_id=None,
+            data_content=[[0, 0, 0, "prediction", "truth"]],
+            trace=None,
+            fold_evaluations=OrderedDict(),
+            sample_evaluations=OrderedDict(),
+            tags=["openml-python", "python"],
+            run_environment=["python", "3.11"],
+            upload_flow=False,
+            avoid_duplicate_runs=False,
+        )
+
+        assert run.task_id == 123
+        assert run.dataset_id == 456
+        assert run.model is model
+        assert run.flow_name == "dummy-flow"
+        assert run.setup_string == "dummy-setup-string"
+        assert run.description_text is not None
+        assert "Created by run_flow_on_task" in run.description_text
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)
