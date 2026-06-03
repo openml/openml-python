@@ -6,7 +6,6 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
