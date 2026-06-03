@@ -112,9 +112,9 @@ class FlowV1API(ResourceV1API, FlowAPI):
         if offset is not None:
             api_call += f"/offset/{offset}"
         if tag is not None:
-            api_call += f"/tag/{tag}"
+            api_call += f"/tag/{quote(str(tag), safe='')}"
         if uploader is not None:
-            api_call += f"/uploader/{uploader}"
+            api_call += f"/uploader/{quote(str(uploader), safe='')}"
 
         response = self._http.get(api_call)
         xml_string = response.text
