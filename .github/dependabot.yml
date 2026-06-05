@@ -1,9 +1,32 @@
 version: 2
 
 updates:
-  # This will check for updates to github actions every day
-  # https://docs.github.com/en/enterprise-server@3.4/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
+  # Check for updates to GitHub Actions daily
+  # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Check for Python dependency updates weekly
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    # Group minor and patch updates together
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
