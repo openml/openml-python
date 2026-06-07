@@ -187,7 +187,7 @@ class OpenMLTask(OpenMLBase):
         # TODO(eddiebergman): Can this every be `None`?
         assert self.task_id is not None
         cache_dir = _create_cache_directory_for_id("tasks", self.task_id)
-        cached_split_file = cache_dir / "datasplits.arff"
+        cached_split_file = cache_dir / "body.arff"
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)
@@ -240,6 +240,48 @@ class OpenMLTask(OpenMLBase):
     def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.task_id = int(xml_response["oml:upload_task"]["oml:id"])
+
+    def publish(self) -> OpenMLTask:
+        """Publish this task to OpenML server.
+
+        Returns
+        -------
+        self : OpenMLTask
+        """
+        file_elements = self._get_file_elements()
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+        task_id = openml._backend.task.publish(path="task", files=file_elements)
+        self.task_id = task_id
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this task with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the task.
+        """
+        if self.task_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to tag it."
+            )
+        openml._backend.task.tag(self.task_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this task on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the task.
+        """
+        if self.task_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to untag it."
+            )
+        openml._backend.task.untag(self.task_id, tag)
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):

@@ -48,7 +48,10 @@ class TestRun(TestBase):
     def _test_prediction_data_equal(run, run_prime):
         # Determine which attributes are numeric and which not
         num_cols = np.array(
-            [d_type == "NUMERIC" for _, d_type in run._generate_arff_dict()["attributes"]],
+            [
+                d_type == "NUMERIC"
+                for _, d_type in run._generate_arff_dict()["attributes"]
+            ],
         )
         # Get run data consistently
         #   (For run from server, .data_content does not exist)
@@ -66,7 +69,9 @@ class TestRun(TestBase):
     def _test_run_obj_equals(self, run, run_prime):
         for dictionary in ["evaluations", "fold_evaluations", "sample_evaluations"]:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(
+                    getattr(run, dictionary), getattr(run_prime, dictionary)
+                )
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
@@ -76,7 +81,9 @@ class TestRun(TestBase):
         self._test_prediction_data_equal(run, run_prime)
 
         # Test trace
-        run_trace_content = run.trace.trace_to_arff()["data"] if run.trace is not None else None
+        run_trace_content = (
+            run.trace.trace_to_arff()["data"] if run.trace is not None else None
+        )
 
         if run_prime.trace is not None:
             run_prime_trace_content = run_prime.trace.trace_to_arff()["data"]
@@ -118,6 +125,10 @@ class TestRun(TestBase):
         else:
             assert run_prime_trace_content is None
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_to_from_filesystem_vanilla(self):
@@ -153,6 +164,10 @@ class TestRun(TestBase):
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
     @pytest.mark.test_server()
@@ -189,14 +204,23 @@ class TestRun(TestBase):
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_to_from_filesystem_no_model(self):
         model = Pipeline(
-            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
+            [
+                ("imputer", SimpleImputer(strategy="mean")),
+                ("classifier", DummyClassifier()),
+            ],
         )
         task = openml.tasks.get_task(119)  # diabetes; crossvalidation
-        run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
+        run = openml.runs.run_model_on_task(
+            model=model, task=task, add_local_measures=False
+        )
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path, store_model=False)
@@ -265,7 +289,9 @@ class TestRun(TestBase):
         # Check correctness of y_true and y_pred in run
         for fold_id in range(n_folds):
             # Get data for fold
-            _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
+            _, test_indices = task.get_train_test_split_indices(
+                repeat=0, fold=fold_id, sample=0
+            )
             train_mask = np.full(len(X), True)
             train_mask[test_indices] = False
 
@@ -279,7 +305,9 @@ class TestRun(TestBase):
             y_pred = model.fit(X_train, y_train).predict(X_test)
 
             # Get stored data for fold
-            saved_fold_data = run.predictions[run.predictions["fold"] == fold_id].sort_values(
+            saved_fold_data = run.predictions[
+                run.predictions["fold"] == fold_id
+            ].sort_values(
                 by="row_id",
             )
             saved_y_pred = saved_fold_data["prediction"].values
@@ -295,6 +323,10 @@ class TestRun(TestBase):
             assert_method(y_pred, saved_y_pred)
             assert_method(y_test, saved_y_test)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_with_local_loaded_flow(self):
@@ -323,7 +355,9 @@ class TestRun(TestBase):
             # Make sure that the prediction data stored in the run is correct.
             self.assert_run_prediction_data(task, run, clone(model))
 
-            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            cache_path = os.path.join(
+                self.workdir, "runs", str(random.getrandbits(128))
+            )
             run.to_filesystem(cache_path)
             # obtain run from filesystem
             loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -339,6 +373,10 @@ class TestRun(TestBase):
             assert openml.flows.flow_exists(flow.name, flow.external_version)
             openml.runs.get_run(loaded_run.run_id)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
@@ -362,7 +400,9 @@ class TestRun(TestBase):
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
 
             # Load from filesystem
-            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            cache_path = os.path.join(
+                self.workdir, "runs", str(random.getrandbits(128))
+            )
             run.to_filesystem(cache_path)
             loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
@@ -396,5 +436,7 @@ class TestRun(TestBase):
         assert "oml:setup_string" in run_dict
         assert run_dict["oml:setup_string"] == SETUP_STRING
 
-        recreated_run = openml.runs.functions._create_run_from_xml(xml, from_server=False)
+        recreated_run = openml.runs.functions._create_run_from_xml(
+            xml, from_server=False
+        )
         assert recreated_run.setup_string == SETUP_STRING
