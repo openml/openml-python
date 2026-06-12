@@ -210,12 +210,3 @@ jobs:
             echo "Not all generated files have been deleted!"
             exit 1
         fi
-
-  dummy_windows_py_sk024:
-    name: (windows-latest, Py, sk0.24.*, sk-only:false)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy job."
-          echo "Always succeeds."
