@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import re
 import shutil
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Iterable, Mapping, Sequence, Sized
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence, Sized
 from functools import wraps
 from pathlib import Path
 from typing import (
@@ -452,6 +453,24 @@ def _create_lockfiles_dir() -> Path:
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
     return path
+
+
+@contextlib.contextmanager
+def file_lock(lock_path: str) -> Iterator[None]:
+    """Context manager that uses `oslo_concurrency.lockutils.external_lock`
+
+    The oslo-based locks are placed in the centralized cache `locks` folder
+    returned by ``_create_lockfiles_dir()``. A deterministic name derived from
+    the lock path is used to avoid collisions.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        from oslo_concurrency import lockutils
+
+    lock_dir = _create_lockfiles_dir()
+    name = hashlib.sha256(str(lock_path).encode()).hexdigest()
+    with lockutils.external_lock(name=name, lock_path=str(lock_dir)):
+        yield
 
 
 class ProgressBar(ProgressType):
