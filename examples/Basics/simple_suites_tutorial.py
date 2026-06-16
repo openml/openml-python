@@ -48,6 +48,7 @@ print(tasks)
 # and iterated over for benchmarking. For speed reasons, we only iterate over the first three tasks:
 
 # %%
-for task_id in tasks[:3]:
-    task = openml.tasks.get_task(task_id)
-    print(task)
+if tasks is not None:
+    for task_id in tasks[:3]:
+        task = openml.tasks.get_task(task_id)
+        print(task)
