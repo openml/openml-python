@@ -1,0 +1,47 @@
+name: Greet new contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet first-time contributors
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          issue-message: >
+            👋 Thanks for opening your first issue! We're glad to have you as part of the OpenML community.
+            
+            
+            Please make sure you've provided all the necessary details to help us understand and address your issue.
+            Someone from the team will take a look as soon as possible.
+            
+            
+            If you're interested in contributing, check out our [Contributing Guide](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
+            and look for issues labeled with `good first issue` to get started!
+            
+          pr-message: >
+            🎉 Thanks for opening your first pull request! We appreciate your contribution to OpenML Python.
+            
+            
+            Please make sure:
+            - Your code follows our coding standards
+            - You've added tests for new functionality
+            - All tests pass locally
+            - You've updated documentation if needed
+            - Your commits are clear and descriptive
+            
+            
+            A maintainer will review your PR soon. Feel free to ask questions if you need help!
+            Check out our [Contributing Guide](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
+            for more information.
