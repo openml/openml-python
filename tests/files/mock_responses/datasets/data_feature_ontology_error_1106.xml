@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+  <oml:code>1106</oml:code>
+  <oml:message>Ontology URL is not a valid URL</oml:message>
+</oml:error>
