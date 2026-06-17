@@ -1,10 +1,15 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import requests
+from unittest import mock
+
 import pandas as pd
 import pytest
 
+import openml
 from openml.tasks import TaskType, get_task
+from openml.testing import create_request_response
 
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
@@ -34,7 +39,22 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
         assert task.task_type_id == TaskType.LEARNING_CURVE
         assert task.dataset_id == 20
 
-    @pytest.mark.test_server()
-    def test_class_labels(self):
-        task = get_task(self.task_id)
-        assert task.class_labels == ["tested_negative", "tested_positive"]
+
+@mock.patch.object(requests.Session, "get")
+def test_class_labels(mock_get, test_files_directory, test_api_key):
+    task_response = create_request_response(
+        status_code=200,
+        content_filepath=test_files_directory / "mock_responses" / "tasks" / "task_801.xml",
+    )
+    description_response = create_request_response(
+        status_code=200,
+        content_filepath=test_files_directory / "mock_responses" / "tasks" / "data_description_20.xml",
+    )
+    features_response = create_request_response(
+        status_code=200,
+        content_filepath=test_files_directory / "mock_responses" / "tasks" / "data_features_20.xml",
+    )
+    mock_get.side_effect = [task_response, description_response, features_response]
+
+    task = openml.tasks.get_task(801)
+    assert task.class_labels == ["tested_negative", "tested_positive"]

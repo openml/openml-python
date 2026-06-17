@@ -1,0 +1,22 @@
+<oml:task xmlns:oml="http://openml.org/openml">
+  <oml:task_id>801</oml:task_id>
+  <oml:task_type_id>3</oml:task_type_id>
+  <oml:task_type>Learning Curve</oml:task_type>
+  <oml:input name="source_data">
+    <oml:data_set>
+      <oml:data_set_id>20</oml:data_set_id>
+      <oml:target_feature>class</oml:target_feature>
+    </oml:data_set>
+  </oml:input>
+  <oml:input name="estimation_procedure">
+    <oml:estimation_procedure>
+      <oml:id>13</oml:id>
+      <oml:type>crossvalidation</oml:type>
+      <oml:data_splits_url>https://test.openml.org/api_splits/get/801/Task_801_splits.arff</oml:data_splits_url>
+      <oml:parameter name="number_repeats">1</oml:parameter>
+      <oml:parameter name="number_folds">10</oml:parameter>
+      <oml:parameter name="percentage"></oml:parameter>
+      <oml:parameter name="stratified_sampling">true</oml:parameter>
+    </oml:estimation_procedure>
+  </oml:input>
+</oml:task>
