@@ -1,0 +1,250 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags (e.g., v1.0.0)
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      is-prerelease: ${{ steps.check-prerelease.outputs.is-prerelease }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag or input
+        id: get-version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Using manual version: ${VERSION}"
+          else
+            # Extract version from tag (remove 'v' prefix)
+            VERSION=${GITHUB_REF#refs/tags/v}
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "Using tag version: ${VERSION}"
+          fi
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ steps.get-version.outputs.version }}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: X.Y.Z or X.Y.Z-suffix"
+            exit 1
+          fi
+          echo "✅ Valid version format: $VERSION"
+
+      - name: Check if pre-release
+        id: check-prerelease
+        run: |
+          VERSION="${{ steps.get-version.outputs.version }}"
+          if [[ "$VERSION" =~ -[a-zA-Z] ]] || [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+            echo "is-prerelease=true" >> $GITHUB_OUTPUT
+            echo "This is a pre-release version"
+          else
+            echo "is-prerelease=false" >> $GITHUB_OUTPUT
+            echo "This is a stable release version"
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify version in code
+        run: |
+          VERSION="${{ steps.get-version.outputs.version }}"
+          CODE_VERSION=$(python -c "import openml; print(openml.__version__.__version__)")
+          
+          echo "Tag/Input version: $VERSION"
+          echo "Code version: $CODE_VERSION"
+          
+          if [ "$VERSION" != "$CODE_VERSION" ]; then
+            echo "⚠️ Warning: Version mismatch detected!"
+            echo "Please ensure openml/__version__.py is updated to $VERSION"
+          else
+            echo "✅ Version matches code"
+          fi
+
+  create-release:
+    needs: validate-version
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build distribution packages
+        run: |
+          python -m build
+          echo "### Built Packages" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -lh dist/ >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify distribution packages
+        run: |
+          twine check dist/*
+          echo "✅ Distribution packages verified"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate-version.outputs.version }}"
+          
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, generating full changelog"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to HEAD"
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Save changelog to file
+          cat > RELEASE_NOTES.md << EOF
+          # Release v${VERSION}
+          
+          ## What's Changed
+          
+          ${CHANGELOG}
+          
+          ## Installation
+          
+          \`\`\`bash
+          pip install openml==${VERSION}
+          \`\`\`
+          
+          ## Full Changelog
+          EOF
+          
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...v${VERSION}" >> RELEASE_NOTES.md
+          else
+            echo "https://github.com/${{ github.repository }}/commits/v${VERSION}" >> RELEASE_NOTES.md
+          fi
+          
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.validate-version.outputs.version }}
+          name: Release v${{ needs.validate-version.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: ${{ needs.validate-version.outputs.is-prerelease == 'true' }}
+          files: |
+            dist/*
+          generate_release_notes: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribution-packages
+          path: dist/
+          retention-days: 90
+
+  publish-pypi:
+    needs: [validate-version, create-release]
+    runs-on: ubuntu-latest
+    if: needs.validate-version.outputs.is-prerelease == 'false'
+    environment:
+      name: pypi
+      url: https://pypi.org/project/openml
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: distribution-packages
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+
+      - name: Notify success
+        run: |
+          echo "### 🎉 Release Published Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Version **${{ needs.validate-version.outputs.version }}** has been:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tagged in Git" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Released on GitHub" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Published to PyPI" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Install with: \`pip install openml==${{ needs.validate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+
+  publish-test-pypi:
+    needs: [validate-version, create-release]
+    runs-on: ubuntu-latest
+    if: needs.validate-version.outputs.is-prerelease == 'true'
+    environment:
+      name: test-pypi
+      url: https://test.pypi.org/project/openml
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: distribution-packages
+          path: dist/
+
+      - name: Publish to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+      - name: Notify success
+        run: |
+          echo "### 🧪 Pre-release Published to Test PyPI!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Version **${{ needs.validate-version.outputs.version }}** has been:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tagged in Git" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Released on GitHub (pre-release)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Published to Test PyPI" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Test with: \`pip install --index-url https://test.pypi.org/simple/ openml==${{ needs.validate-version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
