@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import unittest
 from random import randint, shuffle
+from unittest import mock
 
 import pytest
+import requests
 
 from openml.datasets import (
     get_dataset,
@@ -12,7 +14,7 @@ from openml.datasets import (
 )
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType, create_task, get_task
-from openml.testing import TestBase
+from openml.testing import TestBase, create_request_response
 
 
 class OpenMLTaskTest(TestBase):
@@ -32,47 +34,55 @@ class OpenMLTaskTest(TestBase):
     def setUp(self, n_levels: int = 1):
         super().setUp()
 
-    @pytest.mark.test_server()
     def test_download_task(self):
         return get_task(self.task_id)
 
-    @pytest.mark.test_server()
-    def test_upload_task(self):
+    @mock.patch.object(requests.Session, "post")
+    def test_upload_task(self, mock_post):
+        tasks_dir = self.static_cache_dir / "mock_responses" / "tasks"
+        mock_post.side_effect = [
+            create_request_response(
+                status_code=200, content_filepath=tasks_dir / "task_upload.xml"
+            ),
+        ]
+
         # We don't know if the task in question already exists, so we try a few times. Checking
         # beforehand would not be an option because a concurrent unit test could potentially
         # create the same task and make this unit test fail (i.e. getting a dataset and creating
         # a task for it is not atomic).
-        compatible_datasets = self._get_compatible_rand_dataset()
-        for i in range(100):
-            try:
-                dataset_id = compatible_datasets[i % len(compatible_datasets)]
-                # TODO consider implementing on the diff task types.
-                task = create_task(
-                    task_type=self.task_type,
-                    dataset_id=dataset_id,
-                    target_name=self._get_random_feature(dataset_id),
-                    estimation_procedure_id=self.estimation_procedure,
-                )
+        with mock.patch.object(OpenMLTaskTest, "_get_compatible_rand_dataset", return_value=[20]), \
+             mock.patch.object(OpenMLTaskTest, "_get_random_feature", return_value="class"):
+            compatible_datasets = self._get_compatible_rand_dataset()
+            for i in range(100):
+                try:
+                    dataset_id = compatible_datasets[i % len(compatible_datasets)]
+                    # TODO consider implementing on the diff task types.
+                    task = create_task(
+                        task_type=self.task_type,
+                        dataset_id=dataset_id,
+                        target_name=self._get_random_feature(dataset_id),
+                        estimation_procedure_id=self.estimation_procedure,
+                    )
 
-                task.publish()
-                TestBase._mark_entity_for_removal("task", task.id)
-                TestBase.logger.info(
-                    f"collected from {__file__.split('/')[-1]}: {task.id}",
+                    task.publish()
+                    TestBase._mark_entity_for_removal("task", task.id)
+                    TestBase.logger.info(
+                        f"collected from {__file__.split('/')[-1]}: {task.id}",
+                    )
+                    # success
+                    break
+                except OpenMLServerException as e:
+                    # Error code for 'task already exists'
+                    # Should be 533 according to the docs
+                    # (# https://www.openml.org/api_docs#!/task/post_task)
+                    if e.code == 614:
+                        continue
+                    else:
+                        raise e
+            else:
+                raise ValueError(
+                    f"Could not create a valid task for task type ID {self.task_type}",
                 )
-                # success
-                break
-            except OpenMLServerException as e:
-                # Error code for 'task already exists'
-                # Should be 533 according to the docs
-                # (# https://www.openml.org/api_docs#!/task/post_task)
-                if e.code == 614:
-                    continue
-                else:
-                    raise e
-        else:
-            raise ValueError(
-                f"Could not create a valid task for task type ID {self.task_type}",
-            )
 
     def _get_compatible_rand_dataset(self) -> list:
         active_datasets = list_datasets(status="active")
