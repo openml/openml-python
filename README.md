@@ -89,6 +89,7 @@ Bibtex entry:
   url     = {http://jmlr.org/papers/v22/19-920.html}
 }
 ```
+
 ## :handshake: Contributing
 
 We welcome contributions from both new and experienced developers!
@@ -100,3 +101,12 @@ If you are new to open-source development, a great way to get started is by
 looking at issues labeled **"good first issue"** in our GitHub issue tracker.
 These tasks are beginner-friendly and help you understand the project structure,
 development workflow, and how to submit a pull request.
+
+## ✨ Contributors
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
