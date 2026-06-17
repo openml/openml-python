@@ -26,7 +26,7 @@ class TestTask(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.test_server()
+    @pytest.mark.cache()
     def test__get_cached_tasks(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         tasks = openml.tasks.functions._get_cached_tasks()
@@ -34,7 +34,7 @@ class TestTask(TestBase):
         assert len(tasks) == 3
         assert isinstance(next(iter(tasks.values())), OpenMLTask)
 
-    @pytest.mark.test_server()
+    @pytest.mark.cache()
     def test__get_cached_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.functions._get_cached_task(1)
@@ -49,20 +49,31 @@ class TestTask(TestBase):
             2,
         )
 
-    @pytest.mark.test_server()
-    def test__get_estimation_procedure_list(self):
-        estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
-        assert isinstance(estimation_procedures, list)
-        assert isinstance(estimation_procedures[0], dict)
-        assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
+    @mock.patch.object(requests.Session, "get")
+    def test__get_estimation_procedure_list(self, mock_get):
+      mock_get.return_value = create_request_response(
+          status_code=200,
+          content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "estimation_procedure_list.xml",
+      )
+      estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
+      assert isinstance(estimation_procedures, list)
+      assert isinstance(estimation_procedures[0], dict)
+      assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production_server()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
-    def test_list_clustering_task(self):
-        self.use_production_server()
-        # as shown by #383, clustering tasks can give list/dict casting problems
+    @mock.patch.object(requests.Session, "get")
+    def test_list_clustering_task(self, mock_get):
+        def side_effect(url, **kwargs):
+            if "estimationprocedure" in url:
+                return create_request_response(
+                    status_code=200,
+                    content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "estimation_procedure_list.xml",
+              )
+            return create_request_response(
+              status_code=200,
+              content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "task_list_clustering.xml",
+          )
+        mock_get.side_effect = side_effect
         openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
-        # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
         assert type(task) == dict
@@ -73,27 +84,50 @@ class TestTask(TestBase):
         assert isinstance(task["status"], str)
         assert task["status"] in ["in_preparation", "active", "deactivated"]
 
-    @pytest.mark.test_server()
-    def test_list_tasks_by_type(self):
-        num_curves_tasks = 198  # number is flexible, check server if fails
+    @mock.patch.object(requests.Session, "get")
+    def test_list_tasks_by_type(self, mock_get):
+        def side_effect(url, **kwargs):
+            if "estimationprocedure" in url:
+                return create_request_response(
+                    status_code=200,
+                    content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "estimation_procedure_list.xml",
+                )
+            return create_request_response(
+                status_code=200,
+                content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "task_list_type_learning_curve.xml",
+            )
+        mock_get.side_effect = side_effect
+        num_curves_tasks =198 # number is flexible, check server if fails, must be <209
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) >= num_curves_tasks
         for task in tasks.to_dict(orient="index").values():
             assert ttid == task["ttid"]
             self._check_task(task)
-
-    @pytest.mark.test_server()
-    def test_list_tasks_length(self):
+    
+    @mock.patch.object(requests.Session, "get")
+    def test_list_tasks_length(self, mock_get):
+        def side_effect(url, **kwargs):
+            if "estimationprocedure" in url:
+                return create_request_response(
+                    status_code=200,
+                    content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "estimation_procedure_list.xml",
+                )
+            return create_request_response(
+                status_code=200,
+                content_filepath=self.static_cache_dir / "mock_responses" / "tasks" / "task_list_type_learning_curve.xml",
+            )
+        mock_get.side_effect = side_effect
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) > 100
 
+#Intentionally left unmocked because mocking would require changing request handling in functions.py; Not sure if thats what the maintainers intend.(*1)
     @pytest.mark.test_server()
     def test_list_tasks_empty(self):
         tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
         assert tasks.empty
-
+#Intentionally left unmocked, not sure if mocking required here.(*2)
     @pytest.mark.test_server()
     def test_list_tasks_by_tag(self):
         # Server starts with 99 active tasks with the tag, and one 'in_preparation',
@@ -104,13 +138,14 @@ class TestTask(TestBase):
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
+#Intentionally left unmocked as it would require a very larege fixture(integration test maybe?)(*3)
     @pytest.mark.test_server()
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
         assert len(tasks) >= 900
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
-
+#Intentionally left unmocked as (integration test maybe?)(*4)
     @pytest.mark.test_server()
     def test_list_tasks_paginate(self):
         size = 10
@@ -121,6 +156,7 @@ class TestTask(TestBase):
             for task in tasks.to_dict(orient="index").values():
                 self._check_task(task)
 
+#Intentionally left unmocked as many html requests are made (integration test maybe?)(*5)
     @pytest.mark.test_server()
     def test_list_tasks_per_type_paginate(self):
         size = 40
@@ -138,6 +174,7 @@ class TestTask(TestBase):
                     assert j == task["ttid"]
                     self._check_task(task)
 
+#Intentionally left unmocked basis comments below(*6)       
     @pytest.mark.test_server()
     def test__get_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
@@ -152,7 +189,7 @@ class TestTask(TestBase):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
-
+#Intentionally left unmocked because of io(*7)
     @pytest.mark.test_server()
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
@@ -166,7 +203,7 @@ class TestTask(TestBase):
         assert os.path.exists(
             os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")
         )
-
+#Intentionally left unmocked because of io(*8)
     @pytest.mark.test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
@@ -189,6 +226,7 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
 
+#Intentionally left unmocked because of io(*9)
     @mock.patch("openml.tasks.functions.get_dataset")
     @pytest.mark.test_server()
     def test_removal_upon_download_failure(self, get_dataset):
@@ -208,12 +246,12 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
-    @pytest.mark.test_server()
+    @pytest.mark.cache()
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
-
+#intentionally left unmocked (*10)
     @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
@@ -224,6 +262,7 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
+#intentionally left unmocked (*11)
     @pytest.mark.test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
