@@ -1,0 +1,19 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>123</oml:id>
+  <oml:name>quake</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**:   
+**Source**: Unknown -   
+**Please cite**:   
+
+Dataset from Smoothing Methods in Statistics 
+ (ftp stat.cmu.edu/datasets)
+
+ Simonoff, J.S. (1996). Smoothing Methods in Statistics. New York: Springer-Verlag.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2014-04-23T13:17:24</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://test.openml.org/data/v1/download/123/quake.arff</oml:url>
+    <oml:file_id>123</oml:file_id>  <oml:default_target_attribute>richter</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>      <oml:visibility>public</oml:visibility>        <oml:status>active</oml:status>
+  <oml:processing_date>2025-06-16 08:08:53</oml:processing_date>      <oml:md5_checksum>7ede4fd775db9eae5586b2f55c6d98c6</oml:md5_checksum>
+</oml:data_set_description>
