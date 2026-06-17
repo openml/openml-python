@@ -297,8 +297,10 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """Collect all information to display in the __repr__ body."""
         # Obtain number of features in accordance with lazy loading.
         n_features: int | None = None
-        if self._qualities is not None and self._qualities["NumberOfFeatures"] is not None:
-            n_features = int(self._qualities["NumberOfFeatures"])
+        if self._qualities is not None:
+            n_features_quality = self._qualities.get("NumberOfFeatures")
+            if n_features_quality is not None and not pd.isna(n_features_quality):
+                n_features = int(n_features_quality)
         elif self._features is not None:
             n_features = len(self._features)
 
@@ -312,14 +314,17 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             "Pickle file": (
                 str(self.data_pickle_file) if self.data_pickle_file is not None else None
             ),
-            "# of features": n_features,
         }
+        if n_features is not None:
+            fields["# of features"] = n_features
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.dataset_id is not None:
             fields["OpenML URL"] = self.openml_url
-        if self._qualities is not None and self._qualities["NumberOfInstances"] is not None:
-            fields["# of instances"] = int(self._qualities["NumberOfInstances"])
+        if self._qualities is not None:
+            n_instances_quality = self._qualities.get("NumberOfInstances")
+            if n_instances_quality is not None and not pd.isna(n_instances_quality):
+                fields["# of instances"] = int(n_instances_quality)
 
         # determines the order in which the information will be printed
         order = [
@@ -794,6 +799,17 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             )
 
         target_name = target_names[0]
+        if target_name not in data.columns:
+            available_columns = list(data.columns)
+            msg = (
+                f"Target column '{target_name}' was removed because it is listed as a "
+                f"row_id or ignore attribute. "
+                f"Available columns after filtering: {available_columns}"
+                if target_name in to_exclude
+                else f"Target column '{target_name}' does not exist in this dataset. "
+                f"Available columns: {available_columns}"
+            )
+            raise ValueError(msg)
         x = data.drop(columns=[target_name])
         y = data[target_name].squeeze()
 
