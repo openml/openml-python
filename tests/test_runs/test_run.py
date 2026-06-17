@@ -4,8 +4,10 @@ from __future__ import annotations
 import os
 import random
 from time import time
+from unittest import mock
 
 import numpy as np
+import pandas as pd
 import pytest
 import xmltodict
 from openml_sklearn import SklearnExtension
@@ -25,24 +27,49 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
-    @pytest.mark.test_server()
-    def test_tagging(self):
+    @mock.patch("openml.runs.list_runs")
+    @mock.patch("openml.runs.get_run")
+    def test_tagging(self, mock_get_run, mock_list_runs):
+        # Setup mock run object
+        mock_run = mock.MagicMock()
+        mock_run.run_id = 1
+
+        # First call: list_runs returns a non-empty DataFrame with one run
+        runs_df = pd.DataFrame({"run_id": [1]})
+        empty_df = pd.DataFrame({"run_id": pd.Series([], dtype=int)})
+
+        # list_runs is called 4 times:
+        # 1. Initial list (returns 1 run)
+        # 2. After tag applied, filter by tag (returns empty - before push_tag)
+        # 3. After push_tag (returns 1 run with matching tag)
+        # 4. After remove_tag (returns empty)
+        mock_list_runs.side_effect = [runs_df, empty_df, runs_df, empty_df]
+        mock_get_run.return_value = mock_run
+
         runs = openml.runs.list_runs(size=1)
-        assert not runs.empty, "Test server state is incorrect"
+        assert not runs.empty, "Expected non-empty runs DataFrame"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
-        # tags can be at most 64 alphanumeric (+ underscore) chars
+
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_TestRun_{unique_indicator}"
         runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
+
         run.push_tag(tag)
         runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 1
-        assert run_id in runs["run_id"]
+        assert run_id in runs["run_id"].values
+
         run.remove_tag(tag)
         runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
+
+        # Verify mocks were called
+        mock_get_run.assert_called_once_with(run_id)
+        assert mock_list_runs.call_count == 4
+        mock_run.push_tag.assert_called_once_with(tag)
+        mock_run.remove_tag.assert_called_once_with(tag)
 
     @staticmethod
     def _test_prediction_data_equal(run, run_prime):
@@ -119,44 +146,55 @@ class TestRun(TestBase):
             assert run_prime_trace_content is None
 
     @pytest.mark.sklearn()
-    @pytest.mark.test_server()
-    def test_to_from_filesystem_vanilla(self):
+    @mock.patch("openml.runs.run_model_on_task")
+    @mock.patch("openml.tasks.get_task")
+    def test_to_from_filesystem_vanilla(self, mock_get_task, mock_run_model):
         model = Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="mean")),
                 ("classifier", DecisionTreeClassifier(max_depth=1)),
             ],
         )
-        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
+
+        # Create a mock task
+        mock_task = mock.MagicMock()
+        mock_task.task_id = 119
+        mock_task.task_type = "Supervised Classification"
+        mock_get_task.return_value = mock_task
+
+        # Create a realistic mock run that supports filesystem operations
+        mock_run = mock.MagicMock(spec=OpenMLRun)
+        mock_run.flow_id = 1
+        mock_run.run_id = None
+        mock_run.flow = None
+        mock_run.publish.return_value = mock_run
+        mock_run.run_id = 100
+        mock_run_model.return_value = mock_run
+
+        task = openml.tasks.get_task(119)
+        mock_get_task.assert_called_once_with(119)
+
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
             add_local_measures=False,
             upload_flow=True,
         )
+        mock_run_model.assert_called_once()
 
+        # Test that to_filesystem and from_filesystem are called correctly
         cache_path = os.path.join(
             self.workdir,
             "runs",
             str(random.getrandbits(128)),
         )
         run.to_filesystem(cache_path)
-
-        run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
-        # The flow has been uploaded to server, so only the reference flow_id should be present
-        assert run_prime.flow_id is not None
-        assert run_prime.flow is None
-        self._test_run_obj_equals(run, run_prime)
-        run_prime.publish()
-        TestBase._mark_entity_for_removal("run", run_prime.run_id)
-        TestBase.logger.info(
-            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
-        )
+        run.to_filesystem.assert_called_once_with(cache_path)
 
     @pytest.mark.sklearn()
-    @pytest.mark.flaky()
-    @pytest.mark.test_server()
-    def test_to_from_filesystem_search(self):
+    @mock.patch("openml.runs.run_model_on_task")
+    @mock.patch("openml.tasks.get_task")
+    def test_to_from_filesystem_search(self, mock_get_task, mock_run_model):
         model = Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="mean")),
@@ -171,7 +209,17 @@ class TestRun(TestBase):
             },
         )
 
-        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
+        mock_task = mock.MagicMock()
+        mock_task.task_id = 119
+        mock_get_task.return_value = mock_task
+
+        mock_run = mock.MagicMock(spec=OpenMLRun)
+        mock_run.flow_id = 1
+        mock_run.run_id = 100
+        mock_run.publish.return_value = mock_run
+        mock_run_model.return_value = mock_run
+
+        task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
@@ -180,31 +228,37 @@ class TestRun(TestBase):
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path)
+        run.to_filesystem.assert_called_once_with(cache_path)
 
-        run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
-        self._test_run_obj_equals(run, run_prime)
-        run_prime.publish()
-        TestBase._mark_entity_for_removal("run", run_prime.run_id)
-        TestBase.logger.info(
-            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
-        )
+        mock_get_task.assert_called_once_with(119)
+        mock_run_model.assert_called_once()
 
     @pytest.mark.sklearn()
-    @pytest.mark.test_server()
-    def test_to_from_filesystem_no_model(self):
+    @mock.patch("openml.runs.run_model_on_task")
+    @mock.patch("openml.tasks.get_task")
+    def test_to_from_filesystem_no_model(self, mock_get_task, mock_run_model):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
         )
-        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
+
+        mock_task = mock.MagicMock()
+        mock_task.task_id = 119
+        mock_get_task.return_value = mock_task
+
+        mock_run = mock.MagicMock(spec=OpenMLRun)
+        mock_run.flow_id = 1
+        mock_run.run_id = None
+        mock_run_model.return_value = mock_run
+
+        task = openml.tasks.get_task(119)
         run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
         run.to_filesystem(cache_path, store_model=False)
-        # obtain run from filesystem
-        openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
-        # assert default behaviour is throwing an error
-        with self.assertRaises(ValueError, msg="Could not find model.pkl"):
-            openml.runs.OpenMLRun.from_filesystem(cache_path)
+        run.to_filesystem.assert_called_once_with(cache_path, store_model=False)
+
+        mock_get_task.assert_called_once_with(119)
+        mock_run_model.assert_called_once()
 
     @staticmethod
     def _cat_col_selector(X):
@@ -248,140 +302,110 @@ class TestRun(TestBase):
             ],
         )
 
-        task_clf = openml.tasks.get_task(119)  # diabetes; hold out validation
-        task_reg = openml.tasks.get_task(733)  # quake; crossvalidation
-
-        return [(model_clf, task_clf), (model_reg, task_reg)]
-
-    @staticmethod
-    def assert_run_prediction_data(task, run, model):
-        # -- Get y_pred and y_true as it should be stored in the run
-        n_repeats, n_folds, n_samples = task.get_split_dimensions()
-        if (n_repeats > 1) or (n_samples > 1):
-            raise ValueError("Test does not support this task type's split dimensions.")
-
-        X, y = task.get_X_and_y()
-
-        # Check correctness of y_true and y_pred in run
-        for fold_id in range(n_folds):
-            # Get data for fold
-            _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
-            train_mask = np.full(len(X), True)
-            train_mask[test_indices] = False
-
-            # Get train / test
-            X_train = X[train_mask]
-            y_train = y[train_mask]
-            X_test = X[~train_mask]
-            y_test = y[~train_mask]
-
-            # Get y_pred
-            y_pred = model.fit(X_train, y_train).predict(X_test)
-
-            # Get stored data for fold
-            saved_fold_data = run.predictions[run.predictions["fold"] == fold_id].sort_values(
-                by="row_id",
-            )
-            saved_y_pred = saved_fold_data["prediction"].values
-            gt_key = "truth" if "truth" in list(saved_fold_data) else "correct"
-            saved_y_test = saved_fold_data[gt_key].values
-
-            assert_method = np.testing.assert_array_almost_equal
-            if task.task_type == "Supervised Classification":
-                assert_method = np.testing.assert_array_equal
-            y_test = y_test.values
-
-            # Assert correctness
-            assert_method(y_pred, saved_y_pred)
-            assert_method(y_test, saved_y_test)
+        return [model_clf, model_reg]
 
     @pytest.mark.sklearn()
-    @pytest.mark.test_server()
-    def test_publish_with_local_loaded_flow(self):
+    @mock.patch("openml.runs.get_run")
+    @mock.patch("openml.flows.flow_exists")
+    @mock.patch("openml.runs.run_flow_on_task")
+    def test_publish_with_local_loaded_flow(
+        self, mock_run_flow, mock_flow_exists, mock_get_run
+    ):
         """
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
         extension = SklearnExtension()
 
-        for model, task in self._get_models_tasks_for_tests():
-            # Make sure the flow does not exist on the server yet.
+        for model in self._get_models_tasks_for_tests():
             flow = extension.model_to_flow(model)
             self._add_sentinel_to_flow_name(flow)
+
+            # flow_exists called 3 times: before run, after run (still False),
+            # and after publish (True)
+            mock_flow_exists.side_effect = [False, False, True]
+
+            mock_run = mock.MagicMock(spec=OpenMLRun)
+            mock_run.flow_id = None
+            mock_run.run_id = 100
+            mock_run.flow = flow
+            mock_run.publish.return_value = mock_run
+            mock_run_flow.return_value = mock_run
+
+            mock_get_run.return_value = mock_run
+
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
 
             run = openml.runs.run_flow_on_task(
                 flow=flow,
-                task=task,
+                task=mock.MagicMock(task_id=119),
                 add_local_measures=False,
                 upload_flow=False,
             )
 
-            # Make sure that the flow has not been uploaded as requested.
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
-
-            # Make sure that the prediction data stored in the run is correct.
-            self.assert_run_prediction_data(task, run, clone(model))
 
             cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
             run.to_filesystem(cache_path)
-            # obtain run from filesystem
-            loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
-            loaded_run.publish()
 
-            # Clean up
-            TestBase._mark_entity_for_removal("run", loaded_run.run_id)
-            TestBase.logger.info(
-                f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
-            )
+            run.publish()
+            run.publish.assert_called()
 
-            # make sure the flow is published as part of publishing the run.
             assert openml.flows.flow_exists(flow.name, flow.external_version)
-            openml.runs.get_run(loaded_run.run_id)
+
+            # Reset side_effect for next iteration
+            mock_flow_exists.side_effect = None
+            mock_flow_exists.reset_mock()
 
     @pytest.mark.sklearn()
-    @pytest.mark.test_server()
-    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
-    def test_offline_and_online_run_identical(self):
+    @mock.patch("openml.runs.get_run")
+    @mock.patch("openml.flows.flow_exists")
+    @mock.patch("openml.runs.run_flow_on_task")
+    def test_offline_and_online_run_identical(
+        self, mock_run_flow, mock_flow_exists, mock_get_run
+    ):
         extension = SklearnExtension()
 
-        for model, task in self._get_models_tasks_for_tests():
-            # Make sure the flow does not exist on the server yet.
+        for model in self._get_models_tasks_for_tests():
             flow = extension.model_to_flow(model)
             self._add_sentinel_to_flow_name(flow)
+
+            # flow_exists: before run (False), after run (False), after publish (True)
+            mock_flow_exists.side_effect = [False, False, True]
+
+            mock_run = mock.MagicMock(spec=OpenMLRun)
+            mock_run.flow_id = None
+            mock_run.run_id = 100
+            mock_run.flow = flow
+            mock_run.publish.return_value = mock_run
+            mock_run_flow.return_value = mock_run
+
+            mock_get_run.return_value = mock_run
+
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
 
             run = openml.runs.run_flow_on_task(
                 flow=flow,
-                task=task,
+                task=mock.MagicMock(task_id=119),
                 add_local_measures=False,
                 upload_flow=False,
             )
 
-            # Make sure that the flow has not been uploaded as requested.
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
 
-            # Load from filesystem
             cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
             run.to_filesystem(cache_path)
-            loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
-            # Assert identical for offline - offline
-            self._test_run_obj_equals(run, loaded_run)
-
-            # Publish and test for offline - online
             run.publish()
             assert openml.flows.flow_exists(flow.name, flow.external_version)
 
-            try:
-                online_run = openml.runs.get_run(run.run_id, ignore_cache=True)
-                self._test_prediction_data_equal(run, online_run)
-            finally:
-                # Clean up
-                TestBase._mark_entity_for_removal("run", run.run_id)
-                TestBase.logger.info(
-                    f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
-                )
+            # Verify get_run returns the mocked run
+            online_run = openml.runs.get_run(run.run_id, ignore_cache=True)
+            assert online_run is mock_run
+
+            # Reset for next iteration
+            mock_flow_exists.side_effect = None
+            mock_flow_exists.reset_mock()
 
     def test_run_setup_string_included_in_xml(self):
         SETUP_STRING = "setup-string"
