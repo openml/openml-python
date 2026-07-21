@@ -453,14 +453,17 @@ class HTTPClient:
             code, message = self._parse_exception_response(response)
 
         except (requests.exceptions.JSONDecodeError, xml.parsers.expat.ExpatError) as e:
-            if method != "GET":
-                extra = f"Status code: {response.status_code}\n{response.text}"
-                raise OpenMLServerError(
-                    f"Unexpected server error when calling {url}. Please contact the "
-                    f"developers!\n{extra}"
-                ) from e
+            extra = f"Status code: {response.status_code}\n{response.text}"
+            parse_error = OpenMLServerError(
+                f"Unexpected server error when calling {url}. Please contact the "
+                f"developers!\n{extra}"
+            )
 
-            exception = e
+            if method != "GET":
+                raise parse_error from e
+
+            parse_error.__cause__ = e
+            exception = parse_error
 
         except Exception as e:
             # If we failed to parse it out,
