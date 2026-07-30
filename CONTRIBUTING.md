@@ -83,6 +83,54 @@ pytest tests
 ```
 For Windows systems, you may need to add `pytest` to PATH before executing the command.
 
+#### Running Tests Against Local Services
+
+The test suite can use a local OpenML service stack instead of the remote test server.
+This requires Docker Desktop and the [`openml/services`](https://github.com/openml/services)
+repository.
+
+From the directory where you want to clone the services repository, run:
+
+```bash
+git clone --depth 1 https://github.com/openml/services.git
+cd services
+chmod -R a+rw ./data
+chmod -R a+rw ./logs
+docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+```
+
+The permission commands allow the containers to write their local data and logs.
+Wait until the `openml-php-rest-api` container reports a healthy status before running
+the tests. You can also verify the service gateway with:
+
+```bash
+curl -sSfL http://localhost:8000/api/v1/xml/data/1
+```
+
+In a second terminal, from the `openml-python` repository, enable local services and
+run the tests:
+
+```bash
+# Linux/macOS
+export OPENML_USE_LOCAL_SERVICES=true
+pytest -n 4 --durations=20 --dist load -sv -m "not production_server"
+```
+
+On Windows PowerShell, use:
+
+```powershell
+$env:OPENML_USE_LOCAL_SERVICES = "true"
+pytest -sv -m "not production_server"
+```
+
+The `OPENML_USE_LOCAL_SERVICES` variable must be set in the same terminal session
+where pytest is started. To stop the local services after testing, run this from the
+`services` repository:
+
+```bash
+docker compose --profile rest-api --profile minio --profile evaluation-engine down
+```
+
 Executing a specific unit test can be done by specifying the module, test case, and test.
 You may then run a specific module, test case, or unit test respectively:
 ```bash

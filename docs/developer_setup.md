@@ -31,26 +31,22 @@ cd services
 
 #### 2. Configure File Permissions
 
-To ensure the containerized PHP service can write to the local filesystem, initialize the data directory permissions.
-
-From the repository root:
-
-```bash
-chown -R www-data:www-data data/php
-```
-
-If the `www-data` user does not exist on the host system, grant full permissions as a fallback:
+To ensure the containers can write to the local filesystem, initialize the data and
+log directory permissions from the services repository root:
 
 ```bash
-chmod -R 777 data/php
+chmod -R a+rw ./data
+chmod -R a+rw ./logs
 ```
+
+These permissions are required before starting the Docker services.
 
 #### 3. Launch Services
 
 Initialize the container stack:
 
 ```bash
-docker compose --profile all up -d
+docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
 ```
 
 #### Warning: Container Conflicts
@@ -58,8 +54,8 @@ docker compose --profile all up -d
 If API v2 (Python backend) containers are present on the system, name conflicts may occur. To resolve this, stop and remove existing containers before launching API v1:
 
 ```bash
-docker compose --profile all down
-docker compose --profile all up -d
+docker compose --profile rest-api --profile minio --profile evaluation-engine down
+docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
 ```
 
 #### 4. Verification
