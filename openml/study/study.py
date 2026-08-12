@@ -296,7 +296,7 @@ class OpenMLStudy(BaseStudy):
             raise ValueError(
                 "Cannot attach runs to an unpublished study. Please publish the study first.",
             )
-        result = openml.study.functions.attach_to_study(self.id, run_ids)
+        result = openml.study.attach_to_study(self.id, run_ids)
         self.runs = (self.runs or []) + list(run_ids)
         return result
 
@@ -322,9 +322,9 @@ class OpenMLStudy(BaseStudy):
             raise ValueError(
                 "Cannot detach runs from an unpublished study. Please publish the study first.",
             )
-        result = openml.study.functions.detach_from_study(self.id, run_ids)
+        result = openml.study.detach_from_study(self.id, run_ids)
         if self.runs is not None:
-            self.runs = [run_id for run_id in self.runs if run_id not in run_ids]
+            self.runs = [run_id for run_id in self.runs if run_id not in set(run_ids)]
         return result
 
 
@@ -419,7 +419,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
             raise ValueError(
                 "Cannot attach tasks to an unpublished suite. Please publish the suite first.",
             )
-        result = openml.study.functions.attach_to_suite(self.id, task_ids)
+        result = openml.study.attach_to_suite(self.id, task_ids)
         self.tasks = (self.tasks or []) + list(task_ids)
         return result
 
@@ -445,7 +445,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
             raise ValueError(
                 "Cannot detach tasks from an unpublished suite. Please publish the suite first.",
             )
-        result = openml.study.functions.detach_from_suite(self.id, task_ids)
+        result = openml.study.detach_from_suite(self.id, task_ids)
         if self.tasks is not None:
-            self.tasks = [task_id for task_id in self.tasks if task_id not in task_ids]
+            self.tasks = [task_id for task_id in self.tasks if task_id not in set(task_ids)]
         return result
