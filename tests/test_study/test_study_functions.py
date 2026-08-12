@@ -262,3 +262,129 @@ class TestStudyFunctions(TestBase):
         study_list = openml.study.list_studies(status="in_preparation")
         # might fail if server is recently reset
         assert len(study_list) >= 2
+
+    @pytest.mark.test_server()
+    def test_study_attach_runs_object_method(self):
+        run_list = openml.runs.list_runs(size=5)
+        assert len(run_list) == 5
+        run_ids = list(run_list["run_id"])
+
+        study = openml.study.create_study(
+            alias=None,
+            benchmark_suite=None,
+            name="unit tested study attach runs",
+            description="test attach_runs",
+            run_ids=run_ids,
+        )
+        study.publish()
+        TestBase._mark_entity_for_removal("study", study.id)
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
+
+        study_downloaded = openml.study.get_study(study.id)
+        self.assertSetEqual(set(study_downloaded.runs), set(run_ids))
+
+        # attach more runs using the object method
+        run_list_additional = openml.runs.list_runs(size=3, offset=5)
+        run_list_additional_ids = list(run_list_additional["run_id"])
+        attached_count = study.attach_runs(run_list_additional_ids)
+        assert attached_count == len(run_ids) + len(run_list_additional_ids)
+
+        # verify local state updated
+        self.assertSetEqual(set(study.runs), set(run_ids) | set(run_list_additional_ids))
+
+        study_downloaded = openml.study.get_study(study.id)
+        self.assertSetEqual(set(study_downloaded.runs), set(run_ids) | set(run_list_additional_ids))
+
+        # detach runs using the object method
+        detached_count = study.detach_runs(run_ids)
+        assert detached_count == len(run_list_additional_ids)
+
+        # verify local state updated
+        self.assertSetEqual(set(study.runs), set(run_list_additional_ids))
+
+        study_downloaded = openml.study.get_study(study.id)
+        self.assertSetEqual(set(study_downloaded.runs), set(run_list_additional_ids))
+
+    @pytest.mark.test_server()
+    def test_study_attach_runs_unpublished_raises(self):
+        study = openml.study.create_study(
+            alias=None,
+            benchmark_suite=None,
+            name="unpublished study",
+            description="none",
+            run_ids=None,
+        )
+        with pytest.raises(ValueError, match="Cannot attach runs to an unpublished study"):
+            study.attach_runs([1])
+
+    @pytest.mark.test_server()
+    def test_study_detach_runs_unpublished_raises(self):
+        study = openml.study.create_study(
+            alias=None,
+            benchmark_suite=None,
+            name="unpublished study",
+            description="none",
+            run_ids=None,
+        )
+        with pytest.raises(ValueError, match="Cannot detach runs from an unpublished study"):
+            study.detach_runs([1])
+
+    @pytest.mark.test_server()
+    def test_suite_attach_tasks_object_method(self):
+        fixture_task_ids = [1, 2, 3]
+
+        suite = openml.study.create_benchmark_suite(
+            alias=None,
+            name="unit tested suite attach tasks",
+            description="test attach_tasks",
+            task_ids=fixture_task_ids,
+        )
+        suite.publish()
+        TestBase._mark_entity_for_removal("study", suite.id)
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {suite.id}")
+
+        suite_downloaded = openml.study.get_suite(suite.id)
+        self.assertSetEqual(set(suite_downloaded.tasks), set(fixture_task_ids))
+
+        # attach more tasks using the object method
+        tasks_additional = [4, 5, 6]
+        attached_count = suite.attach_tasks(tasks_additional)
+        assert attached_count == len(fixture_task_ids) + len(tasks_additional)
+
+        # verify local state updated
+        self.assertSetEqual(set(suite.tasks), set(fixture_task_ids + tasks_additional))
+
+        suite_downloaded = openml.study.get_suite(suite.id)
+        self.assertSetEqual(set(suite_downloaded.tasks), set(fixture_task_ids + tasks_additional))
+
+        # detach tasks using the object method
+        detached_count = suite.detach_tasks(fixture_task_ids)
+        assert detached_count == len(tasks_additional)
+
+        # verify local state updated
+        self.assertSetEqual(set(suite.tasks), set(tasks_additional))
+
+        suite_downloaded = openml.study.get_suite(suite.id)
+        self.assertSetEqual(set(suite_downloaded.tasks), set(tasks_additional))
+
+    @pytest.mark.test_server()
+    def test_suite_attach_tasks_unpublished_raises(self):
+        suite = openml.study.create_benchmark_suite(
+            alias=None,
+            name="unpublished suite",
+            description="none",
+            task_ids=[1],
+        )
+        with pytest.raises(ValueError, match="Cannot attach tasks to an unpublished suite"):
+            suite.attach_tasks([2])
+
+    @pytest.mark.test_server()
+    def test_suite_detach_tasks_unpublished_raises(self):
+        suite = openml.study.create_benchmark_suite(
+            alias=None,
+            name="unpublished suite",
+            description="none",
+            task_ids=[1],
+        )
+        with pytest.raises(ValueError, match="Cannot detach tasks from an unpublished suite"):
+            suite.detach_tasks([1])

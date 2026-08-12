@@ -274,6 +274,61 @@ class OpenMLStudy(BaseStudy):
             setups=setups,
         )
 
+    def attach_runs(self, run_ids: list[int]) -> int:
+        """Attach runs to this study.
+
+        Parameters
+        ----------
+        run_ids : list[int]
+            List of run ids to attach to this study.
+
+        Returns
+        -------
+        int
+            The new number of linked entities in the study.
+
+        Raises
+        ------
+        ValueError
+            If the study has not been published yet.
+        """
+        if self.id is None:
+            raise ValueError(
+                "Cannot attach runs to an unpublished study. "
+                "Please publish the study first.",
+            )
+        result = openml.study.functions.attach_to_study(self.id, run_ids)
+        self.runs = (self.runs or []) + list(run_ids)
+        return result
+
+    def detach_runs(self, run_ids: list[int]) -> int:
+        """Detach runs from this study.
+
+        Parameters
+        ----------
+        run_ids : list[int]
+            List of run ids to detach from this study.
+
+        Returns
+        -------
+        int
+            The new number of linked entities in the study.
+
+        Raises
+        ------
+        ValueError
+            If the study has not been published yet.
+        """
+        if self.id is None:
+            raise ValueError(
+                "Cannot detach runs from an unpublished study. "
+                "Please publish the study first.",
+            )
+        result = openml.study.functions.detach_from_study(self.id, run_ids)
+        if self.runs is not None:
+            self.runs = [run_id for run_id in self.runs if run_id not in run_ids]
+        return result
+
 
 class OpenMLBenchmarkSuite(BaseStudy):
     """
@@ -343,3 +398,58 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
+
+    def attach_tasks(self, task_ids: list[int]) -> int:
+        """Attach tasks to this benchmark suite.
+
+        Parameters
+        ----------
+        task_ids : list[int]
+            List of task ids to attach to this suite.
+
+        Returns
+        -------
+        int
+            The new number of linked entities in the suite.
+
+        Raises
+        ------
+        ValueError
+            If the suite has not been published yet.
+        """
+        if self.id is None:
+            raise ValueError(
+                "Cannot attach tasks to an unpublished suite. "
+                "Please publish the suite first.",
+            )
+        result = openml.study.functions.attach_to_suite(self.id, task_ids)
+        self.tasks = (self.tasks or []) + list(task_ids)
+        return result
+
+    def detach_tasks(self, task_ids: list[int]) -> int:
+        """Detach tasks from this benchmark suite.
+
+        Parameters
+        ----------
+        task_ids : list[int]
+            List of task ids to detach from this suite.
+
+        Returns
+        -------
+        int
+            The new number of linked entities in the suite.
+
+        Raises
+        ------
+        ValueError
+            If the suite has not been published yet.
+        """
+        if self.id is None:
+            raise ValueError(
+                "Cannot detach tasks from an unpublished suite. "
+                "Please publish the suite first.",
+            )
+        result = openml.study.functions.detach_from_suite(self.id, task_ids)
+        if self.tasks is not None:
+            self.tasks = [task_id for task_id in self.tasks if task_id not in task_ids]
+        return result
