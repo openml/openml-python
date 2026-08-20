@@ -8,6 +8,7 @@ import time
 import unittest
 import warnings
 from collections import OrderedDict
+import xml
 
 from openml_sklearn import SklearnExtension, cat, cont
 from packaging.version import Version
@@ -342,11 +343,16 @@ class TestRun(TestBase):
 
         # This is only a smoke check right now
         # TODO add a few asserts here
-        run._to_xml()
+        xml = run._to_xml()
+        assert isinstance(xml, str)
         if run.trace is not None:
             # This is only a smoke check right now
             # TODO add a few asserts here
-            run.trace.trace_to_arff()
+            arff = run.trace.trace_to_arff()
+            assert "attributes" in arff
+            assert "data" in arff
+            assert "relation" in arff
+            assert arff["relation"] == "Trace"
 
         # check arff output
         assert len(run.data_content) == num_instances
