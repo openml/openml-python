@@ -838,7 +838,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         else:
             self._qualities = _read_qualities(qualities_file)
 
-    def retrieve_class_labels(self, target_name: str = "class") -> None | list[str]:
+    def retrieve_class_labels(self, target_name: str = "class") -> list[str] | None:
         """Reads the datasets arff to determine the class-labels.
 
         If the task has no class labels (for example a regression problem)
