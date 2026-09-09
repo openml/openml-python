@@ -224,7 +224,8 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        # TODO: assert holdout task
+        task = openml.tasks.get_task(run.task_id)
+        assert task.task_type == "holdout"
 
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
@@ -339,14 +340,14 @@ class TestRun(TestBase):
         TestBase.logger.info(f"collected from test_run_functions: {run.run_id}")
         assert run_ == run
         assert isinstance(run.dataset_id, int)
+        assert len(run.parameters) > 0
 
-        # This is only a smoke check right now
-        # TODO add a few asserts here
-        run._to_xml()
+        xml = run._to_xml()
+        assert xml is not None
+
         if run.trace is not None:
-            # This is only a smoke check right now
-            # TODO add a few asserts here
-            run.trace.trace_to_arff()
+                trace_arff = run.trace.trace_to_arff()
+                assert trace_arff is not None
 
         # check arff output
         assert len(run.data_content) == num_instances
@@ -609,7 +610,7 @@ class TestRun(TestBase):
                 create_task_obj=False,
             )
 
-        # todo: check if runtime is present
+        assert "runtime" in run.attributes
         self._check_fold_timing_evaluations(
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
