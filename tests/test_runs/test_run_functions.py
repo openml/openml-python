@@ -342,11 +342,11 @@ class TestRun(TestBase):
 
         # This is only a smoke check right now
         # TODO add a few asserts here
-        run._to_xml()
+        assert isinstance(run._to_xml(), str)
         if run.trace is not None:
-            # This is only a smoke check right now
-            # TODO add a few asserts here
-            run.trace.trace_to_arff()
+            trace_arff = run.trace.trace_to_arff()
+            assert trace_arff["relation"] == "Trace"
+            assert len(trace_arff["data"]) > 0
 
         # check arff output
         assert len(run.data_content) == num_instances
@@ -395,12 +395,8 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(run_.run_id)
         assert "openml-python" in downloaded.tags
 
-        # TODO make sure that these attributes are instantiated when
-        # downloading a run? Or make sure that the trace object is created when
-        # running a flow on a task (and not only the arff object is created,
-        # so that the two objects can actually be compared):
-        # downloaded_run_trace = downloaded._generate_trace_arff_dict()
-        # self.assertEqual(run_trace, downloaded_run_trace)
+        if run.trace is not None:
+            assert downloaded.trace is not None
         return run
 
     def _check_sample_evaluations(
