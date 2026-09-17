@@ -224,7 +224,7 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        # TODO: assert holdout task
+
 
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
@@ -341,12 +341,14 @@ class TestRun(TestBase):
         assert isinstance(run.dataset_id, int)
 
         # This is only a smoke check right now
-        # TODO add a few asserts here
-        run._to_xml()
+
+        xml = run._to_xml()
+        assert isinstance(xml, str)
         if run.trace is not None:
             # This is only a smoke check right now
-            # TODO add a few asserts here
-            run.trace.trace_to_arff()
+
+            arff_dict = run.trace.trace_to_arff()
+            assert isinstance(arff_dict, dict)
 
         # check arff output
         assert len(run.data_content) == num_instances
@@ -394,7 +396,7 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert "openml-python" in downloaded.tags
-
+        assert len(downloaded.parameter_settings) > 0
         # TODO make sure that these attributes are instantiated when
         # downloading a run? Or make sure that the trace object is created when
         # running a flow on a task (and not only the arff object is created,
@@ -609,13 +611,14 @@ class TestRun(TestBase):
                 create_task_obj=False,
             )
 
-        # todo: check if runtime is present
+
         self._check_fold_timing_evaluations(
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
             num_folds=num_folds,
             task_type=task_type,
         )
+        assert "runtime" in run.attributes
 
         # Check if run string and print representation do not run into an error
         #   The above check already verifies that all columns needed for supported
