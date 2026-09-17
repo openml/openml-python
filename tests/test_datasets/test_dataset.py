@@ -392,9 +392,19 @@ class OpenMLDatasetTestSparse(TestBase):
         # array format returned dense, but now we only return sparse and let the user handle it.
         assert isinstance(y.dtypes, pd.SparseDtype)
         assert X.shape == (600, 19998)
-
         assert len(categorical) == 19998
         self.assertListEqual(categorical, [False] * 19998)
+        assert y.shape == (600,)
+
+        # Test including row ID and ignore attributes
+        X, y, categorical, _ = self.sparse_dataset.get_data(
+            target="class",
+            include_row_id=True,
+            include_ignore_attribute=True,
+        )
+        assert X.shape == (600, 20000)
+        assert len(categorical) == 20000
+        self.assertListEqual(categorical, [False] * 20000)
         assert y.shape == (600,)
 
     def test_get_sparse_categorical_data_id_395(self):
