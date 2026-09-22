@@ -17,6 +17,7 @@ In particular, this module implements a python interface for the
 
 # License: BSD 3-Clause
 from __future__ import annotations
+__version__ = "0.16.0"
 
 from typing import TYPE_CHECKING
 
@@ -34,7 +35,6 @@ from . import (
     tasks,
     utils,
 )
-from .__version__ import __version__
 from ._api import _backend
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .datasets.functions import get_dataset, list_datasets
