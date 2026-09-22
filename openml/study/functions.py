@@ -205,8 +205,6 @@ def create_study(
 
     Parameters
     ----------
-    benchmark_suite : int (optional)
-        the benchmark suite (another study) upon which this study is ran.
     name : str
         the name of the study (meta-info)
     description : str
