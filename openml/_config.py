@@ -119,6 +119,7 @@ class OpenMLConfig:
     retry_policy: Literal["human", "robot"] = "human"
     connection_n_retries: int = 5
     show_progress: bool = False
+    skip_parquet: bool = False
 
     @property
     def server(self) -> str:
@@ -333,6 +334,12 @@ class OpenMLConfigManager:
             ),
         )
 
+    def should_skip_parquet(self) -> bool:
+        """Return whether dataset downloads should prefer ARFF over Parquet."""
+        return self.skip_parquet or (
+            os.environ.get(self.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        )
+
     def _handle_xdg_config_home_backwards_compatibility(self, xdg_home: str) -> Path:
         config_dir = Path(xdg_home) / "openml"
 
@@ -402,7 +409,7 @@ class OpenMLConfigManager:
         config_file_.seek(0)
         config.read_file(config_file_)
         configuration = dict(config.items("FAKE_SECTION"))
-        for boolean_field in ["avoid_duplicate_runs", "show_progress"]:
+        for boolean_field in ["avoid_duplicate_runs", "show_progress", "skip_parquet"]:
             if isinstance(config["FAKE_SECTION"][boolean_field], str):
                 configuration[boolean_field] = config["FAKE_SECTION"].getboolean(boolean_field)  # type: ignore
         return configuration  # type: ignore
@@ -440,6 +447,7 @@ class OpenMLConfigManager:
             avoid_duplicate_runs=config["avoid_duplicate_runs"],
             retry_policy=config["retry_policy"],
             connection_n_retries=int(config["connection_n_retries"]),
+            skip_parquet=config["skip_parquet"],
         )
         if "server" in config:
             self._config.server = config["server"]
