@@ -156,18 +156,46 @@ def list_evaluation_measures() -> list[str]:
     return openml._backend.evaluation_measure.list()
 
 
-def list_estimation_procedures() -> list[str]:
-    """Return list of evaluation procedures available.
+@overload
+def list_estimation_procedures(
+    output_format: Literal["dataframe"],
+) -> pd.DataFrame: ...
+
+
+@overload
+def list_estimation_procedures(
+    output_format: Literal["dict"] = ...,
+) -> dict[int, dict[str, object]]: ...
+
+
+def list_estimation_procedures(
+    output_format: Literal["dict", "dataframe"] = "dict",
+) -> dict[int, dict[str, object]] | pd.DataFrame:
+    """Return the estimation procedures available on OpenML.
 
     The function performs an API call to retrieve the entire list of
-    evaluation procedures' names that are available.
+    evaluation procedures. Each procedure includes its ID, task type,
+    name, and type.
+
+    Parameters
+    ----------
+    output_format : {"dict", "dataframe"}, default="dict"
+        The format of the returned procedures. The dictionary format maps
+        procedure IDs to their remaining metadata. The DataFrame format has
+        one row per procedure, including an ``id`` column.
 
     Returns
     -------
-    list
+    dict or pandas.DataFrame
+        The available estimation procedures in the requested format.
     """
     result = openml._backend.estimation_procedure.list()
-    return [i.name for i in result]
+    records = [procedure._to_dict() for procedure in result]
+
+    if output_format == "dataframe":
+        return pd.DataFrame.from_records(records)
+
+    return {record.pop("id"): record for record in records}
 
 
 def list_evaluations_setups(
