@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3794,7 +3794,7 @@ URL-encoded query parameters (excluding <code>api_key</code>).</p>
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
 <span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    Generate a filesystem-safe cache key for a request.</span>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    The key is constructed from URL path segments and</span>
@@ -3811,11 +3811,11 @@ URL-encoded query parameters (excluding <code>api_key</code>).</p>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    str</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        A relative path string representing the cache key.</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    """</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="n">path_parts</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="n">path_parts</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">filtered_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;api_key&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">filtered_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">"api_key"</span><span class="p">}</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="n">params_part</span> <span class="o">=</span> <span class="p">[</span><span class="n">urlencode</span><span class="p">(</span><span class="n">filtered_params</span><span class="p">)]</span> <span class="k">if</span> <span class="n">filtered_params</span> <span class="k">else</span> <span class="p">[]</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">path_parts</span><span class="p">,</span> <span class="o">*</span><span class="n">params_part</span><span class="p">))</span>
@@ -3977,7 +3977,7 @@ URL-encoded query parameters (excluding <code>api_key</code>).</p>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
 <span class="normal"><a href="#__codelineno-0-176">176</a></span>
 <span class="normal"><a href="#__codelineno-0-177">177</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Load a cached HTTP response from disk.</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    Parameters</span>
@@ -3996,18 +3996,18 @@ URL-encoded query parameters (excluding <code>api_key</code>).</p>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        If the cache entry or required files are missing.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    ValueError</span>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        If required metadata is missing or malformed.</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    """</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_to_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache path not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cache path not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="n">meta_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;meta.json&quot;</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="n">meta_raw</span> <span class="o">=</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span> <span class="k">if</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="n">meta_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">"meta.json"</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>    <span class="n">meta_raw</span> <span class="o">=</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span> <span class="k">if</span> <span class="n">meta_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">"</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="n">meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">meta_raw</span><span class="p">)</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>    <span class="n">headers_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;headers.json&quot;</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="n">headers_raw</span> <span class="o">=</span> <span class="n">headers_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span> <span class="k">if</span> <span class="n">headers_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>    <span class="n">headers_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">"headers.json"</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a>    <span class="n">headers_raw</span> <span class="o">=</span> <span class="n">headers_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span> <span class="k">if</span> <span class="n">headers_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">"</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="n">headers</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">headers_raw</span><span class="p">)</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a>    <span class="n">body_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_body_filename_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -4016,10 +4016,10 @@ URL-encoded query parameters (excluding <code>api_key</code>).</p>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="n">response</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="n">response</span><span class="o">.</span><span class="n">_content</span> <span class="o">=</span> <span class="n">body</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">response</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">response</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="n">response</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status_code"</span><span class="p">)</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">response</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">response</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"reason"</span><span class="p">)</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="n">response</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"encoding"</span><span class="p">)</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="k">return</span> <span class="n">response</span>
 </code></pre></div></td></tr></table></div>
@@ -4140,7 +4140,7 @@ creation timestamp) are stored as JSON.</p>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    Persist an HTTP response to disk.</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    Parameters</span>
@@ -4155,32 +4155,32 @@ creation timestamp) are stored as JSON.</p>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    The response body is stored as binary data. Headers and metadata</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    (status code, URL, reason, encoding, elapsed time, request info, and</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    creation timestamp) are stored as JSON.</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    """</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_to_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="n">body_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_body_filename_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">body_filename</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">body_filename</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;headers.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">"headers.json"</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="s2">&quot;status_code&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="s2">&quot;encoding&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="s2">&quot;headers&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">body</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="s2">"status_code"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>        <span class="s2">"url"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="s2">"reason"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>        <span class="s2">"encoding"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>        <span class="s2">"created_at"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="s2">"request"</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="s2">"url"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="s2">"headers"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>            <span class="s2">"body"</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">body</span> <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="p">},</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="p">}</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;meta.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">with</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">"meta.json"</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4548,7 +4548,7 @@ checksum verification.</p>
 <a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="n">files</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="o">**</span><span class="n">request_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Response</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    Execute a single HTTP request attempt.</span>
 <a id="__codelineno-0-500" name="__codelineno-0-500"></a>
 <a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Parameters</span>
@@ -4574,7 +4574,7 @@ checksum verification.</p>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">    tuple of (requests.Response or None, Exception or None)</span>
 <a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Response and potential retry exception.</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">    """</span>
 <a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="n">exception</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a>    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a>
@@ -4731,7 +4731,7 @@ checksum verification.</p>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-774" name="__codelineno-0-774"></a>    <span class="o">**</span><span class="n">request_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">    Send a DELETE request.</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">    Parameters</span>
@@ -4745,9 +4745,9 @@ checksum verification.</p>
 <a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">    requests.Response</span>
 <a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        HTTP response.</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    """</span>
 <a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">"DELETE"</span><span class="p">,</span>
 <a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="n">enable_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="n">use_api_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4767,7 +4767,7 @@ checksum verification.</p>
 
 
 <a href="#openml._api.clients.HTTPClient.download" class="headerlink" title="Permanent link">#</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span><span class="p">[[</span><span class="n"><span title="requests.Response">Response</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;response.txt&#39;</span><span class="p">,</span> <span class="n">md5_checksum</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pathlib.Path">Path</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span><span class="p">[[</span><span class="n"><span title="requests.Response">Response</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'utf-8'</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">'response.txt'</span><span class="p">,</span> <span class="n">md5_checksum</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pathlib.Path">Path</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4987,11 +4987,11 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-800" name="__codelineno-0-800"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-801" name="__codelineno-0-801"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-802" name="__codelineno-0-802"></a>    <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Response</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;response.txt&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"utf-8"</span><span class="p">,</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"response.txt"</span><span class="p">,</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>    <span class="n">md5_checksum</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">    Download a resource and store it in the cache directory.</span>
 <a id="__codelineno-0-809" name="__codelineno-0-809"></a>
 <a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">    Parameters</span>
@@ -5017,9 +5017,9 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    ------</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">    OpenMLHashException</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        If checksum verification fails.</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">    """</span>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a>    <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">path</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="n">file_path</span> <span class="o">=</span> <span class="n">base</span> <span class="o">/</span> <span class="s2">&quot;downloads&quot;</span> <span class="o">/</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">file_name</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="n">file_path</span> <span class="o">=</span> <span class="n">base</span> <span class="o">/</span> <span class="s2">"downloads"</span> <span class="o">/</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span> <span class="o">/</span> <span class="n">file_name</span>
 <a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">file_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -5260,7 +5260,7 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a>    <span class="n">md5_checksum</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-704" name="__codelineno-0-704"></a>    <span class="o">**</span><span class="n">request_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">    Send a GET request.</span>
 <a id="__codelineno-0-708" name="__codelineno-0-708"></a>
 <a id="__codelineno-0-709" name="__codelineno-0-709"></a><span class="sd">    Parameters</span>
@@ -5282,9 +5282,9 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">    requests.Response</span>
 <a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        HTTP response.</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">    """</span>
 <a id="__codelineno-0-729" name="__codelineno-0-729"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">"GET"</span><span class="p">,</span>
 <a id="__codelineno-0-731" name="__codelineno-0-731"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="n">enable_cache</span><span class="o">=</span><span class="n">enable_cache</span><span class="p">,</span>
 <a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="n">refresh_cache</span><span class="o">=</span><span class="n">refresh_cache</span><span class="p">,</span>
@@ -5445,7 +5445,7 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-743" name="__codelineno-0-743"></a>    <span class="n">use_api_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>    <span class="o">**</span><span class="n">request_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">    Send a POST request.</span>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a>
 <a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">    Parameters</span>
@@ -5461,9 +5461,9 @@ and returning a <code>pathlib.Path</code>.</p>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">    requests.Response</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">        HTTP response.</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">    """</span>
 <a id="__codelineno-0-763" name="__codelineno-0-763"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">method</span><span class="o">=</span><span class="s2">"POST"</span><span class="p">,</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="n">enable_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">use_api_key</span><span class="o">=</span><span class="n">use_api_key</span><span class="p">,</span>
@@ -5701,7 +5701,7 @@ OpenML Python client version.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.annotate", "content.code.copy", "navigation.footer", "navigation.sections", "toc.follow", "toc.integrate", "navigation.tabs", "navigation.tabs.sticky", "header.autohide", "header.social", "search.suggest", "search.highlight", "search.share"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

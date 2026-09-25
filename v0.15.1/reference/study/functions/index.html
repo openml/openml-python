@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3955,7 +3955,7 @@
 <span class="normal"><a href="#__codelineno-0-406">406</a></span>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="k">def</span><span class="w"> </span><span class="nf">attach_to_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">run_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Attaches a set of runs to a study.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">"""Attaches a set of runs to a study.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    ----------</span>
@@ -3969,15 +3969,15 @@
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    int</span>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        new size of the study (in terms of explicitly linked entities)</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="c1"># Interestingly, there&#39;s no need to tell the server about the entity type, it knows by itself</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    """</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="c1"># Interestingly, there's no need to tell the server about the entity type, it knows by itself</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="n">call</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;study/</span><span class="si">{</span><span class="n">study_id</span><span class="si">}</span><span class="s2">/attach&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="n">request_method</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">)},</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="n">call</span><span class="o">=</span><span class="sa">f</span><span class="s2">"study/</span><span class="si">{</span><span class="n">study_id</span><span class="si">}</span><span class="s2">/attach"</span><span class="p">,</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="n">request_method</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"ids"</span><span class="p">:</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">)},</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="p">)</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)[</span><span class="s2">&quot;oml:study_attach&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;oml:linked_entities&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)[</span><span class="s2">"oml:study_attach"</span><span class="p">]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"oml:linked_entities"</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4087,7 +4087,7 @@
 <span class="normal"><a href="#__codelineno-0-380">380</a></span>
 <span class="normal"><a href="#__codelineno-0-381">381</a></span>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">attach_to_suite</span><span class="p">(</span><span class="n">suite_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Attaches a set of tasks to a benchmarking suite.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="w">    </span><span class="sd">"""Attaches a set of tasks to a benchmarking suite.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    ----------</span>
@@ -4101,7 +4101,7 @@
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    int</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        new size of the suite (in terms of explicitly linked entities)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    """</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="k">return</span> <span class="n">attach_to_study</span><span class="p">(</span><span class="n">suite_id</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4277,7 +4277,7 @@ more can be added later with <code>attach_to_suite</code>.</p>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">task_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBenchmarkSuite</span><span class="p">:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Creates an OpenML benchmark suite (collection of entity types, where</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    the tasks are the linked entity)</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
@@ -4297,7 +4297,7 @@ more can be added later with <code>attach_to_suite</code>.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    OpenMLStudy</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        A local OpenML study object (call publish method to upload to server)</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    """</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">return</span> <span class="n">OpenMLBenchmarkSuite</span><span class="p">(</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">suite_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="n">alias</span><span class="o">=</span><span class="n">alias</span><span class="p">,</span>
@@ -4486,8 +4486,8 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">openml</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">study</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;My Study&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A study on decision trees&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">"My Study"</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">"A study on decision trees"</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">... </span>    <span class="n">run_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gp">... </span><span class="p">)</span>
 </code></pre></div>
@@ -4559,7 +4559,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="n">benchmark_suite</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLStudy</span><span class="p">:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    Creates an OpenML study (collection of data, tasks, flows, setups and run),</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    where the runs are the main entity (collection consists of runs and all</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    entities (flows, tasks, etc) that are related to these runs)</span>
@@ -4589,11 +4589,11 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    --------</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    &gt;&gt;&gt; import openml</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    &gt;&gt;&gt; study = openml.study.create_study(  # doctest: +SKIP</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    ...     name=&quot;My Study&quot;,</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    ...     description=&quot;A study on decision trees&quot;,</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    ...     name="My Study",</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    ...     description="A study on decision trees",</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    ...     run_ids=[1, 2, 3],</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    ... )</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    """</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="k">return</span> <span class="n">OpenMLStudy</span><span class="p">(</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">study_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">alias</span><span class="o">=</span><span class="n">alias</span><span class="p">,</span>
@@ -4701,7 +4701,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes a study from the OpenML server.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">"""Deletes a study from the OpenML server.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    ----------</span>
@@ -4712,7 +4712,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    bool</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        True iff the deletion was successful. False otherwise</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    """</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">study_id</span><span class="p">)</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
@@ -4805,7 +4805,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_suite</span><span class="p">(</span><span class="n">suite_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes a study from the OpenML server.</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="w">    </span><span class="sd">"""Deletes a study from the OpenML server.</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    ----------</span>
@@ -4816,7 +4816,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    bool</span>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        True iff the deletion was successful. False otherwise</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    """</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">return</span> <span class="n">delete_study</span><span class="p">(</span><span class="n">suite_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4936,7 +4936,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span>
 <span class="normal"><a href="#__codelineno-0-454">454</a></span>
 <span class="normal"><a href="#__codelineno-0-455">455</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="k">def</span><span class="w"> </span><span class="nf">detach_from_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">run_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Detaches a set of run ids from a study.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">    </span><span class="sd">"""Detaches a set of run ids from a study.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">    ----------</span>
@@ -4950,17 +4950,17 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    int</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        new size of the study (in terms of explicitly linked entities)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="c1"># Interestingly, there&#39;s no need to tell the server about the entity type, it knows by itself</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="n">uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;study/</span><span class="si">{</span><span class="n">study_id</span><span class="si">}</span><span class="s2">/detach&quot;</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">post_variables</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">)}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    """</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="c1"># Interestingly, there's no need to tell the server about the entity type, it knows by itself</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="n">uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"study/</span><span class="si">{</span><span class="n">study_id</span><span class="si">}</span><span class="s2">/detach"</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="n">post_variables</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"ids"</span><span class="p">:</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">)}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">call</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="n">request_method</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="n">request_method</span><span class="o">=</span><span class="s2">"post"</span><span class="p">,</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="n">data</span><span class="o">=</span><span class="n">post_variables</span><span class="p">,</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="p">)</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)[</span><span class="s2">&quot;oml:study_detach&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;oml:linked_entities&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)[</span><span class="s2">"oml:study_detach"</span><span class="p">]</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"oml:linked_entities"</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5082,7 +5082,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="k">def</span><span class="w"> </span><span class="nf">detach_from_suite</span><span class="p">(</span><span class="n">suite_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Detaches a set of task ids from a suite.</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="w">    </span><span class="sd">"""Detaches a set of task ids from a suite.</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    ----------</span>
@@ -5096,7 +5096,7 @@ these can also be added later with <code>attach_to_study</code>.</p>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    int</span>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    new size of the study (in terms of explicitly linked entities)</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    """</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="k">return</span> <span class="n">detach_from_study</span><span class="p">(</span><span class="n">suite_id</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -5245,7 +5245,7 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="n">study_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="n">arg_for_backwards_compat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG001</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLStudy</span><span class="p">:</span>  <span class="c1"># F401</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Retrieves all relevant information of an OpenML study from the server.</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Parameters</span>
@@ -5268,20 +5268,20 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    --------</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    &gt;&gt;&gt; import openml</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    &gt;&gt;&gt; study = openml.study.get_study(1)  # doctest: +SKIP</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="k">if</span> <span class="n">study_id</span> <span class="o">==</span> <span class="s2">&quot;OpenML100&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    """</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="k">if</span> <span class="n">study_id</span> <span class="o">==</span> <span class="s2">"OpenML100"</span><span class="p">:</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>            <span class="s2">&quot;It looks like you are running code from the OpenML100 paper. It still works, but lots &quot;</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>            <span class="s2">&quot;of things have changed since then. Please use `get_suite(&#39;OpenML100&#39;)` instead.&quot;</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>            <span class="s2">"It looks like you are running code from the OpenML100 paper. It still works, but lots "</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>            <span class="s2">"of things have changed since then. Please use `get_suite('OpenML100')` instead."</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="p">)</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>        <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>        <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>        <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">"task"</span><span class="p">)</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study</span><span class="p">,</span> <span class="n">OpenMLBenchmarkSuite</span><span class="p">)</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="k">return</span> <span class="n">study</span>  <span class="c1"># type: ignore</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">&quot;run&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">"run"</span><span class="p">)</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study</span><span class="p">,</span> <span class="n">OpenMLStudy</span><span class="p">)</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="k">return</span> <span class="n">study</span>
 </code></pre></div></td></tr></table></div>
@@ -5357,7 +5357,7 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">openml</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s2">&quot;OpenML-CC18&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s2">"OpenML-CC18"</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -5387,7 +5387,7 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 <span class="normal"><a href="#__codelineno-0-40">40</a></span>
 <span class="normal"><a href="#__codelineno-0-41">41</a></span>
 <span class="normal"><a href="#__codelineno-0-42">42</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_suite</span><span class="p">(</span><span class="n">suite_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBenchmarkSuite</span><span class="p">:</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    Retrieves all relevant information of an OpenML benchmarking suite from the server.</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22"></a>
 <a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">    Parameters</span>
@@ -5404,9 +5404,9 @@ and studies (collections of runs) so this argument is no longer needed.</p>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="sd">    --------</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    &gt;&gt;&gt; import openml</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    &gt;&gt;&gt; suite = openml.study.get_suite(99)  # doctest: +SKIP</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    &gt;&gt;&gt; suite = openml.study.get_suite(&quot;OpenML-CC18&quot;)  # doctest: +SKIP</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">suite_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    &gt;&gt;&gt; suite = openml.study.get_suite("OpenML-CC18")  # doctest: +SKIP</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    """</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">study</span> <span class="o">=</span> <span class="n">_get_study</span><span class="p">(</span><span class="n">suite_id</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="s2">"task"</span><span class="p">)</span>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study</span><span class="p">,</span> <span class="n">OpenMLBenchmarkSuite</span><span class="p">)</span>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="k">return</span> <span class="n">study</span>
@@ -5641,7 +5641,7 @@ these are also returned.</p>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="n">benchmark_suite</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">    Return a list of all studies which are on OpenML.</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Parameters</span>
@@ -5671,10 +5671,10 @@ these are also returned.</p>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        - creation_date</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        If qualities are calculated for the dataset, some of</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        these are also returned.</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    """</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list</span><span class="p">,</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="n">main_entity_type</span><span class="o">=</span><span class="s2">&quot;run&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="n">main_entity_type</span><span class="o">=</span><span class="s2">"run"</span><span class="p">,</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="n">benchmark_suite</span><span class="o">=</span><span class="n">benchmark_suite</span><span class="p">,</span>
@@ -5885,7 +5885,7 @@ suites are returned.</p>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    Return a list of all suites which are on OpenML.</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Parameters</span>
@@ -5911,10 +5911,10 @@ suites are returned.</p>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        - status</span>
 <a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        - creator</span>
 <a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        - creation_date</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    """</span>
 <a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
 <a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list</span><span class="p">,</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">main_entity_type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">main_entity_type</span><span class="o">=</span><span class="s2">"task"</span><span class="p">,</span>
 <a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
 <a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="p">)</span>
@@ -6013,27 +6013,27 @@ suites are returned.</p>
 <span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="k">def</span><span class="w"> </span><span class="nf">update_study_status</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Updates the status of a study to either &#39;active&#39; or &#39;deactivated&#39;.</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Updates the status of a study to either 'active' or 'deactivated'.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    ----------</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    study_id : int</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        The data id of the dataset</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    status : str,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        &#39;active&#39; or &#39;deactivated&#39;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">legal_status</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;active&quot;</span><span class="p">,</span> <span class="s2">&quot;deactivated&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        'active' or 'deactivated'</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    """</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="n">legal_status</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"active"</span><span class="p">,</span> <span class="s2">"deactivated"</span><span class="p">}</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">legal_status</span><span class="p">:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Illegal status value. Legal values: </span><span class="si">{</span><span class="n">legal_status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;study_id&quot;</span><span class="p">:</span> <span class="n">study_id</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="s2">&quot;study/status/update&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Illegal status value. Legal values: </span><span class="si">{</span><span class="n">legal_status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"study_id"</span><span class="p">:</span> <span class="n">study_id</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="s2">"study/status/update"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="n">server_study_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;oml:study_status_update&quot;</span><span class="p">][</span><span class="s2">&quot;oml:id&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="n">server_status</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;oml:study_status_update&quot;</span><span class="p">][</span><span class="s2">&quot;oml:status&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="n">server_study_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:study_status_update"</span><span class="p">][</span><span class="s2">"oml:id"</span><span class="p">]</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="n">server_status</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:study_status_update"</span><span class="p">][</span><span class="s2">"oml:status"</span><span class="p">]</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">server_status</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">study_id</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">server_study_id</span><span class="p">):</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="c1"># This should never happen</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Study id/status does not collide&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Study id/status does not collide"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6114,16 +6114,16 @@ suites are returned.</p>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span><span class="w"> </span><span class="nf">update_suite_status</span><span class="p">(</span><span class="n">suite_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Updates the status of a study to either &#39;active&#39; or &#39;deactivated&#39;.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Updates the status of a study to either 'active' or 'deactivated'.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    ----------</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    suite_id : int</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        The data id of the dataset</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    status : str,</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        &#39;active&#39; or &#39;deactivated&#39;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        'active' or 'deactivated'</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    """</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">return</span> <span class="n">update_study_status</span><span class="p">(</span><span class="n">suite_id</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -6257,7 +6257,7 @@ suites are returned.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.annotate", "content.code.copy", "navigation.footer", "navigation.sections", "toc.follow", "toc.integrate", "navigation.tabs", "navigation.tabs.sticky", "header.autohide", "header.social", "search.suggest", "search.highlight", "search.share"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

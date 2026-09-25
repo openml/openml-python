@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3790,10 +3790,10 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
 <span class="normal"><a href="#__codelineno-0-69">69</a></span>
 <span class="normal"><a href="#__codelineno-0-70">70</a></span>
 <span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_env_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Attempt to find a suitable proxy for this url.</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">"""Attempt to find a suitable proxy for this url.</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Relies on ``requests`` internals to remain consistent. To disable this from the</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    environment, please set the enviornment varialbe ``no_proxy=&quot;*&quot;``.</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    environment, please set the enviornment varialbe ``no_proxy="*"``.</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    Parameters</span>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    ----------</span>
@@ -3804,7 +3804,7 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    -------</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Optional[str]</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        The proxy url if found, else None</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    """</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a>    <span class="n">resolved_proxies</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_environ_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">select_proxy</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">resolved_proxies</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
@@ -3939,7 +3939,7 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.annotate", "content.code.copy", "navigation.footer", "navigation.sections", "toc.follow", "toc.integrate", "navigation.tabs", "navigation.tabs.sticky", "header.autohide", "header.social", "search.suggest", "search.highlight", "search.share"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
