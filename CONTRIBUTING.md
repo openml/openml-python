@@ -76,12 +76,42 @@ However, it is also possible to use the [openml-python docker image](https://git
    pre-commit install
    ```
 
+### Starting Local Services
+
+The test suite runs against local services via Docker. Before starting the services for the first time, set the required file permissions:
+
+```bash
+chown -R www-data:www-data data/php
+# Or, if the above fails (e.g. because `www-data` does not exist on your system):
+chmod -R 777 data/php
+```
+
+Then clone the [openml/services](https://github.com/openml/services) repository and start the services:
+
+```bash
+git clone https://github.com/openml/services.git
+cd services
+docker compose --profile rest-api --profile minio up -d
+```
+
 ### Testing (Your Installation)
 To test your installation and run the tests for the first time, run the following from the repository folder:
 ```bash
 pytest tests
 ```
 For Windows systems, you may need to add `pytest` to PATH before executing the command.
+
+To run tests against the local services (started with `docker compose` above), set the `OPENML_USE_LOCAL_SERVICES` environment variable before running `pytest`:
+
+```bash
+# Linux/macOS
+export OPENML_USE_LOCAL_SERVICES="true"
+pytest tests
+
+# Windows
+$env:OPENML_USE_LOCAL_SERVICES = "true"
+pytest tests
+```
 
 Executing a specific unit test can be done by specifying the module, test case, and test.
 You may then run a specific module, test case, or unit test respectively:
