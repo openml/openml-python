@@ -47,9 +47,7 @@ class TestBase(unittest.TestCase):
         "user": [],
     }
     flow_name_tracker: ClassVar[list[str]] = []
-    test_server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
     admin_key = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR)
-    user_key = openml.config._TEST_SERVER_NORMAL_USER_KEY
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
@@ -99,8 +97,6 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.user_key
-        self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
@@ -114,8 +110,7 @@ class TestBase(unittest.TestCase):
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.server = self.production_server
-        openml.config.apikey = ""
+        openml.config.use_production_servers()
 
     def tearDown(self) -> None:
         """Tear down the test"""
