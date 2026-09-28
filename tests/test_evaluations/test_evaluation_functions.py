@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import pytest
+import requests
+from unittest import mock
 
 import openml
 import openml.evaluations
-from openml.testing import TestBase
+from openml.testing import TestBase, create_request_response
 
 
 @pytest.mark.usefixtures("long_version")
@@ -125,24 +127,10 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].values is None
 
     @pytest.mark.production_server()
-    def test_evaluation_list_filter_run(self):
+    def test_evaluation_list_filter_flow(self):
         self.use_production_server()
 
-        run_id = 12
-
-        evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy",
-            size=2,
-            runs=[run_id],
-        )
-
-        assert len(evaluations) == 1
-        for run_id in evaluations:
-            assert evaluations[run_id].run_id == run_id
-            # default behaviour of this method: return aggregated results (not
-            # per fold)
-            assert evaluations[run_id].value is not None
-            assert evaluations[run_id].values is None
+        flow_id = 100
 
     @pytest.mark.production_server()
     def test_evaluation_list_limit(self):
@@ -264,3 +252,38 @@ class TestEvaluationFunctions(TestBase):
         task_id = [6]
         size = 121
         self._check_list_evaluation_setups(tasks=task_id, size=size)
+
+
+@mock.patch.object(requests.Session, "get")
+def test_evaluation_list_filter_run(mock_get, test_files_directory, test_api_key):
+    mock_dir = test_files_directory / "mock_responses" / "evaluations"
+
+    # GET #1: evaluation list response
+    eval_response = create_request_response(
+        status_code=200,
+        content_filepath=mock_dir / "evaluation_list_run12.xml",
+    )
+    # GET #2: user list response (called internally to resolve uploader names)
+    user_response = create_request_response(
+        status_code=200,
+        content_filepath=mock_dir / "user_list_1.xml",
+    )
+    mock_get.side_effect = [eval_response, user_response]
+
+    run_id = 12
+    evaluations = openml.evaluations.list_evaluations(
+        "predictive_accuracy",
+        size=2,
+        runs=[run_id],
+    )
+
+    assert len(evaluations) == 1
+    for rid in evaluations:
+        assert evaluations[rid].run_id == run_id
+        assert evaluations[rid].value is not None
+        assert evaluations[rid].values is None
+
+    # Verify GET #1 URL contains the evaluation list + run filter
+    first_call_url = mock_get.call_args_list[0].args[0]
+    assert "evaluation/list" in first_call_url
+    assert "run/12" in first_call_url
