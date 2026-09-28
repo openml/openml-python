@@ -21,7 +21,7 @@ from urllib.parse import urlparse
 
 from openml.enums import APIVersion, ServerMode
 
-from .__version__ import __version__
+from . import __version__
 
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
