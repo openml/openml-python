@@ -345,10 +345,18 @@ class TestRun(TestBase):
         # This is only a smoke check right now
         # TODO add a few asserts here
         run._to_xml()
+        assert isinstance(run._to_xml(), str)
+
         if run.trace is not None:
             # This is only a smoke check right now
             # TODO add a few asserts here
+            assert run.trace.run_id == run.run_id
+            assert run.trace.trace_iterations is not None
+            for trace_iteration in run.trace.trace_iterations.values():
+                assert (trace_iteration.setup_string is not None) != (trace_iteration.setup_string is not None)
+
             run.trace.trace_to_arff()
+            assert isinstance(run.trace, dict)
 
         # check arff output
         assert len(run.data_content) == num_instances
