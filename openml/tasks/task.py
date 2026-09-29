@@ -240,6 +240,10 @@ class OpenMLTask(OpenMLBase):
     def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.task_id = int(xml_response["oml:upload_task"]["oml:id"])
+        from openml.tasks.functions import _get_task_description
+        completed = _get_task_description(self.task_id)
+        self.estimation_procedure = completed.estimation_procedure
+        self.estimation_procedure_id = completed.estimation_procedure_id
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):
