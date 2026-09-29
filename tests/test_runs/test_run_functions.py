@@ -224,7 +224,9 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        # TODO: assert holdout task
+        # assert for holdout task
+        task = openml.tasks.get_task(run.task_id)
+        assert task.estimation_procedure["type"] == "holdout"
 
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
