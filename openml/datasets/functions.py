@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import warnings
 from collections import OrderedDict
 from functools import partial
@@ -504,10 +503,9 @@ def get_dataset(  # noqa: C901, PLR0912
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         parquet_file = None
-        skip_parquet = (
-            os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        download_parquet = (
+            "oml:parquet_url" in description and not openml.config.should_skip_parquet()
         )
-        download_parquet = "oml:parquet_url" in description and not skip_parquet
         if download_parquet and (download_data or download_all_files):
             try:
                 parquet_file = _get_dataset_parquet(

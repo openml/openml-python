@@ -87,8 +87,9 @@ class TestConfig(openml.testing.TestBase):
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
+        _config["skip_parquet"] = False
         assert isinstance(config, dict)
-        assert len(config) == 8
+        assert len(config) == 9
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
@@ -102,6 +103,7 @@ class TestConfig(openml.testing.TestBase):
         _config["retry_policy"] = "human"
         _config["connection_n_retries"] = 100
         _config["show_progress"] = False
+        _config["skip_parquet"] = True
         orig_config = openml.config.get_config_as_dict()
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()
@@ -172,7 +174,7 @@ def test_configuration_file_not_overwritten_on_load():
 
 
 def test_configuration_loads_booleans(tmp_path):
-    config_file_content = "avoid_duplicate_runs=true\nshow_progress=false"
+    config_file_content = "avoid_duplicate_runs=true\nshow_progress=false\nskip_parquet=true"
     tmp_file = tmp_path / "config"
     with tmp_file.open("w") as config_file:
         config_file.write(config_file_content)
@@ -181,6 +183,18 @@ def test_configuration_loads_booleans(tmp_path):
     # Explicit test to avoid truthy/falsy modes of other types
     assert read_config["avoid_duplicate_runs"] is True
     assert read_config["show_progress"] is False
+    assert read_config["skip_parquet"] is True
+
+
+def test_should_skip_parquet_uses_configuration(monkeypatch):
+    monkeypatch.delenv(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, raising=False)
+    previous_value = openml.config.skip_parquet
+    openml.config.skip_parquet = True
+
+    try:
+        assert openml.config.should_skip_parquet() is True
+    finally:
+        openml.config.skip_parquet = previous_value
 
 
 def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
