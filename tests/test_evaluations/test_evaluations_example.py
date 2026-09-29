@@ -26,8 +26,8 @@ class TestEvaluationsExample(unittest.TestCase):
                     parameters_in_separate_columns=True,
                 )  # Choose an SVM flow, for example 8353, and a task.
             except openml.exceptions.OpenMLServerException as e:
-                if e.code == 412:
-                    self.skipTest("OpenML server returned HTTP 412 for this flow/task combination")
+                if e.code in [412, 546]:
+                    self.skipTest("OpenML server rejected the request (e.g., result limit too high)")
                 raise
 
             assert len(df) > 0, (
