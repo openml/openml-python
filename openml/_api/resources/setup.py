@@ -26,6 +26,7 @@ class SetupV1API(ResourceV1API, SetupAPI):
         setup: Iterable[int] | None = None,
         flow: int | None = None,
         tag: str | None = None,
+        **kwargs: Any,
     ) -> str:
         """Construct an OpenML Setup API URL with filtering parameters.
 
@@ -50,6 +51,10 @@ class SetupV1API(ResourceV1API, SetupAPI):
             api_call += f"/limit/{limit}"
         if offset is not None:
             api_call += f"/offset/{offset}"
+        if kwargs:
+            for operator, value in kwargs.items():
+                if value is not None:
+                    api_call += f"/{operator}/{value}"
         if setup is not None:
             api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
         if flow is not None:
@@ -164,6 +169,7 @@ class SetupV1API(ResourceV1API, SetupAPI):
         setup: Iterable[int] | None = None,
         flow: int | None = None,
         tag: str | None = None,
+        **kwargs: Any,
     ) -> builtins.list[OpenMLSetup]:
         """Perform API call `/setup/list/{filters}`
 
@@ -183,7 +189,7 @@ class SetupV1API(ResourceV1API, SetupAPI):
         list
             setups that match the filters, going from id to the OpenMLSetup object.
         """
-        api_call = SetupV1API._build_url(limit, offset, setup=setup, flow=flow, tag=tag)
+        api_call = SetupV1API._build_url(limit, offset, setup=setup, flow=flow, tag=tag, **kwargs)
         setup_response = self._http.get(api_call)
         xml_content = setup_response.text
 
@@ -266,6 +272,7 @@ class SetupV2API(ResourceV2API, SetupAPI):
         setup: Iterable[int] | None = None,  # noqa: ARG002
         flow: int | None = None,  # noqa: ARG002
         tag: str | None = None,  # noqa: ARG002
+        **kwargs: Any,  # noqa: ARG002
     ) -> builtins.list[OpenMLSetup]:
         self._not_supported(method="list")
 
