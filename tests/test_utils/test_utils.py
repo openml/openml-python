@@ -92,7 +92,6 @@ def test_list_all_for_flows(min_number_flows_on_test_server):
 @pytest.mark.flaky()  # Other tests might need to upload runs first
 @pytest.mark.test_server()
 def test_list_all_for_setups(min_number_setups_on_test_server):
-    # TODO apparently list_setups function does not support kwargs
     setups = openml.setups.list_setups(size=min_number_setups_on_test_server)
     assert min_number_setups_on_test_server == len(setups)
 
@@ -107,7 +106,6 @@ def test_list_all_for_runs(min_number_runs_on_test_server):
 @pytest.mark.flaky()  # Other tests might need to upload runs first
 @pytest.mark.test_server()
 def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
-    # TODO apparently list_evaluations function does not support kwargs
     evaluations = openml.evaluations.list_evaluations(
         function="predictive_accuracy",
         size=min_number_evaluations_on_test_server,
