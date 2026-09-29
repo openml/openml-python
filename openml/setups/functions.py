@@ -78,6 +78,7 @@ def list_setups(  # noqa: PLR0913
     tag: str | None = None,
     setup: Iterable[int] | None = None,
     output_format: Literal["object", "dataframe"] = "object",
+    **kwargs: Any,
 ) -> dict[int, OpenMLSetup] | pd.DataFrame:
     """
     List all setups matching all of the given filters.
@@ -103,7 +104,7 @@ def list_setups(  # noqa: PLR0913
             "Invalid output format selected. Only 'object', or 'dataframe' applicable.",
         )
 
-    listing_call = partial(openml._backend.setup.list, flow=flow, tag=tag, setup=setup)
+    listing_call = partial(openml._backend.setup.list, flow=flow, tag=tag, setup=setup, **kwargs)
     batches = openml.utils._list_all(
         listing_call,
         batch_size=1_000,  # batch size for setups is lower

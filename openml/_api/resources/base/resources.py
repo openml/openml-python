@@ -171,6 +171,7 @@ class SetupAPI(ResourceAPI):
         setup: Iterable[int] | None = None,
         flow: int | None = None,
         tag: str | None = None,
+        **kwargs: Any,
     ) -> list[OpenMLSetup]: ...
 
     @abstractmethod

@@ -18,12 +18,17 @@ class TestEvaluationsExample(unittest.TestCase):
             import matplotlib.pyplot as plt
             import numpy as np
 
-            df = openml.evaluations.list_evaluations_setups(
-                "predictive_accuracy",
-                flows=[8353],
-                tasks=[6],
-                parameters_in_separate_columns=True,
-            )  # Choose an SVM flow, for example 8353, and a task.
+            try:
+                df = openml.evaluations.list_evaluations_setups(
+                    "predictive_accuracy",
+                    flows=[8353],
+                    tasks=[6],
+                    parameters_in_separate_columns=True,
+                )  # Choose an SVM flow, for example 8353, and a task.
+            except openml.exceptions.OpenMLServerException as e:
+                if e.code in [412, 546]:
+                    self.skipTest("OpenML server rejected the request (e.g., result limit too high)")
+                raise
 
             assert len(df) > 0, (
                 "No evaluation found for flow 8353 on task 6, could "

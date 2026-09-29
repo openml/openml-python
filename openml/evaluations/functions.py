@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import partial
 from itertools import chain
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from typing_extensions import overload
 
 import numpy as np
@@ -33,6 +33,7 @@ def list_evaluations(
     per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["dataframe"] = ...,
+    **kwargs: Any,
 ) -> pd.DataFrame: ...
 
 
@@ -51,6 +52,7 @@ def list_evaluations(
     per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["object"] = "object",
+    **kwargs: Any,
 ) -> dict[int, OpenMLEvaluation]: ...
 
 
@@ -68,6 +70,7 @@ def list_evaluations(
     per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["object", "dataframe"] = "object",
+    **kwargs: Any,
 ) -> dict[int, OpenMLEvaluation] | pd.DataFrame:
     """List all run-evaluation pairs matching all of the given filters.
 
@@ -131,6 +134,7 @@ def list_evaluations(
         study=study,
         sort_order=sort_order,
         per_fold=per_fold_str,
+        **kwargs,
     )
     eval_collection = openml.utils._list_all(listing_call, offset=offset, limit=size)
 
