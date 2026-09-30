@@ -17,7 +17,6 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy",
             **kwargs,
             sort_order="desc",
-            output_format="dataframe",
         )
         evals = openml.evaluations.list_evaluations(
             "predictive_accuracy",
@@ -51,9 +50,9 @@ class TestEvaluationFunctions(TestBase):
             self.assertSequenceEqual(sorted(list1), sorted(list2))
         return evals_setups
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_task(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         task_id = 7312
 
@@ -71,9 +70,9 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_uploader_ID_16(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
@@ -86,9 +85,9 @@ class TestEvaluationFunctions(TestBase):
 
         assert len(evaluations) > 50
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_uploader_ID_10(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         setup_id = 10
         evaluations = openml.evaluations.list_evaluations(
@@ -105,9 +104,9 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow_id = 100
 
@@ -125,9 +124,9 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_run(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         run_id = 12
 
@@ -145,9 +144,9 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_limit(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         evaluations = openml.evaluations.list_evaluations(
             "predictive_accuracy",
@@ -156,6 +155,7 @@ class TestEvaluationFunctions(TestBase):
         )
         assert len(evaluations) == 100
 
+    @pytest.mark.test_server()
     def test_list_evaluations_empty(self):
         evaluations = openml.evaluations.list_evaluations("unexisting_measure")
         if len(evaluations) > 0:
@@ -163,9 +163,9 @@ class TestEvaluationFunctions(TestBase):
 
         assert isinstance(evaluations, dict)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_per_fold(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         size = 1000
         task_ids = [6]
         uploader_ids = [1]
@@ -201,9 +201,9 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_sort(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         size = 10
         task_id = 6
         # Get all evaluations of the task
@@ -233,14 +233,15 @@ class TestEvaluationFunctions(TestBase):
         test_output = sorted(unsorted_output, reverse=True)
         assert test_output[:size] == sorted_output
 
+    @pytest.mark.test_server()
     def test_list_evaluation_measures(self):
         measures = openml.evaluations.list_evaluation_measures()
         assert isinstance(measures, list) is True
         assert all(isinstance(s, str) for s in measures) is True
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_evaluations_setups_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow_id = [405]
         size = 100
         evals = self._check_list_evaluation_setups(flows=flow_id, size=size)
@@ -250,16 +251,16 @@ class TestEvaluationFunctions(TestBase):
             flows=flow_id,
             size=size,
             sort_order="desc",
-            output_format="dataframe",
             parameters_in_separate_columns=True,
         )
         columns = list(evals_cols.columns)
         keys = list(evals["parameters"].values[0].keys())
         assert all(elem in columns for elem in keys)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_evaluations_setups_filter_task(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         task_id = [6]
         size = 121
         self._check_list_evaluation_setups(tasks=task_id, size=size)

@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
+import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -61,7 +62,7 @@ class TestOpenMLDataset(TestBase):
         self.lock_path = os.path.join(openml.config.get_cache_directory(), "locks")
         for did in ["-1", "2"]:
             with lockutils.external_lock(
-                name="datasets.functions.get_dataset:%s" % did,
+                name=f"datasets.functions.get_dataset:{did}",
                 lock_path=self.lock_path,
             ):
                 pickle_path = os.path.join(
@@ -106,6 +107,7 @@ class TestOpenMLDataset(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
+    @pytest.mark.test_server()
     def test_tag_untag_dataset(self):
         tag = "test_tag_%d" % random.randint(1, 1000000)
         all_tags = _tag_entity("data", 1, tag)
@@ -113,30 +115,35 @@ class TestOpenMLDataset(TestBase):
         all_tags = _tag_entity("data", 1, tag, untag=True)
         assert tag not in all_tags
 
-    def test_list_datasets_output_format(self):
-        datasets = openml.datasets.list_datasets(output_format="dataframe")
-        assert isinstance(datasets, pd.DataFrame)
+    @pytest.mark.test_server()
+    def test_list_datasets_length(self):
+        datasets = openml.datasets.list_datasets()
         assert len(datasets) >= 100
 
+    @pytest.mark.test_server()
     def test_list_datasets_paginate(self):
         size = 10
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            assert size == len(datasets)
-            self._check_datasets(datasets)
+            assert len(datasets) == size
+            assert len(datasets.columns) >= 2
+            assert "did" in datasets.columns
+            assert datasets["did"].dtype == int
+            assert "status" in datasets.columns
+            assert datasets["status"].dtype == pd.CategoricalDtype(
+                categories=["in_preparation", "active", "deactivated"],
+            )
 
+    @pytest.mark.test_server()
     def test_list_datasets_empty(self):
-        datasets = openml.datasets.list_datasets(
-            tag="NoOneWouldUseThisTagAnyway",
-            output_format="dataframe",
-        )
+        datasets = openml.datasets.list_datasets(tag="NoOneWouldUseThisTagAnyway")
         assert datasets.empty
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
-        openml.config.server = self.production_server
+        self.use_production_server()
         active = openml.datasets.check_datasets_active(
             [2, 17, 79],
             raise_error_if_not_exist=False,
@@ -150,8 +157,8 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
-        openml.config.server = self.test_server
 
+    @pytest.mark.test_server()
     def test_illegal_character_tag(self):
         dataset = openml.datasets.get_dataset(1)
         tag = "illegal_tag&"
@@ -161,6 +168,7 @@ class TestOpenMLDataset(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
+    @pytest.mark.test_server()
     def test_illegal_length_tag(self):
         dataset = openml.datasets.get_dataset(1)
         tag = "a" * 65
@@ -170,30 +178,29 @@ class TestOpenMLDataset(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__name_to_id_with_deactivated(self):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
-        openml.config.server = self.test_server
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         assert openml.datasets.functions._name_to_id("iris") == 61
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__name_to_id_with_version(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         assert openml.datasets.functions._name_to_id("iris", version=3) == 969
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active_error(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaisesRegex(
             ValueError,
             "Multiple active datasets exist with name 'iris'.",
@@ -202,6 +209,7 @@ class TestOpenMLDataset(TestBase):
             error_if_multiple=True,
         )
 
+    @pytest.mark.test_server()
     def test__name_to_id_name_does_not_exist(self):
         """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
@@ -211,6 +219,7 @@ class TestOpenMLDataset(TestBase):
             dataset_name="does_not_exist",
         )
 
+    @pytest.mark.test_server()
     def test__name_to_id_version_does_not_exist(self):
         """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
@@ -221,6 +230,7 @@ class TestOpenMLDataset(TestBase):
             version=100000,
         )
 
+    @pytest.mark.test_server()
     def test_get_datasets_by_name(self):
         # did 1 and 2 on the test server:
         dids = ["anneal", "kr-vs-kp"]
@@ -228,6 +238,7 @@ class TestOpenMLDataset(TestBase):
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
+    @pytest.mark.test_server()
     def test_get_datasets_by_mixed(self):
         # did 1 and 2 on the test server:
         dids = ["anneal", 2]
@@ -235,12 +246,14 @@ class TestOpenMLDataset(TestBase):
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
+    @pytest.mark.test_server()
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
+    @pytest.mark.test_server()
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
@@ -259,6 +272,7 @@ class TestOpenMLDataset(TestBase):
         # test_get_dataset_lazy
         raise NotImplementedError
 
+    @pytest.mark.test_server()
     def test_get_dataset_uint8_dtype(self):
         dataset = openml.datasets.get_dataset(1)
         assert type(dataset) == OpenMLDataset
@@ -266,17 +280,18 @@ class TestOpenMLDataset(TestBase):
         df, _, _, _ = dataset.get_data()
         assert df["carbon"].dtype == "uint8"
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_dataset_cannot_access_private_data(self):
         # Issue324 Properly handle private datasets when trying to access them
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
     @pytest.mark.skip("Need to find dataset name of private dataset")
     def test_dataset_by_name_cannot_access_private_data(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
+    @pytest.mark.test_server()
     def test_get_dataset_lazy_all_functions(self):
         """Test that all expected functionality is available without downloading the dataset."""
         dataset = openml.datasets.get_dataset(1)
@@ -306,23 +321,28 @@ class TestOpenMLDataset(TestBase):
         assert classes == ["1", "2", "3", "4", "5", "U"]
         ensure_absence_of_real_data()
 
+    @pytest.mark.test_server()
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
-        X, *_ = dataset.get_data(dataset_format="array")
-        assert isinstance(X, scipy.sparse.csr_matrix)
+        X, *_ = dataset.get_data()
+        assert isinstance(X, pd.DataFrame)
+        assert all(isinstance(col, pd.SparseDtype) for col in X.dtypes)
 
+    @pytest.mark.test_server()
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 44
         dataset = openml.datasets.get_dataset(did)
         assert dataset.row_id_attribute == "Counter"
 
+    @pytest.mark.test_server()
     def test__get_dataset_description(self):
         description = _get_dataset_description(self.workdir, 2)
         assert isinstance(description, dict)
         description_xml_path = os.path.join(self.workdir, "description.xml")
         assert os.path.exists(description_xml_path)
 
+    @pytest.mark.test_server()
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
@@ -335,14 +355,14 @@ class TestOpenMLDataset(TestBase):
             FileNotFoundError,
             r"Object at .* does not exist",
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/i_do_not_exist.pq",
+            source="http://data.openml.org/dataset20/i_do_not_exist.pq",
             destination=self.workdir,
             exists_ok=True,
         )
 
     def test__download_minio_file_to_directory(self):
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=self.workdir,
             exists_ok=True,
         )
@@ -353,7 +373,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_to_path(self):
         file_destination = os.path.join(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -368,7 +388,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(
             FileExistsError,
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=str(file_destination),
             exists_ok=False,
         )
@@ -376,7 +396,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_works_with_bucket_subdirectory(self):
         file_destination = Path(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
+            source="http://data.openml.org/dataset61/dataset_61.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -384,23 +404,16 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-    def test__get_dataset_parquet_not_cached(self):
-        description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/dataset_20.pq",
-            "oml:id": "20",
-        }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
+    @pytest.mark.test_server()
     def test__get_dataset_parquet_is_cached(self, patch):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         patch.side_effect = RuntimeError(
             "_download_parquet_url should not be called when loading from cache",
         )
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset30/dataset_30.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
@@ -409,7 +422,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
@@ -434,18 +447,21 @@ class TestOpenMLDataset(TestBase):
 
         openml.config.connection_n_retries = n
 
+    @pytest.mark.test_server()
     def test__get_dataset_features(self):
         features_file = _get_dataset_features_file(self.workdir, 2)
         assert isinstance(features_file, Path)
         features_xml_path = self.workdir / "features.xml"
         assert features_xml_path.exists()
 
+    @pytest.mark.test_server()
     def test__get_dataset_qualities(self):
         qualities = _get_dataset_qualities_file(self.workdir, 2)
         assert isinstance(qualities, Path)
         qualities_xml_path = self.workdir / "qualities.xml"
         assert qualities_xml_path.exists()
 
+    @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache(self):
         did_cache_dir = _create_cache_directory_for_id(
             DATASETS_CACHE_DIR_NAME,
@@ -468,6 +484,7 @@ class TestOpenMLDataset(TestBase):
             did_cache_dir,
         )
 
+    @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache_clean_start(self):
         did_cache_dir = _create_cache_directory_for_id(
             DATASETS_CACHE_DIR_NAME,
@@ -504,21 +521,16 @@ class TestOpenMLDataset(TestBase):
 
     # get_dataset_description is the only data guaranteed to be downloaded
     @mock.patch("openml.datasets.functions._get_dataset_description")
+    @pytest.mark.test_server()
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception("Boom!")
         self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-        datasets_cache_dir = os.path.join(self.workdir, "org", "openml", "test", "datasets")
+        datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
+    @pytest.mark.test_server()
     def test_publish_dataset(self):
-        # lazy loading not possible as we need the arff-file.
-        openml.datasets.get_dataset(3, download_data=True)
-        file_path = os.path.join(
-            openml.config.get_cache_directory(),
-            "datasets",
-            "3",
-            "dataset.arff",
-        )
+        arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
         dataset = OpenMLDataset(
             "anneal",
             "test",
@@ -526,15 +538,16 @@ class TestOpenMLDataset(TestBase):
             version=1,
             licence="public",
             default_target_attribute="class",
-            data_file=file_path,
+            data_file=arff_file_path,
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
+    @pytest.mark.test_server()
     def test__retrieve_class_labels(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         labels = openml.datasets.get_dataset(2).retrieve_class_labels()
@@ -551,9 +564,10 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
+    @pytest.mark.test_server()
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             data_format="arff",
             version=1,
@@ -562,28 +576,29 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
     def _assert_status_of_dataset(self, *, did: int, status: str):
         """Asserts there is exactly one dataset with id `did` and its current status is `status`"""
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(
-            data_id=[did],
-            status="all",
-            output_format="dataframe",
-        )
+        result = openml.datasets.list_datasets(data_id=[did], status="all")
         result = result.to_dict(orient="index")
         # I think we should drop the test that one result is returned,
         # the server should never return multiple results?
         assert len(result) == 1
         assert result[did]["status"] == status
 
+    @pytest.mark.skipif(
+        not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+        reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+    )
     @pytest.mark.flaky()
+    @pytest.mark.test_server()
     def test_data_status(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             "ARFF",
             version=1,
@@ -591,12 +606,12 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
-        # admin key for test server (only adminds can activate datasets.
+        # admin key for test server (only admins can activate datasets.
         # all users can deactivate their own datasets)
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
+        openml.config.apikey = TestBase.admin_key
 
         openml.datasets.status_update(did, "active")
         self._assert_status_of_dataset(did=did, status="active")
@@ -672,13 +687,14 @@ class TestOpenMLDataset(TestBase):
             with pytest.raises(ValueError, match=err_msg):
                 attributes_arff_from_df(df)
 
+    @pytest.mark.test_server()
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
 
         attributes = [(f"col_{i}", "REAL") for i in range(data.shape[1])]
 
         dataset = create_dataset(
-            name="%s-NumPy_testing_dataset" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-NumPy_testing_dataset",
             description="Synthetic dataset created from a NumPy array",
             creator="OpenML tester",
             contributor=None,
@@ -698,13 +714,14 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
 
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded arff does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
+    @pytest.mark.test_server()
     def test_create_dataset_list(self):
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
@@ -733,7 +750,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="%s-ModifiedWeather" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-ModifiedWeather",
             description=("Testing dataset upload when the data is a list of lists"),
             creator="OpenML test",
             contributor=None,
@@ -753,12 +770,13 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
+    @pytest.mark.test_server()
     def test_create_dataset_sparse(self):
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix(
@@ -775,7 +793,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -794,7 +812,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -807,7 +825,7 @@ class TestOpenMLDataset(TestBase):
         sparse_data = [{0: 0.0}, {1: 1.0, 2: 1.0}, {0: 1.0, 2: 1.0}, {0: 1.0, 1: 1.0}]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -826,7 +844,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -861,8 +879,9 @@ class TestOpenMLDataset(TestBase):
         param["data"] = data[0]
         self.assertRaises(ValueError, create_dataset, **param)
 
+    @pytest.mark.test_server()
     def test_get_online_dataset_arff(self):
-        dataset_id = 100  # Australian
+        dataset_id = 128  # iris -- one of the few datasets without parquet file
         # lazy loading not used as arff file is checked.
         dataset = openml.datasets.get_dataset(dataset_id, download_data=True)
         decoder = arff.ArffDecoder()
@@ -876,6 +895,7 @@ class TestOpenMLDataset(TestBase):
             return_type=arff.DENSE if d_format == "arff" else arff.COO,
         ), "ARFF files are not equal"
 
+    @pytest.mark.test_server()
     def test_topic_api_error(self):
         # Check server exception when non-admin accessses apis
         self.assertRaisesRegex(
@@ -894,6 +914,7 @@ class TestOpenMLDataset(TestBase):
             topic="business",
         )
 
+    @pytest.mark.test_server()
     def test_get_online_dataset_format(self):
         # Phoneme dataset
         dataset_id = 77
@@ -903,6 +924,7 @@ class TestOpenMLDataset(TestBase):
             dataset_id
         ), "The format of the ARFF files is different"
 
+    @pytest.mark.test_server()
     def test_create_dataset_pandas(self):
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
@@ -925,7 +947,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -954,7 +976,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -990,7 +1012,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -1022,7 +1044,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         downloaded_data = _get_online_dataset_arff(dataset.id)
         assert downloaded_data == dataset._dataset, "Uploaded ARFF does not match original one"
         assert "@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}" in downloaded_data
@@ -1049,7 +1071,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1127,6 +1149,7 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
+    @pytest.mark.test_server()
     def test_publish_fetch_ignore_attribute(self):
         """Test to upload and retrieve dataset and check ignore_attributes"""
         data = [
@@ -1150,7 +1173,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1185,7 +1208,7 @@ class TestOpenMLDataset(TestBase):
         # publish dataset
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         # test if publish was successful
         assert isinstance(dataset.id, int)
 
@@ -1209,7 +1232,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1245,9 +1268,10 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
+    @pytest.mark.test_server()
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1291,7 +1315,7 @@ class TestOpenMLDataset(TestBase):
             dataset.publish()
             TestBase._mark_entity_for_removal("data", dataset.id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], dataset.id),
+                f"collected from {__file__.split('/')[-1]}: {dataset.id}",
             )
             arff_dataset = arff.loads(_get_online_dataset_arff(dataset.id))
             arff_data = np.array(arff_dataset["data"], dtype=object)
@@ -1335,11 +1359,13 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
+    @pytest.mark.test_server()
     def test_list_qualities(self):
         qualities = openml.datasets.list_qualities()
         assert isinstance(qualities, list) is True
         assert all(isinstance(q, str) for q in qualities) is True
 
+    @pytest.mark.test_server()
     def test_get_dataset_cache_format_pickle(self):
         dataset = openml.datasets.get_dataset(1)
         dataset.get_data()
@@ -1355,6 +1381,7 @@ class TestOpenMLDataset(TestBase):
         assert len(categorical) == X.shape[1]
         assert len(attribute_names) == X.shape[1]
 
+    @pytest.mark.test_server()
     def test_get_dataset_cache_format_feather(self):
         # This test crashed due to using the parquet file by default, which is downloaded
         # from minio. However, there is a mismatch between OpenML test server and minio IDs.
@@ -1387,6 +1414,7 @@ class TestOpenMLDataset(TestBase):
         assert len(categorical) == X.shape[1]
         assert len(attribute_names) == X.shape[1]
 
+    @pytest.mark.test_server()
     def test_data_edit_non_critical_field(self):
         # Case 1
         # All users can edit non-critical fields of datasets
@@ -1408,6 +1436,7 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
+    @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
@@ -1430,10 +1459,12 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
+                
                 shutil.rmtree(
-                    os.path.join(self.workdir, "org", "openml", "test", "datasets", str(did)),
+                    os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
                 )
 
+    @pytest.mark.test_server()
     def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
@@ -1446,6 +1477,7 @@ class TestOpenMLDataset(TestBase):
             data_id=64,  # blood-transfusion-service-center
         )
 
+    @pytest.mark.test_server()
     def test_data_edit_requires_valid_dataset(self):
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
@@ -1456,6 +1488,7 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
+    @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
         # Will be creating a forked version of an existing dataset to allow the unit test user
@@ -1482,6 +1515,7 @@ class TestOpenMLDataset(TestBase):
             default_target_attribute="y",
         )
 
+    @pytest.mark.test_server()
     def test_edit_data_user_cannot_edit_critical_field_of_other_users_dataset(self):
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
@@ -1493,6 +1527,7 @@ class TestOpenMLDataset(TestBase):
             default_target_attribute="y",
         )
 
+    @pytest.mark.test_server()
     def test_data_fork(self):
         did = 1
         result = fork_dataset(did)
@@ -1505,27 +1540,16 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
-    @pytest.mark.production()
-    def test_get_dataset_parquet(self):
-        # Parquet functionality is disabled on the test server
-        # There is no parquet-copy of the test server yet.
-        openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61, download_data=True)
-        assert dataset._parquet_url is not None
-        assert dataset.parquet_file is not None
-        assert os.path.isfile(dataset.parquet_file)
-        assert dataset.data_file is None  # is alias for arff path
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_datasets_with_high_size_parameter(self):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
-        openml.config.server = self.production_server
+        self.use_production_server()
 
-        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
-        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
+        datasets_a = openml.datasets.list_datasets()
+        datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
-        openml.config.server = self.test_server
         assert len(datasets_a) == len(datasets_b)
 
 
@@ -1667,7 +1691,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1700,8 +1724,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
@@ -1716,14 +1739,13 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
@@ -1738,14 +1760,13 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
     )
@@ -1757,14 +1778,13 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
@@ -1779,9 +1799,9 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/9999999"
+    dataset_url = test_server_v1 + "data/9999999"
     assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
@@ -1791,9 +1811,10 @@ def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
 
 @pytest.fixture(scope="module")
 def all_datasets():
-    return openml.datasets.list_datasets(output_format="dataframe")
+    return openml.datasets.list_datasets()
 
 
+@pytest.mark.test_server()
 def test_list_datasets(all_datasets: pd.DataFrame):
     # We can only perform a smoke test here because we test on dynamic
     # data from the internet...
@@ -1802,60 +1823,54 @@ def test_list_datasets(all_datasets: pd.DataFrame):
     _assert_datasets_have_id_and_valid_status(all_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_tag(all_datasets: pd.DataFrame):
-    tag_datasets = openml.datasets.list_datasets(tag="study_14", output_format="dataframe")
+    tag_datasets = openml.datasets.list_datasets(tag="study_14")
     assert 0 < len(tag_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(tag_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_size():
-    datasets = openml.datasets.list_datasets(size=5, output_format="dataframe")
+    datasets = openml.datasets.list_datasets(size=5)
     assert len(datasets) == 5
     _assert_datasets_have_id_and_valid_status(datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_number_instances(all_datasets: pd.DataFrame):
-    small_datasets = openml.datasets.list_datasets(
-        number_instances="5..100",
-        output_format="dataframe",
-    )
+    small_datasets = openml.datasets.list_datasets(number_instances="5..100")
     assert 0 < len(small_datasets) <= len(all_datasets)
     _assert_datasets_have_id_and_valid_status(small_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_number_features(all_datasets: pd.DataFrame):
-    wide_datasets = openml.datasets.list_datasets(
-        number_features="50..100",
-        output_format="dataframe",
-    )
+    wide_datasets = openml.datasets.list_datasets(number_features="50..100")
     assert 8 <= len(wide_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(wide_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
-    five_class_datasets = openml.datasets.list_datasets(
-        number_classes="5",
-        output_format="dataframe",
-    )
+    five_class_datasets = openml.datasets.list_datasets(number_classes="5")
     assert 3 <= len(five_class_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(five_class_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
-    na_datasets = openml.datasets.list_datasets(
-        number_missing_values="5..100",
-        output_format="dataframe",
-    )
+    na_datasets = openml.datasets.list_datasets(number_missing_values="5..100")
     assert 5 <= len(na_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(na_datasets)
 
 
+@pytest.mark.test_server()
 def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
     combined_filter_datasets = openml.datasets.list_datasets(
         tag="study_14",
         number_instances="100..1000",
         number_missing_values="800..1000",
-        output_format="dataframe",
     )
     assert 1 <= len(combined_filter_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
@@ -1879,9 +1894,8 @@ def _dataset_features_is_downloaded(did: int):
 
 
 def _dataset_data_file_is_downloaded(did: int):
-    parquet_present = _dataset_file_is_downloaded(did, "dataset.pq")
-    arff_present = _dataset_file_is_downloaded(did, "dataset.arff")
-    return parquet_present or arff_present
+    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
 
 
 def _assert_datasets_retrieved_successfully(
@@ -1923,6 +1937,7 @@ def isolate_for_test():
     ("with_data", "with_qualities", "with_features"),
     itertools.product([True, False], repeat=3),
 )
+@pytest.mark.test_server()
 def test_get_dataset_lazy_behavior(
     isolate_for_test, with_data: bool, with_qualities: bool, with_features: bool
 ):
@@ -1949,14 +1964,45 @@ def test_get_dataset_lazy_behavior(
     )
 
 
+@pytest.mark.test_server()
 def test_get_dataset_with_invalid_id() -> None:
     INVALID_ID = 123819023109238  # Well, at some point this will probably be valid...
     with pytest.raises(OpenMLServerNoResult, match="Unknown dataset") as e:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
 
+
+def test__get_dataset_parquet_not_cached():
+    description = {
+        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:id": "20",
+    }
+    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+    assert path.is_file(), "_get_dataset_parquet returns path to real file"
+
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
-    features_file = Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+
+    features_file = (
+        Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+    )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
+
+
+@pytest.mark.test_server()
+def test_get_dataset_parquet(requests_mock, test_files_directory, test_server_v1):
+    # Parquet functionality is disabled on the test server
+    # There is no parquet-copy of the test server yet.
+    content_file = (
+            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+    )
+    # While the mocked example is from production, unit tests by default connect to the test server.
+    requests_mock.get(test_server_v1 + "data/61", text=content_file.read_text())
+    dataset = openml.datasets.get_dataset(61, download_data=True)
+    assert dataset._parquet_url is not None
+    assert dataset.parquet_file is not None
+    assert os.path.isfile(dataset.parquet_file)
+    assert dataset.data_file is None  # is alias for arff path

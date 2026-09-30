@@ -18,14 +18,21 @@ class Split(NamedTuple):
     test: np.ndarray
 
 
-class OpenMLSplit:
+class OpenMLSplit:  # noqa: PLW1641
     """OpenML Split object.
+
+    This class manages train-test splits for a dataset across multiple
+    repetitions, folds, and samples.
 
     Parameters
     ----------
     name : int or str
+        The name or ID of the split.
     description : str
+        A description of the split.
     split : dict
+        A dictionary containing the splits organized by repetition, fold,
+        and sample.
     """
 
     def __init__(

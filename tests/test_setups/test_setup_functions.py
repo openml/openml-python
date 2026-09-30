@@ -4,17 +4,16 @@ from __future__ import annotations
 import hashlib
 import time
 import unittest.mock
-from typing import Dict
-
+import os
 import pandas as pd
 import pytest
 import sklearn.base
 import sklearn.naive_bayes
 import sklearn.tree
+from openml_sklearn import SklearnExtension
 
 import openml
 import openml.exceptions
-import openml.extensions.sklearn
 from openml.testing import TestBase
 
 
@@ -25,17 +24,18 @@ def get_sentinel():
     md5 = hashlib.md5()
     md5.update(str(time.time()).encode("utf-8"))
     sentinel = md5.hexdigest()[:10]
-    return "TEST%s" % sentinel
+    return f"TEST{sentinel}"
 
 
 class TestSetupFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        self.extension = openml.extensions.sklearn.SklearnExtension()
+        self.extension = SklearnExtension()
         super().setUp()
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
         sentinel = get_sentinel()
@@ -45,7 +45,7 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{sentinel}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
@@ -58,7 +58,7 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{get_sentinel()}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
@@ -74,7 +74,7 @@ class TestSetupFunctions(TestBase):
         run.flow_id = flow.flow_id
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
         # download the run, as it contains the right setup id
         run = openml.runs.get_run(run.run_id)
 
@@ -83,6 +83,7 @@ class TestSetupFunctions(TestBase):
         assert setup_id == run.setup_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_existing_setup_exists_1(self):
         def side_effect(self):
             self.var_smoothing = 1e-9
@@ -98,11 +99,13 @@ class TestSetupFunctions(TestBase):
             self._existing_setup_exists(nb)
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_existing_setup_exists_3(self):
         # Check a flow with many hyperparameters
         self._existing_setup_exists(
@@ -115,10 +118,10 @@ class TestSetupFunctions(TestBase):
             ),
         )
 
+    @pytest.mark.production_server()
     def test_get_setup(self):
+        self.use_production_server()
         # no setups in default test server
-        openml.config.server = "https://www.openml.org/api/v1/xml/"
-
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.
         setups = [18, 19, 20, 118]
@@ -132,18 +135,19 @@ class TestSetupFunctions(TestBase):
             else:
                 assert len(current.parameters) == num_params[idx]
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_setup_list_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow_id = 5873
 
         setups = openml.setups.list_setups(flow=flow_id)
 
-        assert len(setups) > 0  # TODO: please adjust 0
+        assert len(setups) >= 2
         for setup_id in setups:
             assert setups[setup_id].flow_id == flow_id
 
+    @pytest.mark.test_server()
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
         if len(setups) > 0:
@@ -151,26 +155,20 @@ class TestSetupFunctions(TestBase):
 
         assert isinstance(setups, dict)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_setups_output_format(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow_id = 6794
-        setups = openml.setups.list_setups(flow=flow_id, output_format="object", size=10)
-        assert isinstance(setups, Dict)
+        setups = openml.setups.list_setups(flow=flow_id, size=10)
+        assert isinstance(setups, dict)
         assert isinstance(setups[next(iter(setups.keys()))], openml.setups.setup.OpenMLSetup)
         assert len(setups) == 10
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format="dataframe", size=10)
+        setups = openml.setups.list_setups(flow=flow_id, size=10, output_format="dataframe")
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
-        # TODO: [0.15] Remove section as `dict` is no longer supported.
-        with pytest.warns(FutureWarning):
-            setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
-        assert isinstance(setups, Dict)
-        assert isinstance(setups[next(iter(setups.keys()))], Dict)
-        assert len(setups) == 10
-
+    @pytest.mark.test_server()
     def test_setuplist_offset(self):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
@@ -182,11 +180,11 @@ class TestSetupFunctions(TestBase):
 
         assert len(all) == size * 2
 
+    @pytest.mark.test_server()
     def test_get_cached_setup(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.setups.functions._get_cached_setup(1)
 
-    def test_get_uncached_setup(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.setups.functions._get_cached_setup(10)
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            setup = openml.setups.get_setup(1)
+            mock_request.assert_not_called()
+            assert setup is not None

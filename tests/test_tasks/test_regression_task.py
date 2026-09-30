@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import ast
 
-import numpy as np
+import pandas as pd
+import pytest
 
 import openml
 from openml.exceptions import OpenMLServerException
@@ -18,11 +19,11 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
     def setUp(self, n_levels: int = 1):
         super().setUp()
-
+        self.estimation_procedure = 9
         task_meta_data = {
             "task_type": TaskType.SUPERVISED_REGRESSION,
             "dataset_id": 105,  # wisconsin
-            "estimation_procedure_id": 7,
+            "estimation_procedure_id": self.estimation_procedure, # non default value to test estimation procedure id
             "target_name": "time",
         }
         _task_id = check_task_existence(**task_meta_data)
@@ -46,18 +47,21 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
                     raise Exception(repr(e))
         self.task_id = task_id
         self.task_type = TaskType.SUPERVISED_REGRESSION
-        self.estimation_procedure = 7
 
+
+    @pytest.mark.test_server()
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (194, 32)
-        assert isinstance(X, np.ndarray)
+        assert isinstance(X, pd.DataFrame)
         assert Y.shape == (194,)
-        assert isinstance(Y, np.ndarray)
-        assert Y.dtype == float
+        assert isinstance(Y, pd.Series)
+        assert pd.api.types.is_numeric_dtype(Y)
 
+    @pytest.mark.test_server()
     def test_download_task(self):
         task = super().test_download_task()
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.SUPERVISED_REGRESSION
         assert task.dataset_id == 105
+        assert task.estimation_procedure_id == self.estimation_procedure

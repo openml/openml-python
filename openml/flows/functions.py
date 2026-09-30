@@ -1,97 +1,78 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
-import re
-import warnings
-from collections import OrderedDict
-from typing import Any, Dict, overload
-from typing_extensions import Literal
+from functools import partial
+from typing import Any
 
 import dateutil.parser
 import pandas as pd
 import xmltodict
 
-import openml._api_calls
+import openml
 import openml.utils
-from openml.exceptions import OpenMLCacheException
 
 from . import OpenMLFlow
 
-FLOWS_CACHE_DIR_NAME = "flows"
-
-
-def _get_cached_flows() -> OrderedDict:
-    """Return all the cached flows.
-
-    Returns
-    -------
-    flows : OrderedDict
-        Dictionary with flows. Each flow is an instance of OpenMLFlow.
-    """
-    flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
-
-    flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
-    directory_content = os.listdir(flow_cache_dir)
-    directory_content.sort()
-    # Find all flow ids for which we have downloaded
-    # the flow description
-
-    for filename in directory_content:
-        if not re.match(r"[0-9]*", filename):
-            continue
-
-        fid = int(filename)
-        flows[fid] = _get_cached_flow(fid)
-
-    return flows
-
-
-def _get_cached_flow(fid: int) -> OpenMLFlow:
-    """Get the cached flow with the given id.
-
-    Parameters
-    ----------
-    fid : int
-        Flow id.
-
-    Returns
-    -------
-    OpenMLFlow.
-    """
-    fid_cache_dir = openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, fid)
-    flow_file = fid_cache_dir / "flow.xml"
-
-    try:
-        with flow_file.open(encoding="utf8") as fh:
-            return _create_flow_from_xml(fh.read())
-    except OSError as e:
-        openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
-        raise OpenMLCacheException("Flow file for fid %d not " "cached" % fid) from e
-
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT001, FBT002
-    """Download the OpenML flow for a given flow ID.
+def get_flow(
+    flow_id: int,
+    reinstantiate: bool = False,  # noqa: FBT002
+    strict_version: bool = True,  # noqa: FBT002
+) -> OpenMLFlow:
+    """Fetch an OpenMLFlow by its server-assigned ID.
+
+    Queries the OpenML REST API for the flow metadata and returns an
+    :class:`OpenMLFlow` instance. If the flow is already cached locally,
+    the cached copy is returned. Optionally the flow can be re-instantiated
+    into a concrete model instance using the registered extension.
 
     Parameters
     ----------
     flow_id : int
         The OpenML flow id.
-
-    reinstantiate: bool
-        Whether to reinstantiate the flow to a model instance.
-
-    strict_version : bool, default=True
-        Whether to fail if version requirements are not fulfilled.
+    reinstantiate : bool, optional (default=False)
+        If True, convert the flow description into a concrete model instance
+        using the flow's extension (e.g., sklearn). If conversion fails and
+        ``strict_version`` is True, an exception will be raised.
+    strict_version : bool, optional (default=True)
+        When ``reinstantiate`` is True, whether to enforce exact version
+        requirements for the extension/model. If False, a new flow may
+        be returned when versions differ.
 
     Returns
     -------
-    flow : OpenMLFlow
-        the flow
+    OpenMLFlow
+        The flow object with metadata; ``model`` may be populated when
+        ``reinstantiate=True``.
+
+    Raises
+    ------
+    OpenMLServerException
+        When the REST API call fails.
+
+    Side Effects
+    ------------
+    - Caches the retrieved flow using the HTTP client's caching mechanism.
+
+    Preconditions
+    -------------
+    - Network access to the OpenML server is required unless the flow is cached.
+    - For private flows, ``openml.config.apikey`` must be set.
+
+    Notes
+    -----
+    Results are cached to speed up subsequent calls. When ``reinstantiate`` is
+    True and version mismatches occur, a new flow may be returned to reflect
+    the converted model (only when ``strict_version`` is False).
+
+    Examples
+    --------
+    >>> import openml
+    >>> flow = openml.flows.get_flow(5)  # doctest: +SKIP
     """
     flow_id = int(flow_id)
-    flow = _get_flow_description(flow_id)
+    flow = openml._backend.flow.get(flow_id)
 
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(flow, strict_version=strict_version)
@@ -103,254 +84,158 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     return flow
 
 
-def _get_flow_description(flow_id: int) -> OpenMLFlow:
-    """Get the Flow for a given  ID.
-
-    Does the real work for get_flow. It returns a cached flow
-    instance if the flow exists locally, otherwise it downloads the
-    flow and returns an instance created from the xml representation.
-
-    Parameters
-    ----------
-    flow_id : int
-        The OpenML flow id.
-
-    Returns
-    -------
-    OpenMLFlow
-    """
-    try:
-        return _get_cached_flow(flow_id)
-    except OpenMLCacheException:
-        xml_file = (
-            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id) / "flow.xml"
-        )
-        flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, request_method="get")
-
-        with xml_file.open("w", encoding="utf8") as fh:
-            fh.write(flow_xml)
-
-        return _create_flow_from_xml(flow_xml)
-
-
-@overload
-def list_flows(
-    offset: int | None = ...,
-    size: int | None = ...,
-    tag: str | None = ...,
-    output_format: Literal["dict"] = "dict",
-    **kwargs: Any,
-) -> dict: ...
-
-
-@overload
-def list_flows(
-    offset: int | None = ...,
-    size: int | None = ...,
-    tag: str | None = ...,
-    *,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
-@overload
-def list_flows(
-    offset: int | None,
-    size: int | None,
-    tag: str | None,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
 def list_flows(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
-    """
-    Return a list of all flows which are on OpenML.
-    (Supports large amount of results)
+    uploader: str | None = None,
+) -> pd.DataFrame:
+    """List flows available on the OpenML server.
+
+    This function supports paging and filtering and returns a pandas
+    DataFrame with one row per flow and columns for id, name, version,
+    external_version, full_name and uploader.
 
     Parameters
     ----------
     offset : int, optional
-        the number of flows to skip, starting from the first
+        Number of flows to skip, starting from the first (for paging).
     size : int, optional
-        the maximum number of flows to return
+        Maximum number of flows to return.
     tag : str, optional
-        the tag to include
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-    kwargs: dict, optional
-        Legal filter operators: uploader.
+        Only return flows having this tag.
+    uploader : str, optional
+        Only return flows uploaded by this user.
 
     Returns
     -------
-    flows : dict of dicts, or dataframe
-        - If output_format='dict'
-            A mapping from flow_id to a dict giving a brief overview of the
-            respective flow.
-            Every flow is represented by a dictionary containing
-            the following information:
-            - flow id
-            - full name
-            - name
-            - version
-            - external version
-            - uploader
+    pandas.DataFrame
+        Rows correspond to flows. Columns include ``id``, ``full_name``,
+        ``name``, ``version``, ``external_version``, and ``uploader``.
 
-        - If output_format='dataframe'
-            Each row maps to a dataset
-            Each column contains the following information:
-            - flow id
-            - full name
-            - name
-            - version
-            - external version
-            - uploader
+    Raises
+    ------
+    OpenMLServerException
+        When the API call fails.
+
+    Side Effects
+    ------------
+    - None: results are fetched and returned; Read-only operation.
+
+    Preconditions
+    -------------
+    - Network access is required to list flows unless cached mechanisms are
+      used by the underlying API helper.
+
+    Examples
+    --------
+    >>> import openml
+    >>> flows = openml.flows.list_flows(size=100)  # doctest: +SKIP
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
+    listing_call = partial(openml._backend.flow.list, tag=tag, uploader=uploader)
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
 
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(
-        list_output_format=output_format,
-        listing_call=_list_flows,
-        offset=offset,
-        size=size,
-        tag=tag,
-        **kwargs,
-    )
-
-
-@overload
-def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict: ...
-
-
-@overload
-def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-@overload
-def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-def _list_flows(
-    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
-) -> dict | pd.DataFrame:
-    """
-    Perform the api call that return a list of all flows.
-
-    Parameters
-    ----------
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
-    kwargs: dict, optional
-        Legal filter operators: uploader, tag, limit, offset.
-
-    Returns
-    -------
-    flows : dict, or dataframe
-    """
-    api_call = "flow/list"
-
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
-
-    return __list_flows(api_call=api_call, output_format=output_format)
+    return pd.concat(batches)
 
 
 def flow_exists(name: str, external_version: str) -> int | bool:
-    """Retrieves the flow id.
+    """Check whether a flow (name + external_version) exists on the server.
 
-    A flow is uniquely identified by name + external_version.
+    The OpenML server defines uniqueness of flows by the pair
+    ``(name, external_version)``. This helper queries the server and
+    returns the corresponding flow id when present.
 
     Parameters
     ----------
-    name : string
-        Name of the flow
-    external_version : string
+    name : str
+        Flow name (e.g., ``sklearn.tree._classes.DecisionTreeClassifier(1)``).
+    external_version : str
         Version information associated with flow.
 
     Returns
     -------
-    flow_exist : int or bool
-        flow id iff exists, False otherwise
+    int or bool
+        The flow id if the flow exists on the server, otherwise ``False``.
 
-    Notes
-    -----
-    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    Raises
+    ------
+    ValueError
+        If ``name`` or ``external_version`` are empty or not strings.
+    OpenMLServerException
+        When the API request fails.
+
+    Examples
+    --------
+    >>> import openml
+    >>> openml.flows.flow_exists("weka.JRip", "Weka_3.9.0_10153")  # doctest: +SKIP
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
-    if not (isinstance(name, str) and len(external_version) > 0):
+    if not (isinstance(external_version, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
-    xml_response = openml._api_calls._perform_api_call(
-        "flow/exists",
-        "post",
-        data={"name": name, "external_version": external_version},
-    )
-
-    result_dict = xmltodict.parse(xml_response)
-    flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
-    return flow_id if flow_id > 0 else False
+    return openml._backend.flow.exists(name=name, external_version=external_version)
 
 
 def get_flow_id(
     model: Any | None = None,
     name: str | None = None,
-    exact_version: bool = True,  # noqa: FBT001, FBT002
+    exact_version: bool = True,  # noqa: FBT002
 ) -> int | bool | list[int]:
-    """Retrieves the flow id for a model or a flow name.
+    """Retrieve flow id(s) for a model instance or a flow name.
 
-    Provide either a model or a name to this function. Depending on the input, it does
+    Provide either a concrete ``model`` (which will be converted to a flow by
+    the appropriate extension) or a flow ``name``. Behavior depends on
+    ``exact_version``:
 
-    * ``model`` and ``exact_version == True``: This helper function first queries for the necessary
-      extension. Second, it uses that extension to convert the model into a flow. Third, it
-      executes ``flow_exists`` to potentially obtain the flow id the flow is published to the
-      server.
-    * ``model`` and ``exact_version == False``: This helper function first queries for the
-      necessary extension. Second, it uses that extension to convert the model into a flow. Third
-      it calls ``list_flows`` and filters the returned values based on the flow name.
-    * ``name``: Ignores ``exact_version`` and calls ``list_flows``, then filters the returned
-      values based on the flow name.
+    - ``model`` + ``exact_version=True``: convert ``model`` to a flow and call
+        :func:`flow_exists` to get a single flow id (or False).
+    - ``model`` + ``exact_version=False``: convert ``model`` to a flow and
+        return all server flow ids with the same flow name.
+    - ``name``: ignore ``exact_version`` and return all server flow ids that
+        match ``name``.
 
     Parameters
     ----------
-    model : object
-        Any model. Must provide either ``model`` or ``name``.
-    name : str
-        Name of the flow. Must provide either ``model`` or ``name``.
-    exact_version : bool
-        Whether to return the flow id of the exact version or all flow ids where the name
-        of the flow matches. This is only taken into account for a model where a version number
-        is available (requires ``model`` to be set).
+    model : object, optional
+            A model instance that can be handled by a registered extension. Either
+            ``model`` or ``name`` must be provided.
+    name : str, optional
+            Flow name to query for. Either ``model`` or ``name`` must be provided.
+    exact_version : bool, optional (default=True)
+            When True and ``model`` is provided, only return the id for the exact
+            external version. When False, return a list of matching ids.
 
     Returns
     -------
-    int or bool, List
-        flow id iff exists, ``False`` otherwise, List if ``exact_version is False``
+    int or bool or list[int]
+            If ``exact_version`` is True: the flow id if found, otherwise ``False``.
+            If ``exact_version`` is False: a list of matching flow ids (may be empty).
+
+    Raises
+    ------
+    ValueError
+            If neither ``model`` nor ``name`` is provided, or if both are provided.
+    OpenMLServerException
+            If underlying API calls fail.
+
+    Side Effects
+    ------------
+    - May call server APIs (``flow/exists``, ``flow/list``) and therefore
+        depends on network access and API keys for private flows.
+
+    Examples
+    --------
+    >>> import openml
+    >>> # Lookup by flow name
+    >>> openml.flows.get_flow_id(name="weka.JRip")  # doctest: +SKIP
+    >>> # Lookup by model instance (requires a registered extension)
+    >>> import sklearn
+    >>> import openml_sklearn
+    >>> clf = sklearn.tree.DecisionTreeClassifier()
+    >>> openml.flows.get_flow_id(model=clf)  # doctest: +SKIP
     """
     if model is not None and name is not None:
         raise ValueError("Must provide either argument `model` or argument `name`, but not both.")
@@ -378,63 +263,9 @@ def get_flow_id(
             raise ValueError("exact_version should be False if model is None!")
         return flow_exists(name=flow_name, external_version=external_version)
 
-    flows = list_flows(output_format="dataframe")
-    assert isinstance(flows, pd.DataFrame)  # Make mypy happy
+    flows = list_flows()
     flows = flows.query(f'name == "{flow_name}"')
     return flows["id"].to_list()  # type: ignore[no-any-return]
-
-
-@overload
-def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
-
-
-@overload
-def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-
-def __list_flows(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
-) -> dict | pd.DataFrame:
-    """Retrieve information about flows from OpenML API
-    and parse it to a dictionary or a Pandas DataFrame.
-
-    Parameters
-    ----------
-    api_call: str
-        Retrieves the information about flows.
-    output_format: str in {"dict", "dataframe"}
-        The output format.
-
-    Returns
-    -------
-        The flows information in the specified output format.
-    """
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(flows_dict["oml:flows"]["oml:flow"], list), type(flows_dict["oml:flows"])
-    assert flows_dict["oml:flows"]["@xmlns:oml"] == "http://openml.org/openml", flows_dict[
-        "oml:flows"
-    ]["@xmlns:oml"]
-
-    flows = {}
-    for flow_ in flows_dict["oml:flows"]["oml:flow"]:
-        fid = int(flow_["oml:id"])
-        flow = {
-            "id": fid,
-            "full_name": flow_["oml:full_name"],
-            "name": flow_["oml:name"],
-            "version": flow_["oml:version"],
-            "external_version": flow_["oml:external_version"],
-            "uploader": flow_["oml:uploader"],
-        }
-        flows[fid] = flow
-
-    if output_format == "dataframe":
-        flows = pd.DataFrame.from_dict(flows, orient="index")
-
-    return flows
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
@@ -455,9 +286,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
     ignore_parameter_values_on_older_children: str | None = None,
-    ignore_parameter_values: bool = False,  # noqa: FBT001, FBT002
-    ignore_custom_name_if_none: bool = False,  # noqa:  FBT001, FBT002
-    check_description: bool = True,  # noqa:  FBT001, FBT002
+    ignore_parameter_values: bool = False,  # noqa: FBT002
+    ignore_custom_name_if_none: bool = False,  # noqa: FBT002
+    check_description: bool = True,  # noqa: FBT002
 ) -> None:
     """Check equality of two flows.
 
@@ -482,6 +313,21 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
 
     check_description : bool
         Whether to ignore matching of flow descriptions.
+
+    Raises
+    ------
+    TypeError
+        When either argument is not an :class:`OpenMLFlow`.
+    ValueError
+        When a relevant mismatch is found between the two flows.
+
+    Examples
+    --------
+    >>> import openml
+    >>> f1 = openml.flows.get_flow(5)  # doctest: +SKIP
+    >>> f2 = openml.flows.get_flow(5)  # doctest: +SKIP
+    >>> openml.flows.assert_flows_equal(f1, f2)  # doctest: +SKIP
+    >>> # If flows differ, a ValueError is raised
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError(f"Argument 1 must be of type OpenMLFlow, but is {type(flow1)}")
@@ -508,17 +354,17 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
         attr1 = getattr(flow1, key, None)
         attr2 = getattr(flow2, key, None)
         if key == "components":
-            if not (isinstance(attr1, Dict) and isinstance(attr2, Dict)):
+            if not (isinstance(attr1, dict) and isinstance(attr2, dict)):
                 raise TypeError("Cannot compare components because they are not dictionary.")
 
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 if name not in attr2:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 assert_flows_equal(
                     attr1[name],
@@ -547,9 +393,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                         )
 
                 if ignore_parameter_values_on_older_children:
-                    assert (
-                        flow1.upload_date is not None
-                    ), "Flow1 has no upload date that allows us to compare age of children."
+                    assert flow1.upload_date is not None, (
+                        "Flow1 has no upload date that allows us to compare age of children."
+                    )
                     upload_date_current_flow = dateutil.parser.parse(flow1.upload_date)
                     upload_date_parent_flow = dateutil.parser.parse(
                         ignore_parameter_values_on_older_children,
@@ -579,13 +425,13 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 params2 = set(flow2.parameters_meta_info)
                 if params1 != params2:
                     raise ValueError(
-                        "Parameter list in meta info for parameters differ " "in the two flows.",
+                        "Parameter list in meta info for parameters differ in the two flows.",
                     )
                 # iterating over the parameter's meta info list
                 for param in params1:
                     if (
-                        isinstance(flow1.parameters_meta_info[param], Dict)
-                        and isinstance(flow2.parameters_meta_info[param], Dict)
+                        isinstance(flow1.parameters_meta_info[param], dict)
+                        and isinstance(flow2.parameters_meta_info[param], dict)
                         and "data_type" in flow1.parameters_meta_info[param]
                         and "data_type" in flow2.parameters_meta_info[param]
                     ):
@@ -641,5 +487,20 @@ def delete_flow(flow_id: int) -> bool:
     -------
     bool
         True if the deletion was successful. False otherwise.
+
+    Raises
+    ------
+    OpenMLServerException
+        If the server-side deletion fails due to permissions or other errors.
+
+    Side Effects
+    ------------
+    - Removes the flow from the OpenML server (if permitted).
+
+    Examples
+    --------
+    >>> import openml
+    >>> # Deletes flow 23 if you are the uploader and it's not linked to runs
+    >>> openml.flows.delete_flow(23)  # doctest: +SKIP
     """
-    return openml.utils._delete_entity("flow", flow_id)
+    return openml._backend.flow.delete(flow_id)

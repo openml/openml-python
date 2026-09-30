@@ -5,6 +5,7 @@ from time import time
 
 import openml
 from openml.testing import TestBase
+import pytest
 
 
 # Common methods between tasks
@@ -15,21 +16,23 @@ class OpenMLTaskMethodsTest(TestBase):
     def tearDown(self):
         super().tearDown()
 
+    @pytest.mark.test_server()
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_OpenMLTaskMethodsTest_{unique_indicator}"
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 0
         task.push_tag(tag)
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 1
         assert 1 in tasks["tid"]
         task.remove_tag(tag)
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 0
 
+    @pytest.mark.test_server()
     def test_get_train_and_test_split_indices(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)

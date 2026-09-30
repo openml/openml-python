@@ -1,16 +1,14 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, overload
-from typing_extensions import Literal
+from functools import partial
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import xmltodict
 
 import openml._api_calls
-import openml.config
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
@@ -31,6 +29,12 @@ def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
     -------
     OpenMLSuite
         The OpenML suite object
+
+    Examples
+    --------
+    >>> import openml
+    >>> suite = openml.study.get_suite(99)  # doctest: +SKIP
+    >>> suite = openml.study.get_suite("OpenML-CC18")  # doctest: +SKIP
     """
     study = _get_study(suite_id, entity_type="task")
     assert isinstance(study, OpenMLBenchmarkSuite)
@@ -60,6 +64,11 @@ def get_study(
     -------
     OpenMLStudy
         The OpenML study object
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.get_study(1)  # doctest: +SKIP
     """
     if study_id == "OpenML100":
         message = (
@@ -110,7 +119,10 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     tags = []
     if "oml:tag" in result_dict:
         for tag in result_dict["oml:tag"]:
-            current_tag = {"name": tag["oml:name"], "write_access": tag["oml:write_access"]}
+            current_tag = {
+                "name": tag["oml:name"],
+                "write_access": tag["oml:write_access"],
+            }
             if "oml:window_start" in tag:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
@@ -193,8 +205,6 @@ def create_study(
 
     Parameters
     ----------
-    benchmark_suite : int (optional)
-        the benchmark suite (another study) upon which this study is ran.
     name : str
         the name of the study (meta-info)
     description : str
@@ -211,6 +221,15 @@ def create_study(
     -------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.create_study(  # doctest: +SKIP
+    ...     name="My Study",
+    ...     description="A study on decision trees",
+    ...     run_ids=[1, 2, 3],
+    ... )
     """
     return OpenMLStudy(
         study_id=None,
@@ -298,7 +317,7 @@ def update_study_status(study_id: int, status: str) -> None:
     """
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
-        raise ValueError("Illegal status value. " f"Legal values: {legal_status}")
+        raise ValueError(f"Illegal status value. Legal values: {legal_status}")
     data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
@@ -338,7 +357,8 @@ def delete_study(study_id: int) -> bool:
     bool
         True iff the deletion was successful. False otherwise
     """
-    return openml.utils._delete_entity("study", study_id)
+    result: bool = openml._backend.study.delete(study_id)
+    return result
 
 
 def attach_to_suite(suite_id: int, task_ids: list[int]) -> int:
@@ -422,7 +442,7 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
         new size of the study (in terms of explicitly linked entities)
     """
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
-    uri = "study/%d/detach" % study_id
+    uri = f"study/{study_id}/detach"
     post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
         call=uri,
@@ -433,33 +453,12 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
     return int(result["oml:linked_entities"])
 
 
-@overload
-def list_suites(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[int] | None = ...,
-    output_format: Literal["dict"] = "dict",
-) -> dict: ...
-
-
-@overload
-def list_suites(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[int] | None = ...,
-    output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame: ...
-
-
 def list_suites(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
     uploader: list[int] | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Return a list of all suites which are on OpenML.
 
@@ -474,88 +473,39 @@ def list_suites(
         suites are returned.
     uploader : list (int), optional
         Result filter. Will only return suites created by these users.
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
-        - If output_format='dict'
-            Every suite is represented by a dictionary containing the following information:
-            - id
-            - alias (optional)
-            - name
-            - main_entity_type
-            - status
-            - creator
-            - creation_date
-
-        - If output_format='dataframe'
-            Every row is represented by a dictionary containing the following information:
-            - id
-            - alias (optional)
-            - name
-            - main_entity_type
-            - status
-            - creator
-            - creation_date
+    datasets : dataframe
+        Every row is represented by a dictionary containing the following information:
+        - id
+        - alias (optional)
+        - name
+        - main_entity_type
+        - status
+        - creator
+        - creation_date
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        openml._backend.study.list,
         main_entity_type="task",
         status=status,
         uploader=uploader,
     )
+    batches = openml.utils._list_all(listing_call, limit=size, offset=offset)
+    if len(batches) == 0:
+        return pd.DataFrame()
 
-
-@overload
-def list_studies(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[str] | None = ...,
-    benchmark_suite: int | None = ...,
-    output_format: Literal["dict"] = "dict",
-) -> dict: ...
-
-
-@overload
-def list_studies(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[str] | None = ...,
-    benchmark_suite: int | None = ...,
-    output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame: ...
+    return pd.concat(batches)
 
 
 def list_studies(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
-    uploader: list[str] | None = None,
+    uploader: list[int] | None = None,
     benchmark_suite: int | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Return a list of all studies which are on OpenML.
 
@@ -571,160 +521,31 @@ def list_studies(
     uploader : list (int), optional
         Result filter. Will only return studies created by these users.
     benchmark_suite : int, optional
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
-        - If output_format='dict'
-            Every dataset is represented by a dictionary containing
-            the following information:
-            - id
-            - alias (optional)
-            - name
-            - benchmark_suite (optional)
-            - status
-            - creator
-            - creation_date
-            If qualities are calculated for the dataset, some of
-            these are also returned.
-
-        - If output_format='dataframe'
-            Every dataset is represented by a dictionary containing
-            the following information:
-            - id
-            - alias (optional)
-            - name
-            - benchmark_suite (optional)
-            - status
-            - creator
-            - creation_date
-            If qualities are calculated for the dataset, some of
-            these are also returned.
+    datasets : dataframe
+        Every dataset is represented by a dictionary containing
+        the following information:
+        - id
+        - alias (optional)
+        - name
+        - benchmark_suite (optional)
+        - status
+        - creator
+        - creation_date
+        If qualities are calculated for the dataset, some of
+        these are also returned.
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        openml._backend.study.list,
         main_entity_type="run",
         status=status,
         uploader=uploader,
         benchmark_suite=benchmark_suite,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
 
-
-@overload
-def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict: ...
-
-
-@overload
-def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-def _list_studies(
-    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
-) -> dict | pd.DataFrame:
-    """
-    Perform api call to return a list of studies.
-
-    Parameters
-    ----------
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-    kwargs : dict, optional
-        Legal filter operators (keys in the dict):
-        status, limit, offset, main_entity_type, uploader
-
-    Returns
-    -------
-    studies : dict of dicts
-    """
-    api_call = "study/list"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
-    return __list_studies(api_call=api_call, output_format=output_format)
-
-
-@overload
-def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
-
-
-@overload
-def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-
-def __list_studies(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
-) -> dict | pd.DataFrame:
-    """Retrieves the list of OpenML studies and
-    returns it in a dictionary or a Pandas DataFrame.
-
-    Parameters
-    ----------
-    api_call : str
-        The API call for retrieving the list of OpenML studies.
-    output_format : str in {"dict", "dataframe"}
-        Format of the output, either 'object' for a dictionary
-        or 'dataframe' for a Pandas DataFrame.
-
-    Returns
-    -------
-    Union[Dict, pd.DataFrame]
-        A dictionary or Pandas DataFrame of OpenML studies,
-        depending on the value of 'output_format'.
-    """
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
-        study_dict["oml:study_list"],
-    )
-    assert study_dict["oml:study_list"]["@xmlns:oml"] == "http://openml.org/openml", study_dict[
-        "oml:study_list"
-    ]["@xmlns:oml"]
-
-    studies = {}
-    for study_ in study_dict["oml:study_list"]["oml:study"]:
-        # maps from xml name to a tuple of (dict name, casting fn)
-        expected_fields = {
-            "oml:id": ("id", int),
-            "oml:alias": ("alias", str),
-            "oml:main_entity_type": ("main_entity_type", str),
-            "oml:benchmark_suite": ("benchmark_suite", int),
-            "oml:name": ("name", str),
-            "oml:status": ("status", str),
-            "oml:creation_date": ("creation_date", str),
-            "oml:creator": ("creator", int),
-        }
-        study_id = int(study_["oml:id"])
-        current_study = {}
-        for oml_field_name, (real_field_name, cast_fn) in expected_fields.items():
-            if oml_field_name in study_:
-                current_study[real_field_name] = cast_fn(study_[oml_field_name])
-        current_study["id"] = int(current_study["id"])
-        studies[study_id] = current_study
-
-    if output_format == "dataframe":
-        studies = pd.DataFrame.from_dict(studies, orient="index")
-    return studies
+    return pd.concat(batches)

@@ -2,10 +2,11 @@
 # TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
+import openml
 from openml.base import OpenMLBase
-from openml.config import get_server_base_url
 
 
 class BaseStudy(OpenMLBase):
@@ -110,7 +111,7 @@ class BaseStudy(OpenMLBase):
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            fields["Creator"] = f"{get_server_base_url()}/u/{self.creator}"
+            fields["Creator"] = f"{openml.config.get_server_base_url()}/u/{self.creator}"
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace("T", " ")
         if self.data is not None:
@@ -147,22 +148,18 @@ class BaseStudy(OpenMLBase):
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ["alias", "main_entity_type", "name", "description"]
 
-        # TODO(eddiebergman): Begging for a walrus if we can drop 3.7
         simple_prop_values = {}
         for prop_name in simple_props:
-            content = getattr(self, prop_name, None)
-            if content is not None:
+            if (content := getattr(self, prop_name, None)) is not None:
                 simple_prop_values["oml:" + prop_name] = content
 
         # maps from attribute name (which is used as outer tag name) to immer
         # tag name e.g., self.tasks -> <oml:tasks><oml:task_id>1987</oml:task_id></oml:tasks>
         complex_props = {"tasks": "task_id", "runs": "run_id"}
 
-        # TODO(eddiebergman): Begging for a walrus if we can drop 3.7
         complex_prop_values = {}
         for prop_name, inner_name in complex_props.items():
-            content = getattr(self, prop_name, None)
-            if content is not None:
+            if (content := getattr(self, prop_name, None)) is not None:
                 complex_prop_values["oml:" + prop_name] = {"oml:" + inner_name: content}
 
         return {
@@ -175,11 +172,23 @@ class BaseStudy(OpenMLBase):
 
     def push_tag(self, tag: str) -> None:
         """Add a tag to the study."""
-        raise NotImplementedError("Tags for studies is not (yet) supported.")
+        raise NotImplementedError(
+            "Tag management for studies is not yet supported. "
+            "The OpenML Python SDK does not currently provide functionality"
+            "for adding tags to studies."
+            "For updates on this feature, please refer to the GitHub issues at: "
+            "https://github.com/openml/openml-python/issues"
+        )
 
     def remove_tag(self, tag: str) -> None:
         """Remove a tag from the study."""
-        raise NotImplementedError("Tags for studies is not (yet) supported.")
+        raise NotImplementedError(
+            "Tag management for studies is not yet supported. "
+            "The OpenML Python SDK does not currently provide functionality"
+            "for removing tags from studies. "
+            "For updates on this feature, please refer to the GitHub issues at: "
+            "https://github.com/openml/openml-python/issues"
+        )
 
 
 class OpenMLStudy(BaseStudy):

@@ -12,7 +12,6 @@ import unittest
 from pathlib import Path
 from typing import ClassVar
 
-import pandas as pd
 import requests
 
 import openml
@@ -48,9 +47,7 @@ class TestBase(unittest.TestCase):
         "user": [],
     }
     flow_name_tracker: ClassVar[list[str]] = []
-    test_server = "https://test.openml.org/api/v1/xml"
-    # amueller's read/write key that he will throw away later
-    apikey = "610344db6388d9ba34f6db45a3cf71de"
+    admin_key = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR)
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
@@ -81,7 +78,7 @@ class TestBase(unittest.TestCase):
         for _ in range(n_levels):
             static_cache_dir = static_cache_dir.parent.absolute()
 
-        content = os.listdir(static_cache_dir)
+        content = os.listdir(static_cache_dir)  # noqa: PTH208
         if "files" in content:
             static_cache_dir = static_cache_dir / "files"
         else:
@@ -100,16 +97,20 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.apikey
-        self.production_server = "https://openml.org/api/v1/xml"
-        openml.config.server = TestBase.test_server
-        openml.config.avoid_duplicate_runs = False
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
         self.retry_policy = openml.config.retry_policy
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
+
+    def use_production_server(self) -> None:
+        """
+        Use the production server for the OpenML API calls.
+
+        Please use this sparingly - it is better to use the test server.
+        """
+        openml.config.use_production_servers()
 
     def tearDown(self) -> None:
         """Tear down the test"""
@@ -121,7 +122,6 @@ class TestBase(unittest.TestCase):
                 # one of the files may still be used by another process
                 raise e
 
-        openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
         openml.config.retry_policy = self.retry_policy
 
@@ -161,7 +161,11 @@ class TestBase(unittest.TestCase):
                 delete_index = next(
                     i
                     for i, (id_, _) in enumerate(
-                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker),
+                        zip(
+                            TestBase.publish_tracker[entity_type],
+                            TestBase.flow_name_tracker,
+                            strict=False,
+                        ),
                     )
                     if id_ == entity
                 )
@@ -286,8 +290,7 @@ def check_task_existence(
     int, None
     """
     return_val = None
-    tasks = openml.tasks.list_tasks(task_type=task_type, output_format="dataframe")
-    assert isinstance(tasks, pd.DataFrame)
+    tasks = openml.tasks.list_tasks(task_type=task_type)
     if len(tasks) == 0:
         return None
     tasks = tasks.loc[tasks["did"] == dataset_id]
@@ -348,9 +351,9 @@ def create_request_response(
 
 
 __all__ = [
-    "TestBase",
-    "SimpleImputer",
     "CustomImputer",
+    "SimpleImputer",
+    "TestBase",
     "check_task_existence",
     "create_request_response",
 ]

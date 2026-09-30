@@ -4,6 +4,8 @@ from __future__ import annotations
 import unittest
 from random import randint, shuffle
 
+import pytest
+
 from openml.datasets import (
     get_dataset,
     list_datasets,
@@ -30,9 +32,11 @@ class OpenMLTaskTest(TestBase):
     def setUp(self, n_levels: int = 1):
         super().setUp()
 
+    @pytest.mark.test_server()
     def test_download_task(self):
         return get_task(self.task_id)
 
+    @pytest.mark.test_server()
     def test_upload_task(self):
         # We don't know if the task in question already exists, so we try a few times. Checking
         # beforehand would not be an option because a concurrent unit test could potentially
@@ -53,7 +57,7 @@ class OpenMLTaskTest(TestBase):
                 task.publish()
                 TestBase._mark_entity_for_removal("task", task.id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], task.id),
+                    f"collected from {__file__.split('/')[-1]}: {task.id}",
                 )
                 # success
                 break
@@ -71,7 +75,7 @@ class OpenMLTaskTest(TestBase):
             )
 
     def _get_compatible_rand_dataset(self) -> list:
-        active_datasets = list_datasets(status="active", output_format="dataframe")
+        active_datasets = list_datasets(status="active")
 
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only

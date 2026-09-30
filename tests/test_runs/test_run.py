@@ -8,6 +8,7 @@ from time import time
 import numpy as np
 import pytest
 import xmltodict
+from openml_sklearn import SklearnExtension
 from sklearn.base import clone
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LinearRegression
@@ -16,7 +17,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
 import openml
-import openml.extensions.sklearn
 from openml import OpenMLRun
 from openml.testing import SimpleImputer, TestBase
 
@@ -25,22 +25,23 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
+    @pytest.mark.test_server()
     def test_tagging(self):
-        runs = openml.runs.list_runs(size=1, output_format="dataframe")
+        runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_TestRun_{unique_indicator}"
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
         run.push_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 1
         assert run_id in runs["run_id"]
         run.remove_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
 
     @staticmethod
@@ -118,6 +119,7 @@ class TestRun(TestBase):
             assert run_prime_trace_content is None
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_to_from_filesystem_vanilla(self):
         model = Pipeline(
             [
@@ -130,7 +132,6 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
-            avoid_duplicate_runs=False,
             upload_flow=True,
         )
 
@@ -149,11 +150,12 @@ class TestRun(TestBase):
         run_prime.publish()
         TestBase._mark_entity_for_removal("run", run_prime.run_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id),
+            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
+    @pytest.mark.test_server()
     def test_to_from_filesystem_search(self):
         model = Pipeline(
             [
@@ -174,7 +176,6 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
-            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
@@ -185,10 +186,11 @@ class TestRun(TestBase):
         run_prime.publish()
         TestBase._mark_entity_for_removal("run", run_prime.run_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id),
+            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_to_from_filesystem_no_model(self):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
@@ -205,16 +207,39 @@ class TestRun(TestBase):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
+    def _cat_col_selector(X):
+        return X.select_dtypes(include=["object", "category"]).columns
+
+    @staticmethod
     def _get_models_tasks_for_tests():
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import OneHotEncoder
+
+        basic_preprocessing = [
+            (
+                "cat_handling",
+                ColumnTransformer(
+                    transformers=[
+                        (
+                            "cat",
+                            OneHotEncoder(handle_unknown="ignore"),
+                            TestRun._cat_col_selector,
+                        )
+                    ],
+                    remainder="passthrough",
+                ),
+            ),
+            ("imp", SimpleImputer()),
+        ]
         model_clf = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 ("classifier", DummyClassifier(strategy="prior")),
             ],
         )
         model_reg = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 (
                     "regressor",
                     # LR because dummy does not produce enough float-like values
@@ -263,21 +288,21 @@ class TestRun(TestBase):
 
             assert_method = np.testing.assert_array_almost_equal
             if task.task_type == "Supervised Classification":
-                y_pred = np.take(task.class_labels, y_pred)
-                y_test = np.take(task.class_labels, y_test)
                 assert_method = np.testing.assert_array_equal
+            y_test = y_test.values
 
             # Assert correctness
             assert_method(y_pred, saved_y_pred)
             assert_method(y_test, saved_y_test)
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
-        extension = openml.extensions.sklearn.SklearnExtension()
+        extension = SklearnExtension()
 
         for model, task in self._get_models_tasks_for_tests():
             # Make sure the flow does not exist on the server yet.
@@ -289,7 +314,6 @@ class TestRun(TestBase):
                 flow=flow,
                 task=task,
                 add_local_measures=False,
-                avoid_duplicate_runs=False,
                 upload_flow=False,
             )
 
@@ -308,7 +332,7 @@ class TestRun(TestBase):
             # Clean up
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id),
+                f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
             )
 
             # make sure the flow is published as part of publishing the run.
@@ -316,8 +340,10 @@ class TestRun(TestBase):
             openml.runs.get_run(loaded_run.run_id)
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     def test_offline_and_online_run_identical(self):
-        extension = openml.extensions.sklearn.SklearnExtension()
+        extension = SklearnExtension()
 
         for model, task in self._get_models_tasks_for_tests():
             # Make sure the flow does not exist on the server yet.
@@ -329,7 +355,6 @@ class TestRun(TestBase):
                 flow=flow,
                 task=task,
                 add_local_measures=False,
-                avoid_duplicate_runs=False,
                 upload_flow=False,
             )
 
@@ -355,7 +380,7 @@ class TestRun(TestBase):
                 # Clean up
                 TestBase._mark_entity_for_removal("run", run.run_id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id),
+                    f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
                 )
 
     def test_run_setup_string_included_in_xml(self):

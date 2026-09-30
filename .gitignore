@@ -2,6 +2,8 @@
 doc/generated
 examples/.ipynb_checkpoints
 venv
+.uv-lock
+uv.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -86,6 +88,8 @@ target/
 .idea
 *.swp
 .vscode
+.cursorignore
+.cursorindexingignore
 
 # MYPY
 .mypy_cache
@@ -94,3 +98,17 @@ dmypy.sock
 
 # Tests
 .pytest_cache
+
+# Virtual environments
+oenv/
+venv/
+.env/
+.venv
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Ruff
+.ruff-cache/

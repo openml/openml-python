@@ -20,11 +20,14 @@ dependencies = [
   "minio",
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
-  "packaging",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10,<3.15"    
+maintainers = [
+  { name = "Pieter Gijsbers", email="p.gijsbers@tue.nl"},
+  { name = "Lennart Purucker"},
+]
 authors = [
-  { name = "Matthias Feurer", email="feurerm@informatik.uni-freiburg.de" },
+  { name = "Matthias Feurer"},
   { name = "Jan van Rijn" },
   { name = "Arlind Kadra" },
   { name = "Pieter Gijsbers" },
@@ -47,11 +50,11 @@ classifiers = [
   "Operating System :: Unix",
   "Operating System :: MacOS",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 license = { file = "LICENSE" }
 
@@ -74,6 +77,11 @@ test=[
     "pytest-rerunfailures",
     "mypy",
     "ruff",
+    "requests-mock",
+    "openml-sklearn",
+    "packaging",
+    "pytest-mock",
+    "openml-sklearn",
 ]
 examples=[
     "matplotlib",
@@ -87,10 +95,17 @@ examples=[
     "seaborn",
 ]
 docs=[
-    "sphinx>=3",
-    "sphinx-gallery",
-    "sphinx_bootstrap_theme",
+    "mkdocs",
     "numpydoc",
+    "mkdocs-material",
+    "mkdocs-autorefs",
+    "mkdocstrings[python]",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
+    "mkdocs-jupyter",
+    "mkdocs-linkcheck",
+    "mike"
 ]
 
 [project.urls]
@@ -111,6 +126,7 @@ version = {attr = "openml.__version__.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
+log_level="DEBUG"
 testpaths = ["tests"]
 minversion = "7.0"
 xfail_strict = true
@@ -118,15 +134,15 @@ filterwarnings=[
     "ignore:the matrix subclass:PendingDeprecationWarning"
 ]
 markers = [
-  "server: anything that connects to a server",
   "upload: anything that uploads to a server",
-  "production: any interaction with the production server",
+  "production_server: any interaction with the production server",
   "cache: anything that interacts with the (test) cache",
+  "test_server: tests that require the OpenML test server",
 ]
 
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 line-length = 100
 output-format = "grouped"
 src = ["openml", "tests", "examples"]
@@ -259,9 +275,11 @@ ignore = [
   "S101",    # Use of assert detected.
   "W292",    # No newline at end of file
   "PLC1901", # "" can be simplified to be falsey
-  "TCH003",  # Move stdlib import into TYPE_CHECKING
+  "TC003",  # Move stdlib import into TYPE_CHECKING
   "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
   "N803",    # Argument should be lowercase (but we accept things like `X`)
+  "PLC0415", # Allow imports inside functions / non-top-level scope
+  "FBT001",  # Allow Boolean-typed positional argument in function definition
 
   # TODO(@eddibergman): These should be enabled
   "D100",    # Missing docstring in public module
@@ -292,7 +310,7 @@ force-wrap-aliases = true
 convention = "numpy"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 packages = ["openml", "tests"]
 
 show_error_codes = true

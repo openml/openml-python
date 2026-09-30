@@ -23,15 +23,24 @@ Possible Future: class TestBase from openml/testing.py can be included
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import multiprocessing
+
+multiprocessing.set_start_method("spawn", force=True)
+
 from collections.abc import Iterator
 import logging
 import os
 import shutil
 from pathlib import Path
 import pytest
+import openml_sklearn
+from openml._api import HTTPClient, MinIOClient
+from openml.enums import APIVersion
 
 import openml
 from openml.testing import TestBase
+
+import inspect
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -90,8 +99,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.apikey
+    openml.config.use_test_servers()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -104,7 +112,7 @@ def delete_remote_files(tracker, flow_names) -> None:
 
     # deleting all collected entities published to test server
     # 'run's are deleted first to prevent dependency issue of entities on deletion
-    logger.info("Entity Types: {}".format(["run", "data", "flow", "task", "study"]))
+    logger.info(f"Entity Types: {['run', 'data', 'flow', 'task', 'study']}")
     for entity_type in ["run", "data", "flow", "task", "study"]:
         logger.info(f"Deleting {entity_type}s...")
         for _i, entity in enumerate(tracker[entity_type]):
@@ -170,7 +178,7 @@ def pytest_sessionfinish() -> None:
         # Delete any test dirs that remain
         # In edge cases due to a mixture of pytest parametrization and oslo concurrency,
         # some file lock are created after leaving the test. This removes these files!
-        test_files_dir=Path(__file__).parent.parent / "openml"
+        test_files_dir = Path(__file__).parent.parent / "openml"
         for f in test_files_dir.glob("tests.*"):
             if f.is_dir():
                 shutil.rmtree(f)
@@ -197,7 +205,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    for _d in ["datasets", "tasks", "runs", "setups"]:
+    for _d in ["datasets", "tasks"]:
         res_paths.append(_c_root_dir / _d)
 
     for _id in ["-1", "2"]:
@@ -212,8 +220,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         )
 
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
-    res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
-    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
@@ -223,6 +229,15 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
                 tmp_p / "task.xml",
             ]
         )
+
+    res_paths.extend([
+        _c_root_dir / "api" / "v1" / "xml" / "setup",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "run",
+        _c_root_dir / "api" / "v1" / "xml" / "run" / "1",
+        _c_root_dir / "api" / "v1" / "xml" / "run" / "1" / "body.xml",
+    ])
 
     return res_paths
 
@@ -243,8 +258,23 @@ def test_files_directory() -> Path:
 
 
 @pytest.fixture(scope="session")
-def test_api_key() -> str:
-    return "c0c42819af31e706efe1f4b88c23c6c1"
+def test_server_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["apikey"]
+
+
+@pytest.fixture(scope="session")
+def test_server_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -263,23 +293,65 @@ def as_robot() -> Iterator[None]:
     openml.config.set_retry_policy(policy, n_retries)
 
 
-@pytest.fixture(autouse=True, scope="session")
-def with_test_server():
-    openml.config.start_using_configuration_for_example()
+@pytest.fixture(autouse=True)
+def with_server(request):
+    openml.config.set_api_version(APIVersion.V1)
+
+    if "production_server" in request.keywords:
+        openml.config.use_production_servers()
+        yield
+        return
+
+    openml.config.use_test_servers()
     yield
-    openml.config.stop_using_configuration_for_example()
 
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
+        
+
+@pytest.fixture
+def static_cache_dir():
+    return Path(__file__).parent / "files" 
+
+@pytest.fixture
+def workdir(tmp_path):
+    original_cwd = Path.cwd()
+    os.chdir(tmp_path)
+    yield tmp_path
+    os.chdir(original_cwd)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    if openml.config.servers[APIVersion.V2]["server"] is None:
+        pytest.skip("V2 server is not configured")
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()

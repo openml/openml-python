@@ -20,22 +20,24 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_dataset(self):
         # no clustering tasks on test server
-        openml.config.server = self.production_server
+        self.use_production_server()
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
+    @pytest.mark.test_server()
     def test_download_task(self):
         # no clustering tasks on test server
-        openml.config.server = self.production_server
+        self.use_production_server()
         task = super().test_download_task()
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.CLUSTERING
         assert task.dataset_id == 36
 
+    @pytest.mark.test_server()
     def test_upload_task(self):
         compatible_datasets = self._get_compatible_rand_dataset()
         for i in range(100):
@@ -50,7 +52,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                 task = task.publish()
                 TestBase._mark_entity_for_removal("task", task.id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], task.id),
+                    f"collected from {__file__.split('/')[-1]}: {task.id}",
                 )
                 # success
                 break

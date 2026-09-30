@@ -3,12 +3,15 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from collections.abc import Hashable, Sequence
 from pathlib import Path
-from typing import Any, Hashable, Sequence
+from typing import Any, cast
 
 import xmltodict
 
+import openml
 from openml.base import OpenMLBase
+from openml.exceptions import ObjectNotPublishedError
 from openml.extensions import Extension, get_extension_by_flow
 from openml.utils import extract_xml_tags
 
@@ -157,10 +160,7 @@ class OpenMLFlow(OpenMLBase):
         self.language = language
         self.dependencies = dependencies
         self.flow_id = flow_id
-        if extension is None:
-            self._extension = get_extension_by_flow(self)
-        else:
-            self._extension = extension
+        self._extension = extension
 
     @property
     def id(self) -> int | None:
@@ -170,12 +170,12 @@ class OpenMLFlow(OpenMLBase):
     @property
     def extension(self) -> Extension:
         """The extension of the flow (e.g., sklearn)."""
-        if self._extension is not None:
-            return self._extension
+        if self._extension is None:
+            self._extension = cast(
+                "Extension", get_extension_by_flow(self, raise_if_no_extension=True)
+            )
 
-        raise RuntimeError(
-            f"No extension could be found for flow {self.flow_id}: {self.name}",
-        )
+        return self._extension
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
@@ -411,7 +411,7 @@ class OpenMLFlow(OpenMLBase):
         """Parse the id from the xml_response and assign it to self."""
         self.flow_id = int(xml_response["oml:upload_flow"]["oml:id"])
 
-    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT001, FBT002
+    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT002
         """Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
@@ -438,17 +438,22 @@ class OpenMLFlow(OpenMLBase):
         if not flow_id:
             if self.flow_id:
                 raise openml.exceptions.PyOpenMLError(
-                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None.",
+                    "Flow does not exist on the server, but 'flow.flow_id' is not None.",
                 )
-            super().publish()
-            assert self.flow_id is not None  # for mypy
-            flow_id = self.flow_id
+
+            file_elements = self._get_file_elements()
+            if "description" not in file_elements:
+                file_elements["description"] = self._to_xml()
+
+            # Use openml._backend.flow.publish which internally calls ResourceV1.publish
+            flow_id = openml._backend.flow.publish(path="flow", files=file_elements)
+            self.flow_id = flow_id
         elif raise_error_if_exists:
             error_message = f"This OpenMLFlow already exists with id: {flow_id}."
             raise openml.exceptions.PyOpenMLError(error_message)
         elif self.flow_id is not None and self.flow_id != flow_id:
             raise openml.exceptions.PyOpenMLError(
-                "Local flow_id does not match server flow_id: " f"'{self.flow_id}' vs '{flow_id}'",
+                f"Local flow_id does not match server flow_id: '{self.flow_id}' vs '{flow_id}'",
             )
 
         flow = openml.flows.functions.get_flow(flow_id)
@@ -469,6 +474,38 @@ class OpenMLFlow(OpenMLBase):
                 f"the flow if necessary! Error is:\n'{message}'",
             ) from e
         return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this flow with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        if self.flow_id is None:
+            raise ObjectNotPublishedError(
+                "Cannot tag a flow that has not been published yet. "
+                "Please publish the object first before being able to tag it."
+                f"\n{self}",
+            )
+        openml._backend.flow.tag(self.flow_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this flow on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the flow.
+        """
+        if self.flow_id is None:
+            raise ObjectNotPublishedError(
+                "Cannot untag a flow that has not been published yet. "
+                "Please publish the object first before being able to untag it."
+                f"\n{self}",
+            )
+        openml._backend.flow.untag(self.flow_id, tag)
 
     def get_structure(self, key_item: str) -> dict[str, list[str]]:
         """
@@ -520,7 +557,7 @@ class OpenMLFlow(OpenMLBase):
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError(
-                f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
+                f"Flow {self.name} does not contain component with identifier {sub_identifier}",
             )
         if len(structure) == 1:
             return self.components[sub_identifier]  # type: ignore

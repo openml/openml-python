@@ -1,7 +1,0 @@
-.highlight .n { color: #000000 } /* code */
-.highlight .c1 { color: #1d8908 } /* comments */
-.highlight .mi { color: #0d9fe3; font-weight: bold } /* integers */
-.highlight .s1 { color: #d73c00 } /* string */
-.highlight .o { color: #292929 } /* operators */
- /* Background color for code highlights. Color for bash highlights */
-pre { background-color: #fbfbfb; color: #000000 }
