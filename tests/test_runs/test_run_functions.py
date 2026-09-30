@@ -343,17 +343,15 @@ class TestRun(TestBase):
         assert isinstance(run.dataset_id, int)
 
         # This is only a smoke check right now
-        # TODO add a few asserts here
         run._to_xml()
         assert isinstance(run._to_xml(), str)
 
         if run.trace is not None:
             # This is only a smoke check right now
-            # TODO add a few asserts here
             assert run.trace.run_id == run.run_id
             assert run.trace.trace_iterations is not None
             for trace_iteration in run.trace.trace_iterations.values():
-                assert (trace_iteration.setup_string is not None) != (trace_iteration.setup_string is not None)
+                assert (trace_iteration.setup_string is not None) != (trace_iteration.parameters is not None)
 
             run.trace.trace_to_arff()
             assert isinstance(run.trace, dict)
@@ -404,13 +402,18 @@ class TestRun(TestBase):
 
         downloaded = openml.runs.get_run(run_.run_id)
         assert "openml-python" in downloaded.tags
-
         # TODO make sure that these attributes are instantiated when
         # downloading a run? Or make sure that the trace object is created when
         # running a flow on a task (and not only the arff object is created,
         # so that the two objects can actually be compared):
         # downloaded_run_trace = downloaded._generate_trace_arff_dict()
         # self.assertEqual(run_trace, downloaded_run_trace)
+        
+        downloaded_run_trace = downloaded.trace
+        assert downloaded_run_trace is not None
+        assert run.trace is not None
+        self.assertEqual(run.trace, downloaded_run_trace)
+
         return run
 
     def _check_sample_evaluations(
