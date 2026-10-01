@@ -509,6 +509,31 @@ def __parse_server_exception(
     else:
         full_message = f"{message} - {additional_information}"
 
+    # Improve estimation_procedure error message
+    if additional_information and "acceptable inputs" in additional_information:
+        try:
+            import re
+
+            from openml.tasks.functions import _get_estimation_procedure_list
+
+            # Extract IDs
+            ids = list(map(int, re.findall(r"\d+", additional_information)))
+
+            # Get mapping
+            procedures = _get_estimation_procedure_list()
+            mapping = {p["id"]: p["name"] for p in procedures}
+
+            # Format
+            pretty = [f"{i}: {mapping.get(i, 'Unknown')}" for i in ids]
+
+            full_message = (
+                f"{message} - problematic input: [estimation_procedure],\n"
+                "acceptable inputs:\n" + "\n".join(pretty)
+            )
+
+        except Exception:
+            pass
+
     if code in [
         102,  # flow/exists post
         137,  # dataset post
