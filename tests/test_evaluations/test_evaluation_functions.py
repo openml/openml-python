@@ -230,7 +230,7 @@ def test_evaluation_list_sort():
     assert test_output[:size] == sorted_output
 
 
-def test_list_estimation_procedures_dict():
+def test_list_estimation_procedures_default_warns_about_future_change():
     procedures = [
         OpenMLEstimationProcedure(
             id=5,
@@ -239,16 +239,26 @@ def test_list_estimation_procedures_dict():
             type="crossvalidation",
         )
     ]
-    with patch.object(openml._backend.estimation_procedure, "list", return_value=procedures):
+    with (
+        patch.object(openml._backend.estimation_procedure, "list", return_value=procedures),
+        pytest.warns(FutureWarning, match="output will change"),
+    ):
         result = openml.evaluations.list_estimation_procedures()
 
-    assert result == {
-        5: {
-            "task_type_id": TaskType.SUPERVISED_CLASSIFICATION,
-            "name": "10-fold Crossvalidation",
-            "type": "crossvalidation",
-        }
-    }
+    assert result == ["10-fold Crossvalidation"]
+
+
+def test_list_estimation_procedures_object():
+    procedure = OpenMLEstimationProcedure(
+        id=5,
+        task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+        name="10-fold Crossvalidation",
+        type="crossvalidation",
+    )
+    with patch.object(openml._backend.estimation_procedure, "list", return_value=[procedure]):
+        result = openml.evaluations.list_estimation_procedures(output_format="object")
+
+    assert result == {5: procedure}
 
 
 def test_list_estimation_procedures_dataframe():
