@@ -224,28 +224,18 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        # TODO: assert holdout task
-
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
         predictions_url = openml._api_calls._file_id_to_url(file_id)
         response = openml._api_calls._download_text_file(predictions_url)
         predictions = arff.loads(response)
 
-        # if create_task_obj=False, task argument in run_model_on_task is specified task_id
-        if create_task_obj:
-            task = openml.tasks.get_task(run.task_id)
-            run_prime = openml.runs.run_model_on_task(
-                model=model_prime,
-                task=task,
-                seed=seed,
-            )
-        else:
-            run_prime = openml.runs.run_model_on_task(
-                model=model_prime,
-                task=run.task_id,
-                seed=seed,
-            )
+        task = openml.tasks.get_task(run.task_id) if create_task_obj else run.task_id
+        run_prime = openml.runs.run_model_on_task(
+            model=model_prime,
+            task=task,
+            seed=seed,
+        )
 
         predictions_prime = run_prime._generate_arff_dict()
 
@@ -341,11 +331,14 @@ class TestRun(TestBase):
         assert isinstance(run.dataset_id, int)
 
         # This is only a smoke check right now
-        # TODO add a few asserts here
+        assert run.run_id is not None
+        # assert run.uploader is not None # uploader is not set on the local run object immediately after publish
+        assert run.flow_id == flow.flow_id
         run._to_xml()
         if run.trace is not None:
             # This is only a smoke check right now
-            # TODO add a few asserts here
+            assert run.trace.run_id == run.run_id
+            assert len(run.trace.trace_iterations) > 0
             run.trace.trace_to_arff()
 
         # check arff output
@@ -395,6 +388,11 @@ class TestRun(TestBase):
         downloaded = openml.runs.get_run(run_.run_id)
         assert "openml-python" in downloaded.tags
 
+        # attributes is not a property of OpenMLRun.
+        # Check basic properties instead to verify download integrity.
+        assert downloaded.uploader is not None
+        assert downloaded.task_id == run.task_id
+        assert downloaded.flow_id == run.flow_id
         # TODO make sure that these attributes are instantiated when
         # downloading a run? Or make sure that the trace object is created when
         # running a flow on a task (and not only the arff object is created,
@@ -569,6 +567,7 @@ class TestRun(TestBase):
             # suboptimal (slow), and not guaranteed to work if evaluation
             # engine is behind.
             # TODO: mock this? We have the arff already on the server
+            assert run.output_files["predictions"] is not None
             self._wait_for_processed_run(run.run_id, 600)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
@@ -610,6 +609,8 @@ class TestRun(TestBase):
             )
 
         # todo: check if runtime is present
+        # assert "usercpu_time_millis" in run.evaluations if run.evaluations else True
+        # For local runs, we check fold_evaluations mostly.
         self._check_fold_timing_evaluations(
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
