@@ -224,30 +224,18 @@ class TestRun(TestBase):
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
 
-        if create_task_obj:
-            task = openml.tasks.get_task(run.task_id)
-            assert task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION or task.task_type_id == TaskType.SUPERVISED_REGRESSION
-
         # downloads the predictions of the old task
         file_id = run.output_files["predictions"]
         predictions_url = openml._api_calls._file_id_to_url(file_id)
         response = openml._api_calls._download_text_file(predictions_url)
         predictions = arff.loads(response)
 
-        # if create_task_obj=False, task argument in run_model_on_task is specified task_id
-        if create_task_obj:
-            task = openml.tasks.get_task(run.task_id)
-            run_prime = openml.runs.run_model_on_task(
-                model=model_prime,
-                task=task,
-                seed=seed,
-            )
-        else:
-            run_prime = openml.runs.run_model_on_task(
-                model=model_prime,
-                task=run.task_id,
-                seed=seed,
-            )
+        task = openml.tasks.get_task(run.task_id) if create_task_obj else run.task_id
+        run_prime = openml.runs.run_model_on_task(
+            model=model_prime,
+            task=task,
+            seed=seed,
+        )
 
         predictions_prime = run_prime._generate_arff_dict()
 
@@ -343,7 +331,6 @@ class TestRun(TestBase):
         assert isinstance(run.dataset_id, int)
 
         # This is only a smoke check right now
-        assert run.run_id is not None
         assert run.run_id is not None
         # assert run.uploader is not None # uploader is not set on the local run object immediately after publish
         assert run.flow_id == flow.flow_id
@@ -624,7 +611,6 @@ class TestRun(TestBase):
         # todo: check if runtime is present
         # assert "usercpu_time_millis" in run.evaluations if run.evaluations else True
         # For local runs, we check fold_evaluations mostly.
-        pass
         self._check_fold_timing_evaluations(
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
