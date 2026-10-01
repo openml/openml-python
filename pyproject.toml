@@ -126,6 +126,7 @@ version = {attr = "openml.__version__.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
+log_level="DEBUG"
 testpaths = ["tests"]
 minversion = "7.0"
 xfail_strict = true

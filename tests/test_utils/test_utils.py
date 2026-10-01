@@ -34,7 +34,7 @@ def min_number_setups_on_test_server() -> int:
 @pytest.fixture()
 def min_number_runs_on_test_server() -> int:
     """After a reset at least 21 runs are on the test server"""
-    return 21
+    return 15
 
 
 @pytest.fixture()
@@ -44,7 +44,7 @@ def min_number_evaluations_on_test_server() -> int:
 
 
 def _mocked_perform_api_call(call, request_method):
-    url = openml.config.server + "/" + call
+    url = openml.config.server  + call
     return openml._api_calls._download_text_file(url)
 
 

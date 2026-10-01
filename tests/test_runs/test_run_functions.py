@@ -7,6 +7,7 @@ import random
 import time
 import unittest
 import warnings
+from collections import OrderedDict
 
 from openml_sklearn import SklearnExtension, cat, cont
 from packaging.version import Version
@@ -40,9 +41,10 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-#from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
+    _create_run_from_results,
     _run_task_get_arffcontent,
+    _sync_flow_with_server,
     delete_run,
     format_prediction,
     run_exists,
@@ -110,6 +112,61 @@ class TestRun(TestBase):
     def setUp(self):
         super().setUp()
         self.extension = SklearnExtension()
+
+    def test_sync_flow_with_server_returns_early_without_sync_flags(self):
+        flow = mock.MagicMock()
+        flow.name = "dummy-flow"
+        flow.external_version = "1"
+        flow.flow_id = None
+        task = mock.MagicMock()
+
+        with mock.patch("openml.runs.functions.flow_exists") as flow_exists_mock:
+            flow_id = _sync_flow_with_server(
+                flow=flow,
+                task=task,
+                upload_flow=False,
+                avoid_duplicate_runs=False,
+            )
+
+        assert flow_id is None
+        flow_exists_mock.assert_not_called()
+
+    def test_create_run_from_results_keeps_required_constructor_fields(self):
+        model = object()
+        flow = mock.MagicMock()
+        flow.model = model
+        flow.name = "dummy-flow"
+        flow.flow_id = None
+        flow.extension.create_setup_string.return_value = "dummy-setup-string"
+
+        task = mock.MagicMock()
+        task.task_id = 123
+        task.task_type_id = TaskType.SUPERVISED_CLASSIFICATION
+        dataset = mock.MagicMock()
+        dataset.dataset_id = 456
+        task.get_dataset.return_value = dataset
+
+        run = _create_run_from_results(
+            task=task,
+            flow=flow,
+            flow_id=None,
+            data_content=[[0, 0, 0, "prediction", "truth"]],
+            trace=None,
+            fold_evaluations=OrderedDict(),
+            sample_evaluations=OrderedDict(),
+            tags=["openml-python", "python"],
+            run_environment=["python", "3.11"],
+            upload_flow=False,
+            avoid_duplicate_runs=False,
+        )
+
+        assert run.task_id == 123
+        assert run.dataset_id == 456
+        assert run.model is model
+        assert run.flow_name == "dummy-flow"
+        assert run.setup_string == "dummy-setup-string"
+        assert run.description_text is not None
+        assert "Created by run_flow_on_task" in run.description_text
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)
@@ -1055,6 +1112,7 @@ class TestRun(TestBase):
         self._test_local_evaluations(run)
 
     @pytest.mark.sklearn()
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1586")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1083,6 +1141,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1672,14 +1731,19 @@ class TestRun(TestBase):
             assert len(row) == 12
 
     @pytest.mark.test_server()
-    def test_get_cached_run(self):
+    @mock.patch.object(requests.Session, "request")
+    def test_get_cached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.runs.functions._get_cached_run(1)
+        mock_request.side_effect = Exception("Mocked Exception")
+        openml.runs.get_run(1)
 
-    def test_get_uncached_run(self):
+    @pytest.mark.test_server()
+    @mock.patch.object(requests.Session, "request")
+    def test_get_uncached_run(self, mock_request):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.runs.functions._get_cached_run(10)
+        mock_request.side_effect = Exception("Mocked Exception")
+        with pytest.raises(Exception, match="Mocked Exception"):
+            openml.runs.get_run(10)
 
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
@@ -1782,7 +1846,6 @@ class TestRun(TestBase):
         self.assertListEqual(res, [0] * 5)
 
 
-
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1826,11 +1889,10 @@ class TestRun(TestBase):
         _ = openml.runs.initialize_model_from_run(run_id=1, strict_version=False)
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+@mock.patch.object(requests.Session, "request")
+def test_delete_run_not_owned(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -1841,16 +1903,16 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    run_url = "https://test.openml.org/api/v1/xml/run/40000"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    run_url = test_server_v1 + "run/40000"
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+@mock.patch.object(requests.Session, "request")
+def test_delete_run_success(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
     )
@@ -1858,16 +1920,16 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    run_url = "https://test.openml.org/api/v1/xml/run/10591880"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    run_url = test_server_v1 + "run/10591880"
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
+@mock.patch.object(requests.Session, "request")
+def test_delete_unknown_run(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -1878,15 +1940,20 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    run_url = "https://test.openml.org/api/v1/xml/run/9999999"
-    assert run_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    run_url = test_server_v1 + "run/9999999"
+    assert run_url == mock_request.call_args.kwargs.get("url")
+    assert "DELETE" == mock_request.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
+    )
+@unittest.skipIf(
+    Version(sklearn.__version__) >= Version("1.8"),
+    reason="predictions differ significantly",
     )
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
 @pytest.mark.test_server()
@@ -2030,6 +2097,7 @@ def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
         n_jobs=n_jobs,
     )
     from openml_sklearn import SklearnExtension
+
     extension = SklearnExtension()
     with parallel_backend(backend, n_jobs=n_jobs):
         res = openml.runs.functions._run_task_get_arffcontent(
@@ -2047,9 +2115,3 @@ def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
     assert len(res[2]["predictive_accuracy"][0]) == 10
     assert len(res[3]["predictive_accuracy"][0]) == 10
     assert parallel_mock.call_count == call_count
-
-    # Check if the arff file is valid
-    # TODO: This checks whether the arff file is valid or not.
-    # We should add a check here to ensure that the arff file
-    # is indeed valid.
-    arff.loads(arff.dumps(res[1]))

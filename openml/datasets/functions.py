@@ -19,9 +19,9 @@ import urllib3
 import xmltodict
 from scipy.sparse import coo_matrix
 
+import openml
 import openml._api_calls
 import openml.utils
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
@@ -364,6 +364,11 @@ def get_datasets(
     -------
     datasets : list of datasets
         A list of dataset objects.
+
+    Examples
+    --------
+    >>> import openml
+    >>> datasets = openml.datasets.get_datasets([1, 2, 3])  # doctest: +SKIP
     """
     datasets = []
     for dataset_id in dataset_ids:
@@ -446,6 +451,13 @@ def get_dataset(  # noqa: C901, PLR0912
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
+
+    Examples
+    --------
+    >>> import openml
+    >>> dataset = openml.datasets.get_dataset(1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset("iris", version=1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset(1, download_data=True)  # doctest: +SKIP
     """
     if download_all_files:
         warnings.warn(
@@ -492,7 +504,9 @@ def get_dataset(  # noqa: C901, PLR0912
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         parquet_file = None
-        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        skip_parquet = (
+            os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        )
         download_parquet = "oml:parquet_url" in description and not skip_parquet
         if download_parquet and (download_data or download_all_files):
             try:
