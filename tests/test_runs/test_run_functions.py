@@ -340,13 +340,16 @@ class TestRun(TestBase):
         assert run_ == run
         assert isinstance(run.dataset_id, int)
 
-        # This is only a smoke check right now
-        # TODO add a few asserts here
-        run._to_xml()
+        # Check XML output.
+        xml = run._to_xml()
+        assert xml is not None
+
         if run.trace is not None:
-            # This is only a smoke check right now
-            # TODO add a few asserts here
-            run.trace.trace_to_arff()
+            # Check trace ARFF output.
+            trace_arff = run.trace.trace_to_arff()
+            assert isinstance(trace_arff, dict)
+            assert "data" in trace_arff
+            assert len(trace_arff["data"]) > 0
 
         # check arff output
         assert len(run.data_content) == num_instances
