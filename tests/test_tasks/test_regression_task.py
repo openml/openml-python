@@ -46,6 +46,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
                 else:
                     raise Exception(repr(e))
         self.task_id = task_id
+        self.dataset_id = 105
         self.task_type = TaskType.SUPERVISED_REGRESSION
 
 
