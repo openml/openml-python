@@ -1,0 +1,209 @@
+<oml:tasks xmlns:oml="http://openml.org/openml">
+    <oml:task>
+    <oml:task_id>126033</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>2</oml:did>
+    <oml:name>anneal</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">2</oml:input>
+          <oml:quality name="MajorityClassSize">684.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">7.0</oml:quality>
+        <oml:quality name="MinorityClassSize">8.0</oml:quality>
+        <oml:quality name="NumberOfClasses">5.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">39.0</oml:quality>
+        <oml:quality name="NumberOfInstances">898.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">898.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">22175.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">6.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">33.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126034</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>3</oml:did>
+    <oml:name>kr-vs-kp</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">3</oml:input>
+          <oml:quality name="MajorityClassSize">1669.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">3.0</oml:quality>
+        <oml:quality name="MinorityClassSize">1527.0</oml:quality>
+        <oml:quality name="NumberOfClasses">2.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">37.0</oml:quality>
+        <oml:quality name="NumberOfInstances">3196.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">0.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">37.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126035</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>4</oml:did>
+    <oml:name>labor</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">4</oml:input>
+          <oml:quality name="MajorityClassSize">37.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">3.0</oml:quality>
+        <oml:quality name="MinorityClassSize">20.0</oml:quality>
+        <oml:quality name="NumberOfClasses">2.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">17.0</oml:quality>
+        <oml:quality name="NumberOfInstances">57.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">56.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">326.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">8.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">9.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126036</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>5</oml:did>
+    <oml:name>arrhythmia</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">5</oml:input>
+          <oml:quality name="MajorityClassSize">245.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">13.0</oml:quality>
+        <oml:quality name="MinorityClassSize">2.0</oml:quality>
+        <oml:quality name="NumberOfClasses">13.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">280.0</oml:quality>
+        <oml:quality name="NumberOfInstances">452.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">384.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">408.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">206.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">74.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126037</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>6</oml:did>
+    <oml:name>letter</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">6</oml:input>
+          <oml:quality name="MajorityClassSize">813.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">26.0</oml:quality>
+        <oml:quality name="MinorityClassSize">734.0</oml:quality>
+        <oml:quality name="NumberOfClasses">26.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">17.0</oml:quality>
+        <oml:quality name="NumberOfInstances">20000.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">16.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">1.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126038</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>7</oml:did>
+    <oml:name>audiology</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">7</oml:input>
+          <oml:quality name="MajorityClassSize">57.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">24.0</oml:quality>
+        <oml:quality name="MinorityClassSize">1.0</oml:quality>
+        <oml:quality name="NumberOfClasses">24.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">70.0</oml:quality>
+        <oml:quality name="NumberOfInstances">226.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">222.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">317.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">0.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">70.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126039</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>8</oml:did>
+    <oml:name>liver-disorders</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">8</oml:input>
+          <oml:quality name="NumberOfClasses">0.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">6.0</oml:quality>
+        <oml:quality name="NumberOfInstances">345.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">6.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">0.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126040</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>9</oml:did>
+    <oml:name>autos</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">9</oml:input>
+          <oml:quality name="MajorityClassSize">67.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">22.0</oml:quality>
+        <oml:quality name="MinorityClassSize">3.0</oml:quality>
+        <oml:quality name="NumberOfClasses">6.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">26.0</oml:quality>
+        <oml:quality name="NumberOfInstances">205.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">46.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">59.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">15.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">11.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126041</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>10</oml:did>
+    <oml:name>lymph</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">10</oml:input>
+          <oml:quality name="MajorityClassSize">81.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">8.0</oml:quality>
+        <oml:quality name="MinorityClassSize">2.0</oml:quality>
+        <oml:quality name="NumberOfClasses">4.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">19.0</oml:quality>
+        <oml:quality name="NumberOfInstances">148.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">3.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">16.0</oml:quality>
+    </oml:task>
+    <oml:task>
+    <oml:task_id>126042</oml:task_id>
+    <oml:task_type_id>5</oml:task_type_id>
+    <oml:task_type>Clustering</oml:task_type>
+    <oml:did>11</oml:did>
+    <oml:name>balance-scale</oml:name>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+        <oml:input name="estimation_procedure">17</oml:input>
+        <oml:input name="source_data">11</oml:input>
+          <oml:quality name="MajorityClassSize">288.0</oml:quality>
+        <oml:quality name="MaxNominalAttDistinctValues">3.0</oml:quality>
+        <oml:quality name="MinorityClassSize">49.0</oml:quality>
+        <oml:quality name="NumberOfClasses">3.0</oml:quality>
+        <oml:quality name="NumberOfFeatures">5.0</oml:quality>
+        <oml:quality name="NumberOfInstances">625.0</oml:quality>
+        <oml:quality name="NumberOfInstancesWithMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfMissingValues">0.0</oml:quality>
+        <oml:quality name="NumberOfNumericFeatures">4.0</oml:quality>
+        <oml:quality name="NumberOfSymbolicFeatures">1.0</oml:quality>
+    </oml:task>
+  </oml:tasks>
