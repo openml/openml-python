@@ -56,10 +56,15 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production_server()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
-    def test_list_clustering_task(self):
-        self.use_production_server()
+    @mock.patch("requests.Session.request")
+    def test_list_clustering_task(self, mock_request):
+        import pathlib
+        mock_request.return_value = create_request_response(
+            status_code=200,
+            content_filepath=pathlib.Path(__file__).parent.parent
+            / "mock_data"
+            / "clustering_tasks.xml",
+        )
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
