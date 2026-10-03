@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import pathlib
 import unittest
 from typing import cast
 from unittest import mock
@@ -56,11 +57,17 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production_server()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
-    def test_list_clustering_task(self):
-        self.use_production_server()
+    @mock.patch("requests.Session.request")
+    def test_list_clustering_task(self, mock_request):
         # as shown by #383, clustering tasks can give list/dict casting problems
+        mock_request.return_value = create_request_response(
+            status_code=200,
+            content_filepath=pathlib.Path(__file__).parent.parent
+            / "files"
+            / "mock_responses"
+            / "tasks"
+            / "task_list_clustering.xml",
+        )
         openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
@@ -143,15 +150,19 @@ class TestTask(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.tasks.get_task(1882)
 
-    @unittest.skip(
-        "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
-    )
-    @pytest.mark.production_server()
-    def test__get_task_live(self):
-        self.use_production_server()
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test__get_task_live(self, mock_api):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
-        openml.tasks.get_task(34536)
+        task_xml = (
+            pathlib.Path(__file__).parent.parent
+            / "files"
+            / "mock_responses"
+            / "tasks"
+            / "task_34536.xml"
+        ).read_text()
+        mock_api.return_value = task_xml
+        openml.tasks.functions._get_task_description(34536)
 
     @pytest.mark.test_server()
     def test_get_task(self):
@@ -214,15 +225,29 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
 
-    @pytest.mark.production_server()
-    def test_get_task_different_types(self):
-        self.use_production_server()
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_get_task_different_types(self, mock_api):
+        mock_responses_dir = (
+            pathlib.Path(__file__).parent.parent
+            / "files"
+            / "mock_responses"
+            / "tasks"
+        )
+
+        def side_effect(call, method, **kwargs):
+            # Map API call to the corresponding mock XML file
+            task_id = call.split("/")[-1]
+            xml_path = mock_responses_dir / f"task_{task_id}.xml"
+            return xml_path.read_text()
+
+        mock_api.side_effect = side_effect
+
         # Regression task
-        openml.tasks.functions.get_task(5001)
+        openml.tasks.functions._get_task_description(5001)
         # Learning curve
-        openml.tasks.functions.get_task(64)
+        openml.tasks.functions._get_task_description(64)
         # Issue 538, get_task failing with clustering task.
-        openml.tasks.functions.get_task(126033)
+        openml.tasks.functions._get_task_description(126033)
 
     @pytest.mark.test_server()
     def test_download_split(self):
