@@ -140,10 +140,11 @@ class TestOpenMLDataset(TestBase):
         datasets = openml.datasets.list_datasets(tag="NoOneWouldUseThisTagAnyway")
         assert datasets.empty
 
-    @pytest.mark.production_server()
-    def test_check_datasets_active(self):
-        # Have to test on live because there is no deactivated dataset on the test server.
-        self.use_production_server()
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test_check_datasets_active(self, mock_list_datasets):
+        mock_list_datasets.return_value = pd.DataFrame(
+            {"status": ["active", "deactivated"]}, index=[2, 17]
+        )
         active = openml.datasets.check_datasets_active(
             [2, 17, 79],
             raise_error_if_not_exist=False,
@@ -178,29 +179,37 @@ class TestOpenMLDataset(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
-    @pytest.mark.production_server()
-    def test__name_to_id_with_deactivated(self):
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test__name_to_id_with_deactivated(self, mock_list_datasets):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
-        self.use_production_server()
-        # /d/1 was deactivated
+        # /d/1 was deactivated, /d/2 is active
+        mock_list_datasets.return_value = pd.DataFrame(
+            {"did": [2], "status": ["active"]}, index=[2]
+        )
         assert openml.datasets.functions._name_to_id("anneal") == 2
 
-    @pytest.mark.production_server()
-    def test__name_to_id_with_multiple_active(self):
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test__name_to_id_with_multiple_active(self, mock_list_datasets):
         """With multiple active datasets, retrieve the least recent active."""
-        self.use_production_server()
+        mock_list_datasets.return_value = pd.DataFrame(
+            {"did": [61, 969], "status": ["active", "active"]}, index=[61, 969]
+        )
         assert openml.datasets.functions._name_to_id("iris") == 61
 
-    @pytest.mark.production_server()
-    def test__name_to_id_with_version(self):
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test__name_to_id_with_version(self, mock_list_datasets):
         """With multiple active datasets, retrieve the least recent active."""
-        self.use_production_server()
+        mock_list_datasets.return_value = pd.DataFrame(
+            {"did": [969], "status": ["active"]}, index=[969]
+        )
         assert openml.datasets.functions._name_to_id("iris", version=3) == 969
 
-    @pytest.mark.production_server()
-    def test__name_to_id_with_multiple_active_error(self):
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test__name_to_id_with_multiple_active_error(self, mock_list_datasets):
         """With multiple active datasets, retrieve the least recent active."""
-        self.use_production_server()
+        mock_list_datasets.return_value = pd.DataFrame(
+            {"did": [61, 969], "status": ["active", "active"]}, index=[61, 969]
+        )
         self.assertRaisesRegex(
             ValueError,
             "Multiple active datasets exist with name 'iris'.",
@@ -280,16 +289,16 @@ class TestOpenMLDataset(TestBase):
         df, _, _, _ = dataset.get_data()
         assert df["carbon"].dtype == "uint8"
 
-    @pytest.mark.production_server()
-    def test_get_dataset_cannot_access_private_data(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_get_dataset_cannot_access_private_data(self, mock_api):
         # Issue324 Properly handle private datasets when trying to access them
-        self.use_production_server()
+        mock_api.side_effect = OpenMLPrivateDatasetError("No access granted")
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
-    @pytest.mark.skip("Need to find dataset name of private dataset")
-    def test_dataset_by_name_cannot_access_private_data(self):
-        self.use_production_server()
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_dataset_by_name_cannot_access_private_data(self, mock_api):
+        mock_api.side_effect = OpenMLPrivateDatasetError("No access granted")
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "private_dataset")
 
     @pytest.mark.test_server()
     def test_get_dataset_lazy_all_functions(self):
@@ -1541,15 +1550,15 @@ class TestOpenMLDataset(TestBase):
         )
 
 
-    @pytest.mark.production_server()
-    def test_list_datasets_with_high_size_parameter(self):
-        # Testing on prod since concurrent deletion of uploded datasets make the test fail
-        self.use_production_server()
+    @mock.patch("openml.datasets.functions._list_datasets")
+    def test_list_datasets_with_high_size_parameter(self, mock_inner_list):
+        # Testing that size=np.inf produces the same call as default (no size limit)
+        fake_df = pd.DataFrame({"did": [1, 2, 3], "status": ["active"] * 3})
+        mock_inner_list.return_value = fake_df
 
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
-        # Reverting to test server
         assert len(datasets_a) == len(datasets_b)
 
 
