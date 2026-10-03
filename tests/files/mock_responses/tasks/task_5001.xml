@@ -1,0 +1,33 @@
+<oml:task xmlns:oml="http://openml.org/openml">
+	<oml:task_id>5001</oml:task_id>
+  <oml:task_name>Task 5001: visualizing_galaxy (Supervised Regression)</oml:task_name>
+	<oml:task_type_id>2</oml:task_type_id>
+	<oml:task_type>Supervised Regression</oml:task_type>
+	      <oml:input name="source_data">
+    <oml:data_set>
+<oml:data_set_id>690</oml:data_set_id>
+<oml:target_feature>velocity</oml:target_feature>
+</oml:data_set>  </oml:input>
+	      <oml:input name="estimation_procedure">
+    <oml:estimation_procedure>
+<oml:id>7</oml:id>
+<oml:type>crossvalidation</oml:type>
+<oml:data_splits_url>https://openml.org//api_splits/get/5001/Task_5001_splits.arff</oml:data_splits_url>
+<oml:parameter name="number_repeats">1</oml:parameter>
+<oml:parameter name="number_folds">10</oml:parameter>
+<oml:parameter name="percentage"></oml:parameter>
+</oml:estimation_procedure>  </oml:input>
+	      <oml:input name="evaluation_measures">
+    <oml:evaluation_measures>
+<oml:evaluation_measure>mean_absolute_error</oml:evaluation_measure>
+</oml:evaluation_measures>  </oml:input>
+	      <oml:output name="predictions">
+    <oml:predictions>
+<oml:format>ARFF</oml:format>
+<oml:feature name="repeat" type="integer"/>
+<oml:feature name="fold" type="integer"/>
+<oml:feature name="row_id" type="integer"/>
+<oml:feature name="prediction" type="string"/>
+</oml:predictions>  </oml:output>
+	    <oml:tag>under1m</oml:tag>
+  </oml:task>
