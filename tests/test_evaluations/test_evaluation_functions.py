@@ -164,6 +164,7 @@ class TestEvaluationFunctions(TestBase):
 
         assert isinstance(evaluations, dict)
 
+
     @pytest.mark.production_server()
     def test_evaluation_list_per_fold(self):
         self.use_production_server()
@@ -171,6 +172,7 @@ class TestEvaluationFunctions(TestBase):
         task_ids = [6]
         uploader_ids = [1]
         flow_ids = [6969]
+        runs = [6070667, 6070666]
 
         evaluations = openml.evaluations.list_evaluations(
             "predictive_accuracy",
@@ -179,10 +181,11 @@ class TestEvaluationFunctions(TestBase):
             tasks=task_ids,
             flows=flow_ids,
             uploaders=uploader_ids,
+            runs=runs,
             per_fold=True,
         )
 
-        assert len(evaluations) == size
+        assert len(evaluations) == len(runs)
         for run_id in evaluations:
             assert evaluations[run_id].value is None
             assert evaluations[run_id].values is not None
@@ -196,6 +199,7 @@ class TestEvaluationFunctions(TestBase):
             tasks=task_ids,
             flows=flow_ids,
             uploaders=uploader_ids,
+            runs=runs,
             per_fold=False,
         )
         for run_id in evaluations:
