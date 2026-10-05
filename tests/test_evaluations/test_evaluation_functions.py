@@ -155,6 +155,7 @@ class TestEvaluationFunctions(TestBase):
         )
         assert len(evaluations) == 100
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.test_server()
     def test_list_evaluations_empty(self):
         evaluations = openml.evaluations.list_evaluations("unexisting_measure")
@@ -201,6 +202,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.production_server()
     def test_evaluation_list_sort(self):
         self.use_production_server()
