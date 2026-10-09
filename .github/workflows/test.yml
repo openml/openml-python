@@ -100,7 +100,7 @@ jobs:
         if [[ "$major" -gt 1 ]] || { [[ "$major" -eq 1 ]] && [[ "$minor" -ge 7 ]]; }; then
           pip install "pandas==3.*"
         else
-          pip install "pandas==2.*"
+          pip install "pandas==2.*" "pyarrow<26"
         fi
 
     - name: Store repository status
