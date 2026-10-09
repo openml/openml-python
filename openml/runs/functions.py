@@ -6,8 +6,7 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -16,11 +15,8 @@ import xmltodict
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml._api_calls
 import openml.utils
-from openml import config
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLRunsExistError,
     OpenMLServerException,
     PyOpenMLError,
@@ -45,13 +41,242 @@ from .trace import OpenMLRunTrace
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
-    from openml.config import _Config
+    from openml._config import _Config
     from openml.extensions.extension_interface import Extension
 
 # get_dict is in run.py to avoid circular imports
 
-RUNS_CACHE_DIR_NAME = "runs"
 ERROR_CODE = 512
+
+
+def _validate_flow_and_task_inputs(
+    flow: OpenMLFlow | OpenMLTask,
+    task: OpenMLTask | OpenMLFlow,
+    flow_tags: list[str] | None,
+) -> tuple[OpenMLFlow, OpenMLTask]:
+    """Validate and normalize inputs for flow and task execution.
+
+    Parameters
+    ----------
+    flow : OpenMLFlow or OpenMLTask
+        The flow object (may be swapped with task for backward compatibility).
+    task : OpenMLTask or OpenMLFlow
+        The task object (may be swapped with flow for backward compatibility).
+    flow_tags : List[str] or None
+        A list of tags that the flow should have at creation.
+
+    Returns
+    -------
+    Tuple[OpenMLFlow, OpenMLTask]
+        The validated flow and task.
+
+    Raises
+    ------
+    ValueError
+        If flow_tags is not a list or task is not published.
+    """
+    if flow_tags is not None and not isinstance(flow_tags, list):
+        raise ValueError("flow_tags should be a list")
+
+    # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
+    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
+    if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
+        # We want to allow either order of argument (to avoid confusion).
+        warnings.warn(
+            "run_flow_on_task: the old argument order (task, flow) is deprecated and "
+            "will not be supported in the future. Please use the "
+            "order (flow, task).",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        task, flow = flow, task
+
+    if not isinstance(flow, OpenMLFlow):
+        raise TypeError(
+            f"run_flow_on_task: expected argument 'flow' to be OpenMLFlow, "
+            f"got {type(flow).__name__}",
+        )
+
+    if not isinstance(task, OpenMLTask):
+        raise TypeError(
+            f"run_flow_on_task: expected argument 'task' to be OpenMLTask, "
+            f"got {type(task).__name__}",
+        )
+
+    if task.task_id is None:
+        raise ValueError(
+            "run_flow_on_task: argument 'task.task_id' is None; task must be published on OpenML"
+        )
+
+    return flow, task
+
+
+def _sync_flow_with_server(
+    flow: OpenMLFlow,
+    task: OpenMLTask,
+    *,
+    upload_flow: bool,
+    avoid_duplicate_runs: bool,
+) -> int | None:
+    """Synchronize flow with server and check if setup/task combination is already present.
+
+    Parameters
+    ----------
+    flow : OpenMLFlow
+        The flow to synchronize.
+    task : OpenMLTask
+        The task to check for duplicate runs.
+    upload_flow : bool
+        Whether to upload the flow if it doesn't exist.
+    avoid_duplicate_runs : bool
+        Whether to check for duplicate runs.
+
+    Returns
+    -------
+    int or None
+        The flow_id if synced with server, None otherwise.
+
+    Raises
+    ------
+    PyOpenMLError
+        If flow_id mismatch or flow doesn't exist when expected.
+    OpenMLRunsExistError
+        If duplicate runs exist and avoid_duplicate_runs is True.
+    """
+    # We only need to sync with the server right now if we want to upload the flow,
+    # or ensure no duplicate runs exist. Otherwise it can be synced at upload time.
+    flow_id = None
+    if not upload_flow and not avoid_duplicate_runs:
+        return flow_id
+
+    flow_id = flow_exists(flow.name, flow.external_version)
+    if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
+        if flow_id is not False:
+            raise PyOpenMLError(
+                f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
+            )
+        raise PyOpenMLError("Flow does not exist on the server, but 'flow.flow_id' is not None.")
+
+    if upload_flow and flow_id is False:
+        flow.publish()
+        return flow.flow_id
+
+    if flow_id:
+        flow_from_server = get_flow(flow_id)
+        _copy_server_fields(flow_from_server, flow)
+        if avoid_duplicate_runs:
+            flow_from_server.model = flow.model
+            setup_id = setup_exists(flow_from_server)
+            ids = run_exists(cast("int", task.task_id), setup_id)
+            if ids:
+                error_message = "One or more runs of this setup were already performed on the task."
+                raise OpenMLRunsExistError(ids, error_message)
+        return flow_id
+
+    # Flow does not exist on server and we do not want to upload it.
+    # No sync with the server happens.
+    return None
+
+
+def _prepare_run_environment(flow: OpenMLFlow) -> tuple[list[str], list[str]]:
+    """Prepare run environment information and tags.
+
+    Parameters
+    ----------
+    flow : OpenMLFlow
+        The flow to get version information from.
+
+    Returns
+    -------
+    Tuple[List[str], List[str]]
+        A tuple of (tags, run_environment).
+    """
+    run_environment = flow.extension.get_version_information()
+    tags = ["openml-python", run_environment[1]]
+    return tags, run_environment
+
+
+def _create_run_from_results(  # noqa: PLR0913
+    task: OpenMLTask,
+    flow: OpenMLFlow,
+    flow_id: int | None,
+    data_content: list[list],
+    trace: OpenMLRunTrace | None,
+    fold_evaluations: OrderedDict[str, OrderedDict],
+    sample_evaluations: OrderedDict[str, OrderedDict],
+    tags: list[str],
+    run_environment: list[str],
+    upload_flow: bool,
+    avoid_duplicate_runs: bool,
+) -> OpenMLRun:
+    """Create an OpenMLRun object from execution results.
+
+    Parameters
+    ----------
+    task : OpenMLTask
+        The task that was executed.
+    flow : OpenMLFlow
+        The flow that was executed.
+    flow_id : int or None
+        The flow ID if synced with server.
+    data_content : List[List]
+        The prediction data content.
+    trace : OpenMLRunTrace or None
+        The execution trace if available.
+    fold_evaluations : OrderedDict
+        The fold-based evaluation measures.
+    sample_evaluations : OrderedDict
+        The sample-based evaluation measures.
+    tags : List[str]
+        Tags to attach to the run.
+    run_environment : List[str]
+        Environment information.
+    upload_flow : bool
+        Whether the flow was uploaded.
+    avoid_duplicate_runs : bool
+        Whether duplicate runs were checked.
+
+    Returns
+    -------
+    OpenMLRun
+        The created run object.
+    """
+    dataset = task.get_dataset()
+    task_id = cast("int", task.task_id)
+    dataset_id = dataset.dataset_id
+    model = flow.model
+    flow_name = flow.name
+    setup_string = flow.extension.create_setup_string(flow.model)
+    fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
+    generated_description = "\n".join(fields)
+
+    run = OpenMLRun(
+        task_id=task_id,
+        flow_id=flow_id,
+        dataset_id=dataset_id,
+        model=model,
+        flow_name=flow_name,
+        tags=tags,
+        trace=trace,
+        data_content=data_content,
+        flow=flow,
+        setup_string=setup_string,
+        description_text=generated_description,
+    )
+
+    if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
+        # We only extract the parameter settings if a sync happened with the server.
+        # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
+        # Otherwise, we will do this at upload time.
+        run.parameter_settings = flow.extension.obtain_parameter_values(flow)
+
+    # now we need to attach the detailed evaluations
+    if task.task_type_id == TaskType.LEARNING_CURVE:
+        run.sample_evaluations = sample_evaluations
+    else:
+        run.fold_evaluations = fold_evaluations
+
+    return run
 
 
 # TODO(eddiebergman): Could potentially overload this but
@@ -62,9 +287,9 @@ def run_model_on_task(  # noqa: PLR0913
     avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
-    add_local_measures: bool = True,  # noqa: FBT001, FBT002
-    upload_flow: bool = False,  # noqa: FBT001, FBT002
-    return_flow: bool = False,  # noqa: FBT001, FBT002
+    add_local_measures: bool = True,  # noqa: FBT002
+    upload_flow: bool = False,  # noqa: FBT002
+    return_flow: bool = False,  # noqa: FBT002
     n_jobs: int | None = None,
 ) -> OpenMLRun | tuple[OpenMLRun, OpenMLFlow]:
     """Run the model on the dataset defined by the task.
@@ -104,10 +329,19 @@ def run_model_on_task(  # noqa: PLR0913
         Result of the run.
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
+
+    Examples
+    --------
+    >>> import openml
+    >>> import openml_sklearn  # doctest: +SKIP
+    >>> from sklearn.tree import DecisionTreeClassifier  # doctest: +SKIP
+    >>> clf = DecisionTreeClassifier()  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(6)  # doctest: +SKIP
+    >>> run = openml.runs.run_model_on_task(clf, task)  # doctest: +SKIP
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
-    if avoid_duplicate_runs and not config.apikey:
+    if avoid_duplicate_runs and not openml.config.apikey:
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
@@ -175,14 +409,14 @@ def run_model_on_task(  # noqa: PLR0913
     return run
 
 
-def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
+def run_flow_on_task(  # noqa: PLR0913
     flow: OpenMLFlow,
     task: OpenMLTask,
     avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
-    add_local_measures: bool = True,  # noqa: FBT001, FBT002
-    upload_flow: bool = False,  # noqa: FBT001, FBT002
+    add_local_measures: bool = True,  # noqa: FBT002
+    upload_flow: bool = False,  # noqa: FBT002
     n_jobs: int | None = None,
 ) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
@@ -222,71 +456,29 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     run : OpenMLRun
         Result of the run.
     """
-    if flow_tags is not None and not isinstance(flow_tags, list):
-        raise ValueError("flow_tags should be a list")
-
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
 
-    # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
-    # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
-    if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
-        # We want to allow either order of argument (to avoid confusion).
-        warnings.warn(
-            "The old argument order (Flow, model) is deprecated and "
-            "will not be supported in the future. Please use the "
-            "order (model, Flow).",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        task, flow = flow, task
+    # 1. Validate inputs
+    flow, task = _validate_flow_and_task_inputs(flow, task, flow_tags)
 
-    if task.task_id is None:
-        raise ValueError("The task should be published at OpenML")
-
+    # 2. Prepare the model
     if flow.model is None:
         flow.model = flow.extension.flow_to_model(flow)
-
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
-    # We only need to sync with the server right now if we want to upload the flow,
-    # or ensure no duplicate runs exist. Otherwise it can be synced at upload time.
-    flow_id = None
-    if upload_flow or avoid_duplicate_runs:
-        flow_id = flow_exists(flow.name, flow.external_version)
-        if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
-            if flow_id is not False:
-                raise PyOpenMLError(
-                    f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
-                )
-            raise PyOpenMLError(
-                "Flow does not exist on the server, but 'flow.flow_id' is not None."
-            )
-        if upload_flow and flow_id is False:
-            flow.publish()
-            flow_id = flow.flow_id
-        elif flow_id:
-            flow_from_server = get_flow(flow_id)
-            _copy_server_fields(flow_from_server, flow)
-            if avoid_duplicate_runs:
-                flow_from_server.model = flow.model
-                setup_id = setup_exists(flow_from_server)
-                ids = run_exists(task.task_id, setup_id)
-                if ids:
-                    error_message = (
-                        "One or more runs of this setup were already performed on the task."
-                    )
-                    raise OpenMLRunsExistError(ids, error_message)
-        else:
-            # Flow does not exist on server and we do not want to upload it.
-            # No sync with the server happens.
-            flow_id = None
+    # 3. Sync with server and check for duplicates
+    flow_id = _sync_flow_with_server(
+        flow,
+        task,
+        upload_flow=upload_flow,
+        avoid_duplicate_runs=avoid_duplicate_runs,
+    )
 
-    dataset = task.get_dataset()
+    # 4. Prepare run environment
+    tags, run_environment = _prepare_run_environment(flow)
 
-    run_environment = flow.extension.get_version_information()
-    tags = ["openml-python", run_environment[1]]
-
+    # 5. Check if model is already fitted
     if flow.extension.check_if_model_fitted(flow.model):
         warnings.warn(
             "The model is already fitted! This might cause inconsistency in comparison of results.",
@@ -294,8 +486,8 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
             stacklevel=2,
         )
 
-    # execute the run
-    res = _run_task_get_arffcontent(
+    # 6. Execute the run (parallel processing happens here)
+    data_content, trace, fold_evaluations, sample_evaluations = _run_task_get_arffcontent(
         model=flow.model,
         task=task,
         extension=flow.extension,
@@ -303,40 +495,27 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         n_jobs=n_jobs,
     )
 
-    data_content, trace, fold_evaluations, sample_evaluations = res
-    fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
-    generated_description = "\n".join(fields)
-    run = OpenMLRun(
-        task_id=task.task_id,
-        flow_id=flow_id,
-        dataset_id=dataset.dataset_id,
-        model=flow.model,
-        flow_name=flow.name,
-        tags=tags,
-        trace=trace,
-        data_content=data_content,
+    # 7. Create run from results
+    run = _create_run_from_results(
+        task=task,
         flow=flow,
-        setup_string=flow.extension.create_setup_string(flow.model),
-        description_text=generated_description,
+        flow_id=flow_id,
+        data_content=data_content,
+        trace=trace,
+        fold_evaluations=fold_evaluations,
+        sample_evaluations=sample_evaluations,
+        tags=tags,
+        run_environment=run_environment,
+        upload_flow=upload_flow,
+        avoid_duplicate_runs=avoid_duplicate_runs,
     )
 
-    if (upload_flow or avoid_duplicate_runs) and flow.flow_id is not None:
-        # We only extract the parameter settings if a sync happened with the server.
-        # I.e. when the flow was uploaded or we found it in the avoid_duplicate check.
-        # Otherwise, we will do this at upload time.
-        run.parameter_settings = flow.extension.obtain_parameter_values(flow)
-
-    # now we need to attach the detailed evaluations
-    if task.task_type_id == TaskType.LEARNING_CURVE:
-        run.sample_evaluations = sample_evaluations
-    else:
-        run.fold_evaluations = fold_evaluations
-
+    # 8. Log completion message
     if flow_id:
         message = f"Executed Task {task.task_id} with Flow id:{run.flow_id}"
     else:
         message = f"Executed Task {task.task_id} on local Flow with name {flow.name}."
-    config.logger.info(message)
+    openml.config.logger.info(message)
 
     return run
 
@@ -353,7 +532,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call("run/trace/%d" % run_id, "get")
+    trace_xml = openml._backend.run.download_text_file(f"run/trace/{run_id}")
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
@@ -376,7 +555,8 @@ def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> An
     run = get_run(run_id)
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
-    assert run.setup_id is not None
+    if run.setup_id is None:
+        raise ValueError(f"Run {run_id} has no associated setup_id. Cannot initialize model.")
     return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
@@ -416,7 +596,8 @@ def initialize_model_from_trace(
     run = get_run(run_id)
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
-    assert run.flow_id is not None
+    if run.flow_id is None:
+        raise ValueError(f"Run {run_id} has no associated flow_id. Cannot initialize model.")
 
     flow = get_flow(run.flow_id)
     run_trace = get_run_trace(run_id)
@@ -528,7 +709,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
 
     # The forked child process may not copy the configuration state of OpenML from the parent.
     # Current configuration setup needs to be copied and passed to the child processes.
-    _config = config.get_config_as_dict()
+    _config = openml.config.get_config_as_dict()
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
@@ -557,9 +738,14 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
-        pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = job_rvals[
-            n_fit - 1
-        ]
+        (
+            pred_y,
+            proba_y,
+            test_indices,
+            test_y,
+            inner_trace,
+            user_defined_measures_fold,
+        ) = job_rvals[n_fit - 1]
 
         if inner_trace is not None:
             traces.append(inner_trace)
@@ -576,8 +762,10 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
             _user_defined_measures_fold[openml_name] = sklearn_fn(_test_y, _pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-            assert test_y is not None
-            assert proba_y is not None
+            if test_y is None:
+                raise ValueError("test_y cannot be None for classification tasks.")
+            if proba_y is None:
+                raise ValueError("proba_y cannot be None for classification tasks.")
 
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
@@ -608,7 +796,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                         index=tst_idx,
                         prediction=prediction,
                         truth=truth,
-                        proba=dict(zip(task.class_labels, pred_prob)),
+                        proba=dict(zip(task.class_labels, pred_prob, strict=False)),
                     )
                 else:
                     raise ValueError("The task has no class labels")
@@ -622,7 +810,8 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
-            assert test_y is not None
+            if test_y is None:
+                raise ValueError("test_y cannot be None for regression tasks.")
             for i, _ in enumerate(test_indices):
                 truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
@@ -733,7 +922,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
-    config._setup(configuration)
+    openml.config._setup(configuration)
 
     train_indices, test_indices = task.get_train_test_split_indices(
         repeat=rep_no,
@@ -743,7 +932,8 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
 
     if isinstance(task, OpenMLSupervisedTask):
         x, y = task.get_X_and_y()
-        assert isinstance(y, (pd.Series, pd.DataFrame))
+        if not isinstance(y, (pd.Series, pd.DataFrame)):
+            raise TypeError(f"y must be a pandas Series or DataFrame, got {type(y).__name__}")
         train_x = x.iloc[train_indices]
         train_y = y.iloc[train_indices]
         test_x = x.iloc[test_indices]
@@ -755,9 +945,14 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         test_x = None
         test_y = None
     else:
-        raise NotImplementedError(task.task_type)
+        raise NotImplementedError(
+            f"Task type '{task.task_type}' is not supported. "
+            f"Only OpenMLSupervisedTask and OpenMLClusteringTask are currently implemented. "
+            f"Task details: task_id={getattr(task, 'task_id', 'unknown')}, "
+            f"task_class={task.__class__.__name__}"
+        )
 
-    config.logger.info(
+    openml.config.logger.info(
         f"Going to run model {model!s} on "
         f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
         f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
@@ -798,7 +993,7 @@ def get_runs(run_ids: list[int]) -> list[OpenMLRun]:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002, FBT001
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002
     """Gets run corresponding to run_id.
 
     Parameters
@@ -809,33 +1004,21 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
         even if the requested run is already cached.
 
-    ignore_cache
-
     Returns
     -------
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
-    run_file = run_dir / "description.xml"
-
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    try:
-        if not ignore_cache:
-            return _get_cached_run(run_id)
-
-        raise OpenMLCacheException(message="dummy")
-
-    except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, "get")
-        with run_file.open("w", encoding="utf8") as fh:
-            fh.write(run_xml)
-
-    return _create_run_from_xml(run_xml)
+    return openml._backend.run.get(
+        run_id,
+        reset_cache=ignore_cache,
+    )
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT001, FBT002
+def _create_run_from_xml(  # noqa: PLR0915, PLR0912, C901
+    xml: str,
+    from_server: bool = True,  # noqa: FBT002
+) -> OpenMLRun:
     """Create a run object from xml returned from server.
 
     Parameters
@@ -977,18 +1160,24 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                     evaluations[key] = value
 
     if "description" not in files and from_server is True:
-        raise ValueError("No description file for run %d in run description XML" % run_id)
+        raise ValueError(f"No description file for run {run_id} in run description XML")
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
-            raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
+            raise NotImplementedError(
+                f"Subgroup discovery tasks are not yet supported. "
+                f"Task ID: {task_id}. Please check the OpenML documentation"
+                f"for supported task types. "
+                f"Currently supported task types: Classification, Regression,"
+                f"Clustering, and Learning Curve."
+            )
 
         # JvR: actually, I am not sure whether this error should be raised.
         # a run can consist without predictions. But for now let's keep it
         # Matthias: yes, it should stay as long as we do not really handle
         # this stuff
-        raise ValueError("No prediction files for run %d in run description XML" % run_id)
+        raise ValueError(f"No prediction files for run {run_id} in run description XML")
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 
@@ -1016,17 +1205,6 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     )
 
 
-def _get_cached_run(run_id: int) -> OpenMLRun:
-    """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = run_cache_dir / "description.xml"
-    try:
-        with run_file.open(encoding="utf8") as fh:
-            return _create_run_from_xml(xml=fh.read())
-    except OSError as e:
-        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
-
-
 def list_runs(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
@@ -1037,7 +1215,7 @@ def list_runs(  # noqa: PLR0913
     uploader: list | None = None,
     tag: str | None = None,
     study: int | None = None,
-    display_errors: bool = False,  # noqa: FBT001, FBT002
+    display_errors: bool = False,  # noqa: FBT002
     task_type: TaskType | int | None = None,
 ) -> pd.DataFrame:
     """
@@ -1087,8 +1265,8 @@ def list_runs(  # noqa: PLR0913
         raise TypeError("uploader must be of type list.")
 
     listing_call = partial(
-        _list_runs,
-        id=id,
+        openml._backend.run.list,
+        ids=id,
         task=task,
         setup=setup,
         flow=flow,
@@ -1103,121 +1281,6 @@ def list_runs(  # noqa: PLR0913
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_runs(  # noqa: PLR0913, C901
-    limit: int,
-    offset: int,
-    *,
-    id: list | None = None,  # noqa: A002
-    task: list | None = None,
-    setup: list | None = None,
-    flow: list | None = None,
-    uploader: list | None = None,
-    study: int | None = None,
-    tag: str | None = None,
-    display_errors: bool = False,
-    task_type: TaskType | int | None = None,
-) -> pd.DataFrame:
-    """
-    Perform API call `/run/list/{filters}'
-    <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
-
-    Parameters
-    ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-    display_errors is also separated from the kwargs since it has a
-    default value.
-
-    id : list, optional
-
-    task : list, optional
-
-    setup: list, optional
-
-    flow : list, optional
-
-    tag: str, optional
-
-    uploader : list, optional
-
-    study : int, optional
-
-    display_errors : bool, optional (default=None)
-        Whether to list runs which have an error (for example a missing
-        prediction file).
-
-    task_type : str, optional
-
-    Returns
-    -------
-    dict, or dataframe
-        List of found runs.
-    """
-    api_call = "run/list"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if id is not None:
-        api_call += f"/run/{','.join([str(int(i)) for i in id])}"
-    if task is not None:
-        api_call += f"/task/{','.join([str(int(i)) for i in task])}"
-    if setup is not None:
-        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
-    if flow is not None:
-        api_call += f"/flow/{','.join([str(int(i)) for i in flow])}"
-    if uploader is not None:
-        api_call += f"/uploader/{','.join([str(int(i)) for i in uploader])}"
-    if study is not None:
-        api_call += "/study/%d" % study
-    if display_errors:
-        api_call += "/show_errors/true"
-    if tag is not None:
-        api_call += f"/tag/{tag}"
-    if task_type is not None:
-        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
-        api_call += f"/task_type/{tvalue}"
-    return __list_runs(api_call=api_call)
-
-
-def __list_runs(api_call: str) -> pd.DataFrame:
-    """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
-    # Minimalistic check if the XML is useful
-    if "oml:runs" not in runs_dict:
-        raise ValueError(f'Error in return XML, does not contain "oml:runs": {runs_dict}')
-
-    if "@xmlns:oml" not in runs_dict["oml:runs"]:
-        raise ValueError(
-            f'Error in return XML, does not contain "oml:runs"/@xmlns:oml: {runs_dict}'
-        )
-
-    if runs_dict["oml:runs"]["@xmlns:oml"] != "http://openml.org/openml":
-        raise ValueError(
-            "Error in return XML, value of  "
-            '"oml:runs"/@xmlns:oml is not '
-            f'"http://openml.org/openml": {runs_dict}',
-        )
-
-    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
-
-    runs = {
-        int(r["oml:run_id"]): {
-            "run_id": int(r["oml:run_id"]),
-            "task_id": int(r["oml:task_id"]),
-            "setup_id": int(r["oml:setup_id"]),
-            "flow_id": int(r["oml:flow_id"]),
-            "uploader": int(r["oml:uploader"]),
-            "task_type": TaskType(int(r["oml:task_type_id"])),
-            "upload_time": str(r["oml:upload_time"]),
-            "error_message": str((r["oml:error_message"]) or ""),
-        }
-        for r in runs_dict["oml:runs"]["oml:run"]
-    }
-    return pd.DataFrame.from_dict(runs, orient="index")
 
 
 def format_prediction(  # noqa: PLR0913
@@ -1282,7 +1345,12 @@ def format_prediction(  # noqa: PLR0913
     if isinstance(task, OpenMLRegressionTask):
         return [repeat, fold, index, prediction, truth]
 
-    raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+    raise NotImplementedError(
+        f"Formatting for {type(task)} is not supported."
+        f"Supported task types: OpenMLClassificationTask, OpenMLRegressionTask,"
+        f"and OpenMLLearningCurveTask. "
+        f"Please ensure your task is one of these types."
+    )
 
 
 def delete_run(run_id: int) -> bool:
@@ -1300,4 +1368,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("run", run_id)
+    return openml._backend.run.delete(run_id)

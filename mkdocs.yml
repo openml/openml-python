@@ -65,6 +65,7 @@ nav:
   - Advanced User Guide: details.md
   - API: reference/
   - Contributing: contributing.md
+  - Developer Setup: developer_setup.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -127,7 +128,6 @@ plugins:
             docstring_options:
               ignore_init_summary: true
               trim_doctest_flags: true
-              returns_multiple_items: false
             show_docstring_attributes: true
             show_docstring_description: true
             show_root_heading: true
@@ -138,7 +138,7 @@ plugins:
             merge_init_into_class: true
             show_symbol_type_heading: true
             show_symbol_type_toc: true
-            docstring_style: google
+            docstring_style: numpy
             inherited_members: true
             show_if_no_docstring: false
             show_bases: true
