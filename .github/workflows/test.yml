@@ -196,7 +196,10 @@ jobs:
 
     - name: Cleanup Docker setup
       if: always() && steps.clone-services.outcome == 'success'
+      working-directory: ./services
       run: |
+        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        cd ..
         sudo rm -rf services
 
     - name: Check for files left behind by test

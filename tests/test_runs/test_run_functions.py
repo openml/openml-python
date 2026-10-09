@@ -1227,6 +1227,7 @@ class TestRun(TestBase):
         assert flowS.components["Imputer"].parameters["strategy"] == '"most_frequent"'
         assert flowS.components["VarianceThreshold"].parameters["threshold"] == "0.05"
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1505,16 +1506,18 @@ class TestRun(TestBase):
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
-        runs = openml.runs.list_runs(id=[2], display_errors=True)
+        runs = openml.runs.list_runs(
+                id=[2], display_errors=True, size=10)
         assert len(runs) == 1
         for run in runs.to_dict(orient="index").values():
             self._check_run(run)
 
     @pytest.mark.test_server()
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[0])
+        runs = openml.runs.list_runs(task=[0], size=1)
         assert runs.empty
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.production_server()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
@@ -1533,7 +1536,8 @@ class TestRun(TestBase):
         for run in runs.to_dict(orient="index").values():
             assert run["task_id"] in task_ids
             self._check_run(run)
-
+  
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.production_server()
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
@@ -1556,6 +1560,7 @@ class TestRun(TestBase):
             assert run["uploader"] in uploader_ids
             self._check_run(run)
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.production_server()
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
@@ -1606,22 +1611,23 @@ class TestRun(TestBase):
         # self.assertRaises(openml.exceptions.OpenMLServerError,
         # openml.runs.list_runs)
 
-        runs = openml.runs.list_runs(id=ids)
+        runs = openml.runs.list_runs(id=ids, size=100)
         assert len(runs) == 2
 
-        runs = openml.runs.list_runs(task=tasks)
+        runs = openml.runs.list_runs(task=tasks, size=100)
         assert len(runs) >= 2
 
-        runs = openml.runs.list_runs(uploader=uploaders_2)
+        runs = openml.runs.list_runs(uploader=uploaders_2, size=100)
         assert len(runs) >= 10
 
-        runs = openml.runs.list_runs(flow=flows)
+        runs = openml.runs.list_runs(flow=flows, size=100)
         assert len(runs) >= 100
 
         runs = openml.runs.list_runs(
             id=ids,
             task=tasks,
             uploader=uploaders_1,
+            size=100,
         )
         assert len(runs) == 2
 
@@ -1831,6 +1837,7 @@ class TestRun(TestBase):
         self.assertListEqual(res, [0] * 5)
 
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
