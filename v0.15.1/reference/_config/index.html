@@ -3916,11 +3916,11 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/_config.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-520">520</a></span>
-<span class="normal"><a href="#__codelineno-0-521">521</a></span>
-<span class="normal"><a href="#__codelineno-0-522">522</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manager</span><span class="p">:</span> <span class="n">OpenMLConfigManager</span><span class="p">):</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span> <span class="o">=</span> <span class="n">manager</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_test_servers</span><span class="p">()</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-523">523</a></span>
+<span class="normal"><a href="#__codelineno-0-524">524</a></span>
+<span class="normal"><a href="#__codelineno-0-525">525</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manager</span><span class="p">:</span> <span class="n">OpenMLConfigManager</span><span class="p">):</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span> <span class="o">=</span> <span class="n">manager</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_test_servers</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -3957,10 +3957,7 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-524">524</a></span>
-<span class="normal"><a href="#__codelineno-0-525">525</a></span>
-<span class="normal"><a href="#__codelineno-0-526">526</a></span>
-<span class="normal"><a href="#__codelineno-0-527">527</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-527">527</a></span>
 <span class="normal"><a href="#__codelineno-0-528">528</a></span>
 <span class="normal"><a href="#__codelineno-0-529">529</a></span>
 <span class="normal"><a href="#__codelineno-0-530">530</a></span>
@@ -3982,32 +3979,35 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 <span class="normal"><a href="#__codelineno-0-546">546</a></span>
 <span class="normal"><a href="#__codelineno-0-547">547</a></span>
 <span class="normal"><a href="#__codelineno-0-548">548</a></span>
-<span class="normal"><a href="#__codelineno-0-549">549</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="w">    </span><span class="sd">"""Sets the configuration to connect to the test server with valid apikey.</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">    To configuration as was before this call is stored, and can be recovered</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">    by using the `stop_use_example_configuration` method.</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">    """</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">servers</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">:</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="c1"># Method is called more than once in a row without modifying the server or apikey.</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="c1"># We don't want to save the current test configuration as a last used configuration.</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="k">return</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_used_servers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">servers</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="normal"><a href="#__codelineno-0-549">549</a></span>
+<span class="normal"><a href="#__codelineno-0-550">550</a></span>
+<span class="normal"><a href="#__codelineno-0-551">551</a></span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="w">    </span><span class="sd">"""Sets the configuration to connect to the test server with valid apikey.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">    To configuration as was before this call is stored, and can be recovered</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    by using the `stop_use_example_configuration` method.</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    """</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">servers</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">:</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="c1"># Method is called more than once in a row without modifying the server or apikey.</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="c1"># We don't want to save the current test configuration as a last used configuration.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>        <span class="k">return</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="c1"># Test server key for examples</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="n">servers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">,</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="p">)</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="n">test_server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">api_version</span><span class="p">][</span><span class="s2">"server"</span><span class="p">]</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="sa">f</span><span class="s2">"Switching to the test server </span><span class="si">{</span><span class="n">test_server</span><span class="si">}</span><span class="s2"> to not upload results to "</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="s2">"the live server. Using the test server may result in reduced performance of the "</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="s2">"API!"</span><span class="p">,</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="p">)</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_used_servers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">servers</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="c1"># Test server key for examples</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="n">servers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">,</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="p">)</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="n">test_server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_servers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">api_version</span><span class="p">][</span><span class="s2">"server"</span><span class="p">]</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="sa">f</span><span class="s2">"Switching to the test server </span><span class="si">{</span><span class="n">test_server</span><span class="si">}</span><span class="s2"> to not upload results to "</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="s2">"the live server. Using the test server may result in reduced performance of the "</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="s2">"API!"</span><span class="p">,</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4032,10 +4032,7 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-551">551</a></span>
-<span class="normal"><a href="#__codelineno-0-552">552</a></span>
-<span class="normal"><a href="#__codelineno-0-553">553</a></span>
-<span class="normal"><a href="#__codelineno-0-554">554</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-554">554</a></span>
 <span class="normal"><a href="#__codelineno-0-555">555</a></span>
 <span class="normal"><a href="#__codelineno-0-556">556</a></span>
 <span class="normal"><a href="#__codelineno-0-557">557</a></span>
@@ -4046,21 +4043,24 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 <span class="normal"><a href="#__codelineno-0-562">562</a></span>
 <span class="normal"><a href="#__codelineno-0-563">563</a></span>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
-<span class="normal"><a href="#__codelineno-0-565">565</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="w">    </span><span class="sd">"""Return to configuration as it was before `start_use_example_configuration`."""</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span><span class="p">:</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="c1"># We don't want to allow this because it will (likely) result in the `server` and</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="c1"># `apikey` variables being set to None.</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>            <span class="s2">"`stop_use_example_configuration` called without a saved config."</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>            <span class="s2">"`start_use_example_configuration` must be called first."</span><span class="p">,</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>        <span class="p">)</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="n">servers</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">"dict[APIVersion, dict[str, str | None]]"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_used_servers</span><span class="p">),</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="p">)</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="normal"><a href="#__codelineno-0-565">565</a></span>
+<span class="normal"><a href="#__codelineno-0-566">566</a></span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span>
+<span class="normal"><a href="#__codelineno-0-568">568</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">    </span><span class="sd">"""Return to configuration as it was before `start_use_example_configuration`."""</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span><span class="p">:</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>        <span class="c1"># We don't want to allow this because it will (likely) result in the `server` and</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="c1"># `apikey` variables being set to None.</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>            <span class="s2">"`stop_use_example_configuration` called without a saved config."</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>            <span class="s2">"`start_use_example_configuration` must be called first."</span><span class="p">,</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="p">)</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_manager</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="n">servers</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">"dict[APIVersion, dict[str, str | None]]"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_used_servers</span><span class="p">),</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="p">)</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4226,10 +4226,7 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
@@ -4238,19 +4235,22 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 <span class="normal"><a href="#__codelineno-0-381">381</a></span>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
-<span class="normal"><a href="#__codelineno-0-384">384</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="k">def</span><span class="w"> </span><span class="nf">determine_config_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">    </span><span class="sd">"""Determine the path to the openml configuration file."""</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"linux"</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">xdg_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"XDG_CONFIG_HOME"</span><span class="p">)</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="k">if</span> <span class="n">xdg_home</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">config_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_xdg_config_home_backwards_compatibility</span><span class="p">(</span><span class="n">xdg_home</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~"</span><span class="p">,</span> <span class="s2">".config"</span><span class="p">,</span> <span class="s2">"openml"</span><span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">".openml"</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">return</span> <span class="n">config_dir</span> <span class="o">/</span> <span class="s2">"config"</span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="k">def</span><span class="w"> </span><span class="nf">determine_config_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="w">    </span><span class="sd">"""Determine the path to the openml configuration file."""</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"linux"</span><span class="p">:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">xdg_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"XDG_CONFIG_HOME"</span><span class="p">)</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">if</span> <span class="n">xdg_home</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">config_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_xdg_config_home_backwards_compatibility</span><span class="p">(</span><span class="n">xdg_home</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~"</span><span class="p">,</span> <span class="s2">".config"</span><span class="p">,</span> <span class="s2">"openml"</span><span class="p">)</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">".openml"</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">config_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">return</span> <span class="n">config_dir</span> <span class="o">/</span> <span class="s2">"config"</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4275,17 +4275,17 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-491">491</a></span>
-<span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-494">494</a></span>
 <span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="w">    </span><span class="sd">"""Get the cache directory for the current server."""</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="n">url_suffix</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">server</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="n">url_parts</span> <span class="o">=</span> <span class="n">url_suffix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">":"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="n">reversed_url_suffix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">url_parts</span><span class="p">)</span>  <span class="c1"># noqa: PTH118</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span><span class="p">,</span> <span class="n">reversed_url_suffix</span><span class="p">)</span>  <span class="c1"># noqa: PTH118</span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span>
+<span class="normal"><a href="#__codelineno-0-499">499</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="w">    </span><span class="sd">"""Get the cache directory for the current server."""</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="n">url_suffix</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">server</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="n">url_parts</span> <span class="o">=</span> <span class="n">url_suffix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">":"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="n">reversed_url_suffix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">url_parts</span><span class="p">)</span>  <span class="c1"># noqa: PTH118</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span><span class="p">,</span> <span class="n">reversed_url_suffix</span><span class="p">)</span>  <span class="c1"># noqa: PTH118</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4310,11 +4310,11 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-487">487</a></span>
-<span class="normal"><a href="#__codelineno-0-488">488</a></span>
-<span class="normal"><a href="#__codelineno-0-489">489</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_config_as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="w">    </span><span class="sd">"""Get the current configuration as a dictionary."""</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-490">490</a></span>
+<span class="normal"><a href="#__codelineno-0-491">491</a></span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_config_as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="w">    </span><span class="sd">"""Get the current configuration as a dictionary."""</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4370,23 +4370,23 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-503">503</a></span>
-<span class="normal"><a href="#__codelineno-0-504">504</a></span>
-<span class="normal"><a href="#__codelineno-0-505">505</a></span>
-<span class="normal"><a href="#__codelineno-0-506">506</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-506">506</a></span>
 <span class="normal"><a href="#__codelineno-0-507">507</a></span>
 <span class="normal"><a href="#__codelineno-0-508">508</a></span>
 <span class="normal"><a href="#__codelineno-0-509">509</a></span>
 <span class="normal"><a href="#__codelineno-0-510">510</a></span>
-<span class="normal"><a href="#__codelineno-0-511">511</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="nd">@contextmanager</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="k">def</span><span class="w"> </span><span class="nf">overwrite_config_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">    </span><span class="sd">"""Overwrite the current configuration within a context manager."""</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="n">existing_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config_as_dict</span><span class="p">()</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="n">merged_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">existing_config</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">}</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">merged_config</span><span class="p">)</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="k">yield</span> <span class="n">merged_config</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">existing_config</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-511">511</a></span>
+<span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="nd">@contextmanager</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="k">def</span><span class="w"> </span><span class="nf">overwrite_config_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="w">    </span><span class="sd">"""Overwrite the current configuration within a context manager."""</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="n">existing_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config_as_dict</span><span class="p">()</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="n">merged_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">existing_config</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">}</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">merged_config</span><span class="p">)</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">yield</span> <span class="n">merged_config</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">(</span><span class="n">existing_config</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4442,10 +4442,7 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-470">470</a></span>
-<span class="normal"><a href="#__codelineno-0-471">471</a></span>
-<span class="normal"><a href="#__codelineno-0-472">472</a></span>
-<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-473">473</a></span>
 <span class="normal"><a href="#__codelineno-0-474">474</a></span>
 <span class="normal"><a href="#__codelineno-0-475">475</a></span>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
@@ -4457,22 +4454,25 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 <span class="normal"><a href="#__codelineno-0-482">482</a></span>
 <span class="normal"><a href="#__codelineno-0-483">483</a></span>
 <span class="normal"><a href="#__codelineno-0-484">484</a></span>
-<span class="normal"><a href="#__codelineno-0-485">485</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_field_in_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="w">    </span><span class="sd">"""Set a field in the configuration file."""</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">OpenMLConfig</span><span class="p">(),</span> <span class="n">field</span><span class="p">):</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="sa">f</span><span class="s2">"Field '</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">' is not valid and must be one of "</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">OpenMLConfig</span><span class="p">()</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">'."</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="p">)</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_config_file_path</span><span class="p">()</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="k">with</span> <span class="n">config_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">OpenMLConfig</span><span class="p">()</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="n">v</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">field</span> <span class="k">else</span> <span class="n">existing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span>
+<span class="normal"><a href="#__codelineno-0-487">487</a></span>
+<span class="normal"><a href="#__codelineno-0-488">488</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_field_in_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="w">    </span><span class="sd">"""Set a field in the configuration file."""</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">OpenMLConfig</span><span class="p">(),</span> <span class="n">field</span><span class="p">):</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="sa">f</span><span class="s2">"Field '</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">' is not valid and must be one of "</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">OpenMLConfig</span><span class="p">()</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">'."</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="p">)</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_config_file_path</span><span class="p">()</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="k">with</span> <span class="n">config_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">OpenMLConfig</span><span class="p">()</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>            <span class="n">v</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">field</span> <span class="k">else</span> <span class="n">existing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4528,10 +4528,7 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-309">309</a></span>
-<span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span>
-<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
 <span class="normal"><a href="#__codelineno-0-315">315</a></span>
@@ -4553,32 +4550,35 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_retry_policy</span><span class="p">(</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"human"</span><span class="p">,</span> <span class="s2">"robot"</span><span class="p">],</span> <span class="n">n_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="w">    </span><span class="sd">"""Set the retry policy for server connections."""</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="n">default_retries_by_policy</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"human"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"robot"</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_retries_by_policy</span><span class="p">:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="sa">f</span><span class="s2">"Detected retry_policy '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">' but must be one of "</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">default_retries_by_policy</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="p">)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">if</span> <span class="n">n_retries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_retries</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="sa">f</span><span class="s2">"`n_retries` must be of type `int` or `None` but is `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">n_retries</span><span class="p">)</span><span class="si">}</span><span class="s2">`."</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="p">)</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_retries</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_retries</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`n_retries` is '</span><span class="si">{</span><span class="n">n_retries</span><span class="si">}</span><span class="s2">' but must be positive."</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_retry_policy</span><span class="p">(</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"human"</span><span class="p">,</span> <span class="s2">"robot"</span><span class="p">],</span> <span class="n">n_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">"""Set the retry policy for server connections."""</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="n">default_retries_by_policy</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"human"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"robot"</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_retries_by_policy</span><span class="p">:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="sa">f</span><span class="s2">"Detected retry_policy '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">' but must be one of "</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">default_retries_by_policy</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">if</span> <span class="n">n_retries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_retries</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="sa">f</span><span class="s2">"`n_retries` must be of type `int` or `None` but is `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">n_retries</span><span class="p">)</span><span class="si">}</span><span class="s2">`."</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="p">)</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">retry_policy</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">connection_n_retries</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">default_retries_by_policy</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="n">n_retries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_retries</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="p">),</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_retries</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_retries</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`n_retries` is '</span><span class="si">{</span><span class="n">n_retries</span><span class="si">}</span><span class="s2">' but must be positive."</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">retry_policy</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">connection_n_retries</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="n">default_retries_by_policy</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="n">n_retries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_retries</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="p">),</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4603,13 +4603,13 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_root_cache_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_cache_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="w">    </span><span class="sd">"""Set the root cache directory."""</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_cache_directory</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span> <span class="n">cachedir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-501">501</a></span>
+<span class="normal"><a href="#__codelineno-0-502">502</a></span>
+<span class="normal"><a href="#__codelineno-0-503">503</a></span>
+<span class="normal"><a href="#__codelineno-0-504">504</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_root_cache_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_cache_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="w">    </span><span class="sd">"""Set the root cache directory."""</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_cache_directory</span><span class="p">)</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">,</span> <span class="n">cachedir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_cache_directory</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4634,11 +4634,11 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">    </span><span class="sd">"""Sets the configuration to connect to the test server with valid apikey."""</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_examples</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="w">    </span><span class="sd">"""Sets the configuration to connect to the test server with valid apikey."""</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_examples</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4663,11 +4663,11 @@ by using the <code>stop_use_example_configuration</code> method.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span>
-<span class="normal"><a href="#__codelineno-0-416">416</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="w">    </span><span class="sd">"""Store the configuration as it was before `start_use_example_configuration`."""</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_examples</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="w">    </span><span class="sd">"""Store the configuration as it was before `start_use_example_configuration`."""</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_examples</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

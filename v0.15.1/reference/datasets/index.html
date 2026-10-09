@@ -7148,39 +7148,39 @@ no tasks are attached to the dataset.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1460">1460</a></span>
-<span class="normal"><a href="#__codelineno-0-1461">1461</a></span>
-<span class="normal"><a href="#__codelineno-0-1462">1462</a></span>
-<span class="normal"><a href="#__codelineno-0-1463">1463</a></span>
-<span class="normal"><a href="#__codelineno-0-1464">1464</a></span>
-<span class="normal"><a href="#__codelineno-0-1465">1465</a></span>
-<span class="normal"><a href="#__codelineno-0-1466">1466</a></span>
-<span class="normal"><a href="#__codelineno-0-1467">1467</a></span>
-<span class="normal"><a href="#__codelineno-0-1468">1468</a></span>
-<span class="normal"><a href="#__codelineno-0-1469">1469</a></span>
-<span class="normal"><a href="#__codelineno-0-1470">1470</a></span>
-<span class="normal"><a href="#__codelineno-0-1471">1471</a></span>
-<span class="normal"><a href="#__codelineno-0-1472">1472</a></span>
-<span class="normal"><a href="#__codelineno-0-1473">1473</a></span>
-<span class="normal"><a href="#__codelineno-0-1474">1474</a></span>
-<span class="normal"><a href="#__codelineno-0-1475">1475</a></span>
-<span class="normal"><a href="#__codelineno-0-1476">1476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-1461" name="__codelineno-0-1461"></a><span class="w">    </span><span class="sd">"""Delete dataset with id `dataset_id` from the OpenML server.</span>
-<a id="__codelineno-0-1462" name="__codelineno-0-1462"></a>
-<a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">    This can only be done if you are the owner of the dataset and</span>
-<a id="__codelineno-0-1464" name="__codelineno-0-1464"></a><span class="sd">    no tasks are attached to the dataset.</span>
-<a id="__codelineno-0-1465" name="__codelineno-0-1465"></a>
-<a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    dataset_id : int</span>
-<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">        OpenML id of the dataset</span>
-<a id="__codelineno-0-1470" name="__codelineno-0-1470"></a>
-<a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">    bool</span>
-<a id="__codelineno-0-1474" name="__codelineno-0-1474"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
-<a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">    """</span>
-<a id="__codelineno-0-1476" name="__codelineno-0-1476"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1483">1483</a></span>
+<span class="normal"><a href="#__codelineno-0-1484">1484</a></span>
+<span class="normal"><a href="#__codelineno-0-1485">1485</a></span>
+<span class="normal"><a href="#__codelineno-0-1486">1486</a></span>
+<span class="normal"><a href="#__codelineno-0-1487">1487</a></span>
+<span class="normal"><a href="#__codelineno-0-1488">1488</a></span>
+<span class="normal"><a href="#__codelineno-0-1489">1489</a></span>
+<span class="normal"><a href="#__codelineno-0-1490">1490</a></span>
+<span class="normal"><a href="#__codelineno-0-1491">1491</a></span>
+<span class="normal"><a href="#__codelineno-0-1492">1492</a></span>
+<span class="normal"><a href="#__codelineno-0-1493">1493</a></span>
+<span class="normal"><a href="#__codelineno-0-1494">1494</a></span>
+<span class="normal"><a href="#__codelineno-0-1495">1495</a></span>
+<span class="normal"><a href="#__codelineno-0-1496">1496</a></span>
+<span class="normal"><a href="#__codelineno-0-1497">1497</a></span>
+<span class="normal"><a href="#__codelineno-0-1498">1498</a></span>
+<span class="normal"><a href="#__codelineno-0-1499">1499</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="w">    </span><span class="sd">"""Delete dataset with id `dataset_id` from the OpenML server.</span>
+<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a>
+<a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">    This can only be done if you are the owner of the dataset and</span>
+<a id="__codelineno-0-1487" name="__codelineno-0-1487"></a><span class="sd">    no tasks are attached to the dataset.</span>
+<a id="__codelineno-0-1488" name="__codelineno-0-1488"></a>
+<a id="__codelineno-0-1489" name="__codelineno-0-1489"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-1490" name="__codelineno-0-1490"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-1491" name="__codelineno-0-1491"></a><span class="sd">    dataset_id : int</span>
+<a id="__codelineno-0-1492" name="__codelineno-0-1492"></a><span class="sd">        OpenML id of the dataset</span>
+<a id="__codelineno-0-1493" name="__codelineno-0-1493"></a>
+<a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-1495" name="__codelineno-0-1495"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">    bool</span>
+<a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
+<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">    """</span>
+<a id="__codelineno-0-1499" name="__codelineno-0-1499"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7605,7 +7605,30 @@ be discarded.</p>
 <span class="normal"><a href="#__codelineno-0-938">938</a></span>
 <span class="normal"><a href="#__codelineno-0-939">939</a></span>
 <span class="normal"><a href="#__codelineno-0-940">940</a></span>
-<span class="normal"><a href="#__codelineno-0-941">941</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="k">def</span><span class="w"> </span><span class="nf">edit_dataset</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-941">941</a></span>
+<span class="normal"><a href="#__codelineno-0-942">942</a></span>
+<span class="normal"><a href="#__codelineno-0-943">943</a></span>
+<span class="normal"><a href="#__codelineno-0-944">944</a></span>
+<span class="normal"><a href="#__codelineno-0-945">945</a></span>
+<span class="normal"><a href="#__codelineno-0-946">946</a></span>
+<span class="normal"><a href="#__codelineno-0-947">947</a></span>
+<span class="normal"><a href="#__codelineno-0-948">948</a></span>
+<span class="normal"><a href="#__codelineno-0-949">949</a></span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span>
+<span class="normal"><a href="#__codelineno-0-952">952</a></span>
+<span class="normal"><a href="#__codelineno-0-953">953</a></span>
+<span class="normal"><a href="#__codelineno-0-954">954</a></span>
+<span class="normal"><a href="#__codelineno-0-955">955</a></span>
+<span class="normal"><a href="#__codelineno-0-956">956</a></span>
+<span class="normal"><a href="#__codelineno-0-957">957</a></span>
+<span class="normal"><a href="#__codelineno-0-958">958</a></span>
+<span class="normal"><a href="#__codelineno-0-959">959</a></span>
+<span class="normal"><a href="#__codelineno-0-960">960</a></span>
+<span class="normal"><a href="#__codelineno-0-961">961</a></span>
+<span class="normal"><a href="#__codelineno-0-962">962</a></span>
+<span class="normal"><a href="#__codelineno-0-963">963</a></span>
+<span class="normal"><a href="#__codelineno-0-964">964</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="k">def</span><span class="w"> </span><span class="nf">edit_dataset</span><span class="p">(</span>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="n">data_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">creator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7679,40 +7702,63 @@ be discarded.</p>
 <a id="__codelineno-0-905" name="__codelineno-0-905"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 <a id="__codelineno-0-906" name="__codelineno-0-906"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`data_id` must be of type `int`, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 <a id="__codelineno-0-907" name="__codelineno-0-907"></a>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a>    <span class="c1"># compose data edit parameters as xml</span>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a>    <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"data_id"</span><span class="p">:</span> <span class="n">data_id</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="n">xml</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># type: 'OrderedDict[str, OrderedDict]'</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"@xmlns:oml"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"http://openml.org/openml"</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:description"</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:creator"</span><span class="p">]</span> <span class="o">=</span> <span class="n">creator</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:contributor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">contributor</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:collection_date"</span><span class="p">]</span> <span class="o">=</span> <span class="n">collection_date</span>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:language"</span><span class="p">]</span> <span class="o">=</span> <span class="n">language</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:default_target_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_target_attribute</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:row_id_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">row_id_attribute</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:ignore_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_attribute</span>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:citation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">citation</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:original_data_url"</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_data_url</span>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:paper_url"</span><span class="p">]</span> <span class="o">=</span> <span class="n">paper_url</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a>    <span class="c1"># delete None inputs</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">]):</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="n">k</span><span class="p">]:</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a>            <span class="k">del</span> <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a>        <span class="s2">"edit_parameters"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"description.xml"</span><span class="p">,</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">xml</span><span class="p">)),</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a>    <span class="p">}</span>  <span class="c1"># type: openml._api_calls.FILE_ELEMENTS_TYPE</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>        <span class="s2">"data/edit"</span><span class="p">,</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="s2">"post"</span><span class="p">,</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>        <span class="n">data</span><span class="o">=</span><span class="n">form_data</span><span class="p">,</span>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="p">)</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)</span>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>    <span class="n">data_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:data_edit"</span><span class="p">][</span><span class="s2">"oml:id"</span><span class="p">]</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>        <span class="n">field</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>            <span class="n">description</span><span class="p">,</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>            <span class="n">creator</span><span class="p">,</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>            <span class="n">contributor</span><span class="p">,</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>            <span class="n">collection_date</span><span class="p">,</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>            <span class="n">language</span><span class="p">,</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="n">default_target_attribute</span><span class="p">,</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>            <span class="n">ignore_attribute</span><span class="p">,</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>            <span class="n">citation</span><span class="p">,</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>            <span class="n">row_id_attribute</span><span class="p">,</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>            <span class="n">original_data_url</span><span class="p">,</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>            <span class="n">paper_url</span><span class="p">,</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>        <span class="p">]</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>    <span class="p">):</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>            <span class="s2">"Please provide atleast one field among description, creator, "</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>            <span class="s2">"contributor, collection_date, language, citation, "</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>            <span class="s2">"original_data_url, default_target_attribute, row_id_attribute, "</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>            <span class="s2">"ignore_attribute or paper_url to edit."</span><span class="p">,</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a>        <span class="p">)</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a>    <span class="c1"># compose data edit parameters as xml</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a>    <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"data_id"</span><span class="p">:</span> <span class="n">data_id</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a>    <span class="n">xml</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># type: 'OrderedDict[str, OrderedDict]'</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"@xmlns:oml"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"http://openml.org/openml"</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:description"</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:creator"</span><span class="p">]</span> <span class="o">=</span> <span class="n">creator</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:contributor"</span><span class="p">]</span> <span class="o">=</span> <span class="n">contributor</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:collection_date"</span><span class="p">]</span> <span class="o">=</span> <span class="n">collection_date</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:language"</span><span class="p">]</span> <span class="o">=</span> <span class="n">language</span>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:default_target_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_target_attribute</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:row_id_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">row_id_attribute</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:ignore_attribute"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_attribute</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:citation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">citation</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:original_data_url"</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_data_url</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>    <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="s2">"oml:paper_url"</span><span class="p">]</span> <span class="o">=</span> <span class="n">paper_url</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>    <span class="c1"># delete None inputs</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">]):</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="n">k</span><span class="p">]:</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>            <span class="k">del</span> <span class="n">xml</span><span class="p">[</span><span class="s2">"oml:data_edit_parameters"</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-952" name="__codelineno-0-952"></a>
+<a id="__codelineno-0-953" name="__codelineno-0-953"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-954" name="__codelineno-0-954"></a>        <span class="s2">"edit_parameters"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"description.xml"</span><span class="p">,</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">xml</span><span class="p">)),</span>
+<a id="__codelineno-0-955" name="__codelineno-0-955"></a>    <span class="p">}</span>  <span class="c1"># type: openml._api_calls.FILE_ELEMENTS_TYPE</span>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
+<a id="__codelineno-0-957" name="__codelineno-0-957"></a>        <span class="s2">"data/edit"</span><span class="p">,</span>
+<a id="__codelineno-0-958" name="__codelineno-0-958"></a>        <span class="s2">"post"</span><span class="p">,</span>
+<a id="__codelineno-0-959" name="__codelineno-0-959"></a>        <span class="n">data</span><span class="o">=</span><span class="n">form_data</span><span class="p">,</span>
+<a id="__codelineno-0-960" name="__codelineno-0-960"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
+<a id="__codelineno-0-961" name="__codelineno-0-961"></a>    <span class="p">)</span>
+<a id="__codelineno-0-962" name="__codelineno-0-962"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)</span>
+<a id="__codelineno-0-963" name="__codelineno-0-963"></a>    <span class="n">data_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:data_edit"</span><span class="p">][</span><span class="s2">"oml:id"</span><span class="p">]</span>
+<a id="__codelineno-0-964" name="__codelineno-0-964"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7800,79 +7846,79 @@ be discarded.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-944">944</a></span>
-<span class="normal"><a href="#__codelineno-0-945">945</a></span>
-<span class="normal"><a href="#__codelineno-0-946">946</a></span>
-<span class="normal"><a href="#__codelineno-0-947">947</a></span>
-<span class="normal"><a href="#__codelineno-0-948">948</a></span>
-<span class="normal"><a href="#__codelineno-0-949">949</a></span>
-<span class="normal"><a href="#__codelineno-0-950">950</a></span>
-<span class="normal"><a href="#__codelineno-0-951">951</a></span>
-<span class="normal"><a href="#__codelineno-0-952">952</a></span>
-<span class="normal"><a href="#__codelineno-0-953">953</a></span>
-<span class="normal"><a href="#__codelineno-0-954">954</a></span>
-<span class="normal"><a href="#__codelineno-0-955">955</a></span>
-<span class="normal"><a href="#__codelineno-0-956">956</a></span>
-<span class="normal"><a href="#__codelineno-0-957">957</a></span>
-<span class="normal"><a href="#__codelineno-0-958">958</a></span>
-<span class="normal"><a href="#__codelineno-0-959">959</a></span>
-<span class="normal"><a href="#__codelineno-0-960">960</a></span>
-<span class="normal"><a href="#__codelineno-0-961">961</a></span>
-<span class="normal"><a href="#__codelineno-0-962">962</a></span>
-<span class="normal"><a href="#__codelineno-0-963">963</a></span>
-<span class="normal"><a href="#__codelineno-0-964">964</a></span>
-<span class="normal"><a href="#__codelineno-0-965">965</a></span>
-<span class="normal"><a href="#__codelineno-0-966">966</a></span>
-<span class="normal"><a href="#__codelineno-0-967">967</a></span>
-<span class="normal"><a href="#__codelineno-0-968">968</a></span>
-<span class="normal"><a href="#__codelineno-0-969">969</a></span>
-<span class="normal"><a href="#__codelineno-0-970">970</a></span>
-<span class="normal"><a href="#__codelineno-0-971">971</a></span>
-<span class="normal"><a href="#__codelineno-0-972">972</a></span>
-<span class="normal"><a href="#__codelineno-0-973">973</a></span>
-<span class="normal"><a href="#__codelineno-0-974">974</a></span>
-<span class="normal"><a href="#__codelineno-0-975">975</a></span>
-<span class="normal"><a href="#__codelineno-0-976">976</a></span>
-<span class="normal"><a href="#__codelineno-0-977">977</a></span>
-<span class="normal"><a href="#__codelineno-0-978">978</a></span>
-<span class="normal"><a href="#__codelineno-0-979">979</a></span>
-<span class="normal"><a href="#__codelineno-0-980">980</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-944" name="__codelineno-0-944"></a><span class="k">def</span><span class="w"> </span><span class="nf">fork_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a><span class="w">    </span><span class="sd">"""</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a><span class="sd">     Creates a new dataset version, with the authenticated user as the new owner.</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a><span class="sd">     The forked dataset can have distinct dataset meta-data,</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a><span class="sd">     but the actual data itself is shared with the original version.</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a><span class="sd">     This API is intended for use when a user is unable to edit the critical fields of a dataset</span>
-<a id="__codelineno-0-951" name="__codelineno-0-951"></a><span class="sd">     through the edit_dataset API.</span>
-<a id="__codelineno-0-952" name="__codelineno-0-952"></a><span class="sd">     (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)</span>
-<a id="__codelineno-0-953" name="__codelineno-0-953"></a>
-<a id="__codelineno-0-954" name="__codelineno-0-954"></a><span class="sd">     Specifically, this happens when the user is:</span>
-<a id="__codelineno-0-955" name="__codelineno-0-955"></a><span class="sd">            1. Not the owner of the dataset.</span>
-<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">            2. User is the owner of the dataset, but the dataset has tasks.</span>
-<a id="__codelineno-0-957" name="__codelineno-0-957"></a>
-<a id="__codelineno-0-958" name="__codelineno-0-958"></a><span class="sd">     In these two cases the only way to edit critical fields is:</span>
-<a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">            1. STEP 1: Fork the dataset using fork_dataset API</span>
-<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">            2. STEP 2: Call edit_dataset API on the forked version.</span>
-<a id="__codelineno-0-961" name="__codelineno-0-961"></a>
-<a id="__codelineno-0-962" name="__codelineno-0-962"></a>
-<a id="__codelineno-0-963" name="__codelineno-0-963"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-965" name="__codelineno-0-965"></a><span class="sd">    data_id : int</span>
-<a id="__codelineno-0-966" name="__codelineno-0-966"></a><span class="sd">        id of the dataset to be forked</span>
-<a id="__codelineno-0-967" name="__codelineno-0-967"></a>
-<a id="__codelineno-0-968" name="__codelineno-0-968"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-969" name="__codelineno-0-969"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-970" name="__codelineno-0-970"></a><span class="sd">    Dataset id of the forked dataset</span>
-<a id="__codelineno-0-971" name="__codelineno-0-971"></a>
-<a id="__codelineno-0-972" name="__codelineno-0-972"></a><span class="sd">    """</span>
-<a id="__codelineno-0-973" name="__codelineno-0-973"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-<a id="__codelineno-0-974" name="__codelineno-0-974"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`data_id` must be of type `int`, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
-<a id="__codelineno-0-975" name="__codelineno-0-975"></a>    <span class="c1"># compose data fork parameters</span>
-<a id="__codelineno-0-976" name="__codelineno-0-976"></a>    <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"data_id"</span><span class="p">:</span> <span class="n">data_id</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
-<a id="__codelineno-0-977" name="__codelineno-0-977"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="s2">"data/fork"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span>
-<a id="__codelineno-0-978" name="__codelineno-0-978"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)</span>
-<a id="__codelineno-0-979" name="__codelineno-0-979"></a>    <span class="n">data_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:data_fork"</span><span class="p">][</span><span class="s2">"oml:id"</span><span class="p">]</span>
-<a id="__codelineno-0-980" name="__codelineno-0-980"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-967"> 967</a></span>
+<span class="normal"><a href="#__codelineno-0-968"> 968</a></span>
+<span class="normal"><a href="#__codelineno-0-969"> 969</a></span>
+<span class="normal"><a href="#__codelineno-0-970"> 970</a></span>
+<span class="normal"><a href="#__codelineno-0-971"> 971</a></span>
+<span class="normal"><a href="#__codelineno-0-972"> 972</a></span>
+<span class="normal"><a href="#__codelineno-0-973"> 973</a></span>
+<span class="normal"><a href="#__codelineno-0-974"> 974</a></span>
+<span class="normal"><a href="#__codelineno-0-975"> 975</a></span>
+<span class="normal"><a href="#__codelineno-0-976"> 976</a></span>
+<span class="normal"><a href="#__codelineno-0-977"> 977</a></span>
+<span class="normal"><a href="#__codelineno-0-978"> 978</a></span>
+<span class="normal"><a href="#__codelineno-0-979"> 979</a></span>
+<span class="normal"><a href="#__codelineno-0-980"> 980</a></span>
+<span class="normal"><a href="#__codelineno-0-981"> 981</a></span>
+<span class="normal"><a href="#__codelineno-0-982"> 982</a></span>
+<span class="normal"><a href="#__codelineno-0-983"> 983</a></span>
+<span class="normal"><a href="#__codelineno-0-984"> 984</a></span>
+<span class="normal"><a href="#__codelineno-0-985"> 985</a></span>
+<span class="normal"><a href="#__codelineno-0-986"> 986</a></span>
+<span class="normal"><a href="#__codelineno-0-987"> 987</a></span>
+<span class="normal"><a href="#__codelineno-0-988"> 988</a></span>
+<span class="normal"><a href="#__codelineno-0-989"> 989</a></span>
+<span class="normal"><a href="#__codelineno-0-990"> 990</a></span>
+<span class="normal"><a href="#__codelineno-0-991"> 991</a></span>
+<span class="normal"><a href="#__codelineno-0-992"> 992</a></span>
+<span class="normal"><a href="#__codelineno-0-993"> 993</a></span>
+<span class="normal"><a href="#__codelineno-0-994"> 994</a></span>
+<span class="normal"><a href="#__codelineno-0-995"> 995</a></span>
+<span class="normal"><a href="#__codelineno-0-996"> 996</a></span>
+<span class="normal"><a href="#__codelineno-0-997"> 997</a></span>
+<span class="normal"><a href="#__codelineno-0-998"> 998</a></span>
+<span class="normal"><a href="#__codelineno-0-999"> 999</a></span>
+<span class="normal"><a href="#__codelineno-0-1000">1000</a></span>
+<span class="normal"><a href="#__codelineno-0-1001">1001</a></span>
+<span class="normal"><a href="#__codelineno-0-1002">1002</a></span>
+<span class="normal"><a href="#__codelineno-0-1003">1003</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-967" name="__codelineno-0-967"></a><span class="k">def</span><span class="w"> </span><span class="nf">fork_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-968" name="__codelineno-0-968"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-969" name="__codelineno-0-969"></a><span class="sd">     Creates a new dataset version, with the authenticated user as the new owner.</span>
+<a id="__codelineno-0-970" name="__codelineno-0-970"></a><span class="sd">     The forked dataset can have distinct dataset meta-data,</span>
+<a id="__codelineno-0-971" name="__codelineno-0-971"></a><span class="sd">     but the actual data itself is shared with the original version.</span>
+<a id="__codelineno-0-972" name="__codelineno-0-972"></a>
+<a id="__codelineno-0-973" name="__codelineno-0-973"></a><span class="sd">     This API is intended for use when a user is unable to edit the critical fields of a dataset</span>
+<a id="__codelineno-0-974" name="__codelineno-0-974"></a><span class="sd">     through the edit_dataset API.</span>
+<a id="__codelineno-0-975" name="__codelineno-0-975"></a><span class="sd">     (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)</span>
+<a id="__codelineno-0-976" name="__codelineno-0-976"></a>
+<a id="__codelineno-0-977" name="__codelineno-0-977"></a><span class="sd">     Specifically, this happens when the user is:</span>
+<a id="__codelineno-0-978" name="__codelineno-0-978"></a><span class="sd">            1. Not the owner of the dataset.</span>
+<a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="sd">            2. User is the owner of the dataset, but the dataset has tasks.</span>
+<a id="__codelineno-0-980" name="__codelineno-0-980"></a>
+<a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">     In these two cases the only way to edit critical fields is:</span>
+<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">            1. STEP 1: Fork the dataset using fork_dataset API</span>
+<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">            2. STEP 2: Call edit_dataset API on the forked version.</span>
+<a id="__codelineno-0-984" name="__codelineno-0-984"></a>
+<a id="__codelineno-0-985" name="__codelineno-0-985"></a>
+<a id="__codelineno-0-986" name="__codelineno-0-986"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">    data_id : int</span>
+<a id="__codelineno-0-989" name="__codelineno-0-989"></a><span class="sd">        id of the dataset to be forked</span>
+<a id="__codelineno-0-990" name="__codelineno-0-990"></a>
+<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="sd">    Dataset id of the forked dataset</span>
+<a id="__codelineno-0-994" name="__codelineno-0-994"></a>
+<a id="__codelineno-0-995" name="__codelineno-0-995"></a><span class="sd">    """</span>
+<a id="__codelineno-0-996" name="__codelineno-0-996"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`data_id` must be of type `int`, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+<a id="__codelineno-0-998" name="__codelineno-0-998"></a>    <span class="c1"># compose data fork parameters</span>
+<a id="__codelineno-0-999" name="__codelineno-0-999"></a>    <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"data_id"</span><span class="p">:</span> <span class="n">data_id</span><span class="p">}</span>  <span class="c1"># type: openml._api_calls.DATA_TYPE</span>
+<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a>    <span class="n">result_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="s2">"data/fork"</span><span class="p">,</span> <span class="s2">"post"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span>
+<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">result_xml</span><span class="p">)</span>
+<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a>    <span class="n">data_id</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"oml:data_fork"</span><span class="p">][</span><span class="s2">"oml:id"</span><span class="p">]</span>
+<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a>    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
