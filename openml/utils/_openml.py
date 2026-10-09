@@ -249,7 +249,7 @@ def _list_all(  # noqa: C901
     *,
     limit: int | None = None,
     offset: int | None = None,
-    batch_size: int | None = 10_000,
+    batch_size: int | None = 1000,
 ) -> list[_SizedT]:
     """Helper to handle paged listing requests.
 
@@ -279,7 +279,7 @@ def _list_all(  # noqa: C901
     results: list[_SizedT] = []
 
     offset = offset if offset is not None else 0
-    batch_size = batch_size if batch_size is not None else 10_000
+    batch_size = batch_size if batch_size is not None else 1000
 
     LIMIT = limit
     BATCH_SIZE_ORIG = batch_size
