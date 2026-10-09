@@ -1415,31 +1415,8 @@ class TestOpenMLDataset(TestBase):
         assert len(attribute_names) == X.shape[1]
 
     @pytest.mark.test_server()
-    def test_data_edit_non_critical_field(self):
-        # Case 1
-        # All users can edit non-critical fields of datasets
-        desc = (
-            "This data sets consists of 3 different types of irises' "
-            "(Setosa, Versicolour, and Virginica) petal and sepal length,"
-            " stored in a 150x4 numpy.ndarray"
-        )
-        did = 128
-        result = edit_dataset(
-            did,
-            description=desc,
-            creator="R.A.Fisher",
-            collection_date="1937",
-            citation="The use of multiple measurements in taxonomic problems",
-            language="English",
-        )
-        assert did == result
-        edited_dataset = openml.datasets.get_dataset(did)
-        assert edited_dataset.description == desc
-
-    @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
-        # Case 2
-        # only owners (or admin) can edit all critical fields of datasets
+        # only owners (or admin) can edit all fields of datasets
         # for this, we need to first clone a dataset to do changes
         did = fork_dataset(1)
         self._wait_for_dataset_being_processed(did)
@@ -1464,11 +1441,10 @@ class TestOpenMLDataset(TestBase):
                     os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
                 )
 
-    @pytest.mark.test_server()
     def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
-            OpenMLServerException,
+            ValueError,
             "Please provide atleast one field among description, creator, "
             "contributor, collection_date, language, citation, "
             "original_data_url, default_target_attribute, row_id_attribute, "
@@ -1516,12 +1492,12 @@ class TestOpenMLDataset(TestBase):
         )
 
     @pytest.mark.test_server()
-    def test_edit_data_user_cannot_edit_critical_field_of_other_users_dataset(self):
+    def test_edit_data_user_cannot_edit_field_of_other_users_dataset(self):
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,
-            "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
-            "can be edited only by the owner. Fork the dataset if changes are required.",
+            "Dataset can only be edited by the owner or an administrator. "
+            "Fork the dataset if changes are required.",
             edit_dataset,
             data_id=128,
             default_target_attribute="y",
