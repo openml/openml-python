@@ -11,7 +11,7 @@ from requests import Request, Response, Session
 
 import openml
 from openml._api import HTTPCache, HTTPClient
-from openml.exceptions import OpenMLAuthenticationError
+from openml.exceptions import OpenMLAuthenticationError, OpenMLServerError
 
 
 @pytest.fixture
@@ -106,10 +106,11 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
 
     cache_key = cache.get_key(sample_url_v1, {})
     cache_path = cache._key_to_path(cache_key)
+    body_filename = cache._get_body_filename_from_path(cache_path)
 
     assert (cache_path / "meta.json").exists()
     assert (cache_path / "headers.json").exists()
-    assert (cache_path / "body.bin").exists()
+    assert (cache_path / body_filename).exists()
 
 
 @pytest.mark.test_server
@@ -168,6 +169,26 @@ def test_get_without_api_key_raises(http_client):
         pytest.raises(OpenMLAuthenticationError),
     ):
         http_client.get("task/1", use_api_key=True)
+
+
+@pytest.mark.test_server
+def test_get_with_invalid_error_xml_shows_response(http_client, sample_url_v1):
+    response = Response()
+    response.status_code = 500
+    response._content = b"<invalid"
+    response.headers = {"Content-Type": "text/xml", "Content-Encoding": "gzip"}
+
+    with (
+        openml.config.overwrite_config_context({"connection_n_retries": 1}),
+        patch.object(Session, "request", return_value=response),
+        pytest.raises(OpenMLServerError) as exc_info,
+    ):
+        http_client.get("task/1")
+
+    assert str(exc_info.value) == (
+        f"Unexpected server error when calling {sample_url_v1}. Please contact the developers!\n"
+        "Status code: 500\n<invalid"
+    )
 
 
 @pytest.mark.test_server

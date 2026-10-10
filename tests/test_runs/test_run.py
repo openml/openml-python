@@ -25,6 +25,7 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.test_server
     def test_tagging(self):
         runs = openml.runs.list_runs(size=1)

@@ -9,7 +9,6 @@ from typing_extensions import overload
 
 import numpy as np
 import pandas as pd
-import xmltodict
 
 import openml
 import openml._api_calls
@@ -154,17 +153,7 @@ def list_evaluation_measures() -> list[str]:
     list
 
     """
-    api_call = "evaluationmeasure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"))
-    # Minimalistic check if the XML is useful
-    if "oml:evaluation_measures" not in qualities:
-        raise ValueError('Error in return XML, does not contain "oml:evaluation_measures"')
-
-    if not isinstance(qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:measure" as a list')
-
-    return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
+    return openml._backend.evaluation_measure.list()
 
 
 def list_estimation_procedures() -> list[str]:
@@ -177,24 +166,8 @@ def list_estimation_procedures() -> list[str]:
     -------
     list
     """
-    api_call = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    api_results = xmltodict.parse(xml_string)
-
-    # Minimalistic check if the XML is useful
-    if "oml:estimationprocedures" not in api_results:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedures"')
-
-    if "oml:estimationprocedure" not in api_results["oml:estimationprocedures"]:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedure"')
-
-    if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:estimationprocedure" as a list')
-
-    return [
-        prod["oml:name"]
-        for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
-    ]
+    result = openml._backend.estimation_procedure.list()
+    return [i.name for i in result]
 
 
 def list_evaluations_setups(

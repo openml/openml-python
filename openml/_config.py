@@ -70,7 +70,7 @@ _SERVERS_REGISTRY: dict[ServerMode, dict[APIVersion, dict[str, str | None]]] = {
 
 
 def _get_servers(mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
-    if mode not in ServerMode:
+    if mode not in ServerMode._value2member_map_:
         raise ValueError(f'invalid mode="{mode}" allowed modes: {", ".join(list(ServerMode))}')
     return deepcopy(_SERVERS_REGISTRY[mode])
 
@@ -289,13 +289,16 @@ class OpenMLConfigManager:
         api_version: APIVersion,
         fallback_api_version: APIVersion | None = None,
     ) -> None:
-        if api_version not in APIVersion:
+        if api_version not in APIVersion._value2member_map_:
             raise ValueError(
                 f'invalid api_version="{api_version}" '
                 f"allowed versions: {', '.join(list(APIVersion))}"
             )
 
-        if fallback_api_version is not None and fallback_api_version not in APIVersion:
+        if (
+            fallback_api_version is not None
+            and fallback_api_version not in APIVersion._value2member_map_
+        ):
             raise ValueError(
                 f'invalid fallback_api_version="{fallback_api_version}" '
                 f"allowed versions: {', '.join(list(APIVersion))}"

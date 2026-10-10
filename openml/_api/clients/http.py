@@ -91,6 +91,46 @@ class HTTPCache:
         """
         return self.path.joinpath(key)
 
+    def _get_body_filename_from_response(self, response: Response) -> str:
+        content_type = response.headers.get("Content-Type", "").lower()
+
+        # check for .json
+        if "application/json" in content_type:
+            return "body.json"
+
+        # check for .xml
+        if "text/xml" in content_type:
+            return "body.xml"
+
+        # check for .zip
+        if response.content.startswith(b"PK\x03\x04"):
+            return "body.zip"
+
+        # check for .arff
+        for raw_line in response.text.splitlines():
+            stripped_line = raw_line.strip()
+            # skip empty lines and comments
+            if not stripped_line or stripped_line.startswith("%"):
+                continue
+            if stripped_line.lower().startswith("@relation"):
+                return "body.arff"
+            break
+
+        return "body.txt"
+
+    def _get_body_filename_from_path(self, path: Path) -> str:
+        candidates = [p for p in path.glob("body.*") if len(p.suffixes) == 1]
+
+        if not candidates:
+            raise FileNotFoundError(f"No body file found in path: {path}")
+
+        if len(candidates) > 1:
+            raise FileNotFoundError(
+                f"Multiple body files found in path: {path} ({[p.name for p in candidates]})"
+            )
+
+        return candidates[0].name
+
     def load(self, key: str) -> Response:
         """
         Load a cached HTTP response from disk.
@@ -115,30 +155,26 @@ class HTTPCache:
         path = self._key_to_path(key)
 
         if not path.exists():
-            raise FileNotFoundError(f"Cache entry not found: {path}")
+            raise FileNotFoundError(f"Cache path not found: {path}")
 
         meta_path = path / "meta.json"
+        meta_raw = meta_path.read_bytes() if meta_path.exists() else "{}"
+        meta = json.loads(meta_raw)
+
         headers_path = path / "headers.json"
-        body_path = path / "body.bin"
+        headers_raw = headers_path.read_bytes() if headers_path.exists() else "{}"
+        headers = json.loads(headers_raw)
 
-        if not (meta_path.exists() and headers_path.exists() and body_path.exists()):
-            raise FileNotFoundError(f"Incomplete cache at {path}")
-
-        with meta_path.open("r", encoding="utf-8") as f:
-            meta = json.load(f)
-
-        with headers_path.open("r", encoding="utf-8") as f:
-            headers = json.load(f)
-
+        body_path = path / self._get_body_filename_from_path(path)
         body = body_path.read_bytes()
 
         response = Response()
-        response.status_code = meta["status_code"]
-        response.url = meta["url"]
-        response.reason = meta["reason"]
         response.headers = headers
         response._content = body
-        response.encoding = meta["encoding"]
+        response.status_code = meta.get("status_code")
+        response.url = meta.get("url")
+        response.reason = meta.get("reason")
+        response.encoding = meta.get("encoding")
 
         return response
 
@@ -162,7 +198,9 @@ class HTTPCache:
         path = self._key_to_path(key)
         path.mkdir(parents=True, exist_ok=True)
 
-        (path / "body.bin").write_bytes(response.content)
+        body_filename = self._get_body_filename_from_response(response)
+        with (path / body_filename).open("wb") as f:
+            f.write(response.content)
 
         with (path / "headers.json").open("w", encoding="utf-8") as f:
             json.dump(dict(response.headers), f)
@@ -409,31 +447,19 @@ class HTTPClient:
         if response.status_code == requests.codes.URI_TOO_LONG:
             raise OpenMLServerError(f"URI too long! ({url})")
 
-        exception: Exception | None = None
-        code: int | None = None
-        message: str = ""
-
         try:
             code, message = self._parse_exception_response(response)
-
-        except (requests.exceptions.JSONDecodeError, xml.parsers.expat.ExpatError) as e:
-            if method != "GET":
-                extra = f"Status code: {response.status_code}\n{response.text}"
-                raise OpenMLServerError(
-                    f"Unexpected server error when calling {url}. Please contact the "
-                    f"developers!\n{extra}"
-                ) from e
-
-            exception = e
-
         except Exception as e:
-            # If we failed to parse it out,
-            # then something has gone wrong in the body we have sent back
-            # from the server and there is little extra information we can capture.
-            raise OpenMLServerError(
-                f"Unexpected server error when calling {url}. Please contact the developers!\n"
-                f"Status code: {response.status_code}\n{response.text}",
-            ) from e
+            error = OpenMLServerError(
+                f"Unexpected server error when calling {url}. Please contact the "
+                f"developers!\nStatus code: {response.status_code}\n{response.text}"
+            )
+            if method == "GET" and isinstance(
+                e, (requests.exceptions.JSONDecodeError, xml.parsers.expat.ExpatError)
+            ):
+                error.__cause__ = e
+                return error
+            raise error from e
 
         if code is not None:
             self._raise_code_specific_error(
@@ -443,10 +469,7 @@ class HTTPClient:
                 files=files,
             )
 
-        if exception is None:
-            exception = OpenMLServerException(code=code, message=message, url=url)
-
-        return exception
+        return OpenMLServerException(code=code, message=message, url=url)
 
     def __request(  # noqa: PLR0913
         self,
@@ -810,3 +833,9 @@ class HTTPClient:
         handler = handler or write_to_file
         handler(response, file_path, encoding)
         return file_path
+
+    def cache_path_from_url(self, url: str) -> Path:
+        full_url = urljoin(self.server, url)
+        key = self.cache.get_key(full_url, params={})
+        path = self.cache._key_to_path(key)
+        return path / self.cache._get_body_filename_from_path(path)

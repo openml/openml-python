@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import unittest
 
+import pytest
+
 import openml
 
 
 class TestEvaluationsExample(unittest.TestCase):
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     def test_example_python_paper(self):
         # Example script which will appear in the upcoming OpenML-Python paper
         # This test ensures that the example will keep running!

@@ -107,6 +107,32 @@ $env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
 
+#### Diagnosing Slow Tests
+
+If you suspect a test (or the suite as a whole) is running too slowly, `pytest` already exposes everything you need to investigate it. A few invocations that are useful when looking into test runtimes:
+
+```bash
+# Show the 20 slowest tests (use 0 to list every test's duration)
+pytest tests --durations=20
+
+# Fail any test that exceeds the given timeout (requires pytest-timeout)
+pytest tests --timeout=600
+
+# Investigate only fixture/setup costs without actually running the tests
+pytest tests --setup-only
+
+# Profile a specific module, class, or test
+pytest tests/test_datasets/test_dataset.py --durations=0
+
+# Skip the slow live-server tests while profiling locally
+pytest tests --durations=0 -m "not production_server and not test_server"
+
+# Run the suite in parallel to reproduce CI behaviour (requires pytest-xdist)
+pytest tests -n 4 --dist=load --durations=0
+```
+
+Combining these with the marker filters (`production_server`, `test_server`, `sklearn`) makes it straightforward to narrow the investigation down to the slow tests without changing project configuration.
+
 ### Pull Request Checklist
 
 You can go to the `openml-python` GitHub repository to create the pull request by [comparing the branch](https://github.com/openml/openml-python/compare) from your fork with the `main` branch of the `openml-python` repository. When creating a pull request, make sure to follow the comments and structured provided by the template on GitHub.
@@ -127,8 +153,7 @@ in the PR description.
 
 The preferred workflow for contributing to openml-python is to
 fork the [main repository](https://github.com/openml/openml-python) on
-GitHub, clone, check out the branch `main`, and develop on a new branch
-branch. Steps:
+GitHub, clone, and develop on a new branch:
 
 0. Make sure you have git installed, and a GitHub account.
 
@@ -143,12 +168,6 @@ local disk:
    ```bash
    git clone git@github.com:YourLogin/openml-python.git
    cd openml-python
-   ```
-
-3. Switch to the ``develop`` branch:
-
-   ```bash
-   git checkout main
    ```
 
 3. Create a ``feature`` branch to hold your development changes:

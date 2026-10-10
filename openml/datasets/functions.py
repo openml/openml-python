@@ -364,6 +364,11 @@ def get_datasets(
     -------
     datasets : list of datasets
         A list of dataset objects.
+
+    Examples
+    --------
+    >>> import openml
+    >>> datasets = openml.datasets.get_datasets([1, 2, 3])  # doctest: +SKIP
     """
     datasets = []
     for dataset_id in dataset_ids:
@@ -446,6 +451,13 @@ def get_dataset(  # noqa: C901, PLR0912
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
+
+    Examples
+    --------
+    >>> import openml
+    >>> dataset = openml.datasets.get_dataset(1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset("iris", version=1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset(1, download_data=True)  # doctest: +SKIP
     """
     if download_all_files:
         warnings.warn(
@@ -892,6 +904,29 @@ def edit_dataset(
     """
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
+    if not any(
+        field
+        for field in [
+            description,
+            creator,
+            contributor,
+            collection_date,
+            language,
+            default_target_attribute,
+            ignore_attribute,
+            citation,
+            row_id_attribute,
+            original_data_url,
+            paper_url,
+        ]
+    ):
+        raise ValueError(
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, "
+            "original_data_url, default_target_attribute, row_id_attribute, "
+            "ignore_attribute or paper_url to edit.",
+        )
 
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
