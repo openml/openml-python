@@ -27,6 +27,8 @@ import openml
 import openml._api_calls
 import openml.exceptions
 
+MAX_LISTING_BATCH_SIZE = 1_000
+
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
     from openml.base import OpenMLBase
@@ -249,7 +251,7 @@ def _list_all(  # noqa: C901
     *,
     limit: int | None = None,
     offset: int | None = None,
-    batch_size: int | None = 10_000,
+    batch_size: int | None = MAX_LISTING_BATCH_SIZE,
 ) -> list[_SizedT]:
     """Helper to handle paged listing requests.
 
@@ -263,7 +265,7 @@ def _list_all(  # noqa: C901
         Call listing, e.g. list_evaluations. Takes two positional
         arguments: batch_size and offset.
     batch_size : int, optional
-        The batch size to use for the listing call.
+        The batch size to use for the listing call. Requests are capped at 1,000 items.
     offset : int, optional
         The initial offset to use for the listing call.
     limit : int, optional
@@ -279,7 +281,7 @@ def _list_all(  # noqa: C901
     results: list[_SizedT] = []
 
     offset = offset if offset is not None else 0
-    batch_size = batch_size if batch_size is not None else 10_000
+    batch_size = batch_size if batch_size is not None else MAX_LISTING_BATCH_SIZE
 
     LIMIT = limit
     BATCH_SIZE_ORIG = batch_size
@@ -289,6 +291,8 @@ def _list_all(  # noqa: C901
     # changed afterwards. The derived batch_size can be changed.
     if not isinstance(BATCH_SIZE_ORIG, int):
         raise ValueError(f"'batch_size' should be an integer but got {BATCH_SIZE_ORIG}")
+
+    BATCH_SIZE_ORIG = min(BATCH_SIZE_ORIG, MAX_LISTING_BATCH_SIZE)
 
     if (LIMIT is not None) and (not isinstance(LIMIT, int)) and (not np.isinf(LIMIT)):
         raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
