@@ -1442,15 +1442,14 @@ class TestOpenMLDataset(TestBase):
 
     def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
-        self.assertRaisesRegex(
+        with pytest.raises(
             ValueError,
-            "Please provide atleast one field among description, creator, "
-            "contributor, collection_date, language, citation, "
-            "original_data_url, default_target_attribute, row_id_attribute, "
-            "ignore_attribute or paper_url to edit.",
-            edit_dataset,
-            data_id=64,  # blood-transfusion-service-center
-        )
+            match=r"Please provide atleast one field among description, creator, "
+            r"contributor, collection_date, language, citation, "
+            r"original_data_url, default_target_attribute, row_id_attribute, "
+            r"ignore_attribute or paper_url to edit\.",
+        ):
+            edit_dataset(data_id=64)  # blood-transfusion-service-center
 
     @pytest.mark.test_server
     def test_data_edit_requires_valid_dataset(self):

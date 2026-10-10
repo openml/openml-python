@@ -317,7 +317,8 @@ class TestFlow(TestBase):
         get_flow_mock.return_value = flow
 
         flow.publish()
-        # The first publish succeeds, so we don't collect flow_id for deletion since this is a mocked test.
+        # The first publish succeeds, so we don't collect flow_id
+        # for deletion since this is a mocked test.
 
         assert mock_request.call_count == 1
         assert get_flow_mock.call_count == 1

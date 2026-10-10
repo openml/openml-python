@@ -35,7 +35,7 @@ def test_run_v1_get(run_v1, test_files_directory):
     _assert_run_shape(run)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_run_v1_list(run_v1):
     limit = 5
     runs_df = run_v1.list(limit=limit, offset=0)
@@ -55,10 +55,10 @@ def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:upload_run xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:run_id>456</oml:run_id>\n"
-            "</oml:upload_run>\n"
-        ).encode("utf-8")
+            b'<oml:upload_run xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:run_id>456</oml:run_id>\n"
+            b"</oml:upload_run>\n"
+        )
 
         result = run_v1.publish(path="run", files=files)
 
@@ -73,7 +73,6 @@ def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
         )
 
 
-
 def test_run_v1_delete_mocked(run_v1, test_apikey_v1):
     run_id = 456
 
@@ -81,10 +80,10 @@ def test_run_v1_delete_mocked(run_v1, test_apikey_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:run_delete xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>456</oml:id>\n"
-            "</oml:run_delete>\n"
-        ).encode("utf-8")
+            b'<oml:run_delete xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>456</oml:id>\n"
+            b"</oml:run_delete>\n"
+        )
 
         result = run_v1.delete(run_id)
 

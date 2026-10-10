@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-import builtins
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import xmltodict
 
 from openml._api.resources.base import ResourceV1API, ResourceV2API, StudyAPI
+
+if TYPE_CHECKING:
+    import builtins
 
 
 class StudyV1API(ResourceV1API, StudyAPI):

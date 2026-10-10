@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import os
 from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import urljoin, urlparse
@@ -52,10 +51,7 @@ def test_cache(cache, sample_url_v1):
 
     key = cache.get_key(sample_url_v1, params)
 
-    expected_key = os.path.join(
-        *path_parts,
-        params_key,
-    )
+    expected_key = str(Path(*path_parts) / params_key)
 
     assert key == expected_key
 
@@ -78,7 +74,7 @@ def test_cache(cache, sample_url_v1):
     response.headers = {"Content-Type": "text/xml"}
     response.encoding = "utf-8"
     response.request = req
-    response.elapsed = type("Elapsed", (), {"total_seconds": lambda x: 0.1})()
+    response.elapsed = type("Elapsed", (), {"total_seconds": lambda _x: 0.1})()
 
     cache.save(key, response)
     cached = cache.load(key)
@@ -123,7 +119,7 @@ def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path
     key = cache.get_key(url=sample_url_v1, params={})
     cache.save(key=key, response=response)
 
-    def fail_request(*args, **kwargs):
+    def fail_request(*_args, **_kwargs):
         raise AssertionError("HTTP request should not be called")
 
     monkeypatch.setattr(Session, "request", fail_request)
@@ -194,7 +190,7 @@ def test_get_with_invalid_error_xml_shows_response(http_client, sample_url_v1):
 @pytest.mark.test_server
 def test_download_creates_file(http_client, sample_download_url_v1):
     dummy_content = b"this is dummy content"
-    md5_checksum = hashlib.md5(dummy_content).hexdigest()
+    md5_checksum = hashlib.md5(dummy_content, usedforsecurity=False).hexdigest()
 
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
@@ -220,7 +216,7 @@ def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeyp
     )
     mtime1 = path1.stat().st_mtime
 
-    def fail_request(*args, **kwargs):
+    def fail_request(*_args, **_kwargs):
         raise AssertionError("HTTP request should not be called")
 
     monkeypatch.setattr(Session, "request", fail_request)
@@ -237,7 +233,7 @@ def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeyp
 
 @pytest.mark.test_server
 def test_download_respects_custom_handler(http_client, sample_download_url_v1):
-    def handler(response, path: Path, encoding: str):
+    def handler(_response, path: Path, encoding: str):
         path.write_text("HANDLED", encoding=encoding)
         return path
 
