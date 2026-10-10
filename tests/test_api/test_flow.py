@@ -1,12 +1,12 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from typing import Any
 from unittest.mock import patch
 
+import pandas as pd
 import pytest
 from requests import Response, Session
-import pandas as pd
-from typing import Any
 
 import openml
 from openml._api import FlowV1API, FlowV2API
@@ -38,7 +38,7 @@ def _validate_flow(flow: OpenMLFlow) -> None:
 
 
 def _validate_flow_dict(flow: dict[str, Any]) -> None:
-    assert type(flow) == dict
+    assert type(flow) is dict
     assert len(flow) == 6
     assert isinstance(flow["id"], int)
     assert isinstance(flow["name"], str)
@@ -51,13 +51,14 @@ def _validate_flow_dict(flow: dict[str, Any]) -> None:
     )
     assert ext_version_str_or_none
 
-@pytest.mark.test_server()
+
+@pytest.mark.test_server
 def test_flow_v1_get(flow_v1):
     flow = flow_v1.get(flow_id=1)
     _validate_flow(flow)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_flow_v1_list(flow_v1):
     limit = 5
     flows_df = flow_v1.list(limit=limit)
@@ -85,10 +86,10 @@ def test_flow_v1_exists_mocked_success(flow_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:flow_exists xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>123</oml:id>\n"
-            "</oml:flow_exists>\n"
-        ).encode("utf-8")
+            b'<oml:flow_exists xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>123</oml:id>\n"
+            b"</oml:flow_exists>\n"
+        )
 
         result = flow_v1.exists(name=flow_name, external_version=external_version)
 
@@ -109,11 +110,11 @@ def test_flow_v1_exists_mocked_server_error(flow_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:error xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:code>104</oml:code>\n"
-            "  <oml:message>Server error</oml:message>\n"
-            "</oml:error>\n"
-        ).encode("utf-8")
+            b'<oml:error xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:code>104</oml:code>\n"
+            b"  <oml:message>Server error</oml:message>\n"
+            b"</oml:error>\n"
+        )
 
         with pytest.raises(OpenMLServerException, match="Server error"):
             flow_v1.exists(name="foo", external_version="1")
@@ -126,10 +127,10 @@ def test_flow_v1_publish_mocked(flow_v1, test_apikey_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>321</oml:id>\n"
-            "</oml:upload_flow>\n"
-        ).encode("utf-8")
+            b'<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>321</oml:id>\n"
+            b"</oml:upload_flow>\n"
+        )
 
         result = flow_v1.publish(path="flow", files=files)
 
@@ -151,10 +152,10 @@ def test_flow_v1_delete_mocked(flow_v1, test_apikey_v1):
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
         mock_request.return_value._content = (
-            '<oml:flow_delete xmlns:oml="http://openml.org/openml">\n'
-            "  <oml:id>123</oml:id>\n"
-            "</oml:flow_delete>\n"
-        ).encode("utf-8")
+            b'<oml:flow_delete xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>123</oml:id>\n"
+            b"</oml:flow_delete>\n"
+        )
 
         result = flow_v1.delete(flow_id)
 
@@ -182,7 +183,7 @@ def test_flow_v1_tag_mocked(flow_v1, test_apikey_v1):
             f"<oml:id>{flow_id}</oml:id>"
             f"<oml:tag>{tag_name}</oml:tag>"
             "</oml:flow_tag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = flow_v1.tag(flow_id, tag_name)
 
@@ -213,7 +214,7 @@ def test_flow_v1_untag_mocked(flow_v1, test_apikey_v1):
             '<oml:flow_untag xmlns:oml="http://openml.org/openml">'
             f"<oml:id>{flow_id}</oml:id>"
             "</oml:flow_untag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = flow_v1.untag(flow_id, tag_name)
 
@@ -232,7 +233,7 @@ def test_flow_v1_untag_mocked(flow_v1, test_apikey_v1):
         )
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_flow_v2_get(flow_v2):
     flow = flow_v2.get(flow_id=1)
     _validate_flow(flow)
@@ -269,7 +270,7 @@ def test_flow_v2_publish_not_supported(flow_v2):
         flow_v2.publish(path="flow", files={"description": "<flow/>"})
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_flow_v1_v2_get_output_match(flow_v1, flow_v2):
     flow_from_v1 = flow_v1.get(flow_id=1)
     flow_from_v2 = flow_v2.get(flow_id=1)

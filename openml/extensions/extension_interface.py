@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from typing import TYPE_CHECKING, Any
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from collections import OrderedDict
+
     import numpy as np
     import scipy.sparse
 

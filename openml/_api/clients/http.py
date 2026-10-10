@@ -7,9 +7,8 @@ import math
 import random
 import time
 import xml
-from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlencode, urljoin, urlparse
 
 import requests
@@ -25,6 +24,9 @@ from openml.exceptions import (
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
 
 
 class HTTPCache:

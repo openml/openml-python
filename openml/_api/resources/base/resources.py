@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import builtins
 from abc import abstractmethod
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from openml.enums import ResourceType
@@ -10,6 +8,9 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    import builtins
+    from collections.abc import Iterable
+
     import pandas as pd
 
     from openml.estimation_procedures import OpenMLEstimationProcedure

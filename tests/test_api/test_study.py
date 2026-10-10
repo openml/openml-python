@@ -1,14 +1,15 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import pytest
-from requests import Session, Response
 from unittest.mock import patch
-import pandas as pd
 
+import pandas as pd
+import pytest
+from requests import Response, Session
+
+import openml
 from openml._api.resources import StudyV1API, StudyV2API
 from openml.exceptions import OpenMLNotSupportedError
-import openml
 
 
 @pytest.fixture
@@ -23,7 +24,7 @@ def study_v2(http_client_v2, minio_client) -> StudyV2API:
     return StudyV2API(http=http_client_v2, minio=minio_client)
 
 
-def test_v1_list(study_v1, test_server_v1, test_apikey_v1):
+def test_v1_list(study_v1, test_server_v1, test_apikey_v1):  # noqa: ARG001
     """Test V1 list basic functionality with limit and offset."""
     # Mock response with study list
     mock_response = """<?xml version="1.0" encoding="UTF-8"?>
@@ -75,7 +76,7 @@ def test_v1_publish(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 publish a new study."""
     study_id = 999
     study_files = {"description": "Test Study Description"}
-    
+
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -83,7 +84,7 @@ def test_v1_publish(study_v1, test_server_v1, test_apikey_v1):
             f'<oml:upload_study xmlns:oml="http://openml.org/openml">\n'
             f"\t<oml:id>{study_id}</oml:id>\n"
             f"</oml:upload_study>\n"
-        ).encode("utf-8")
+        ).encode()
 
         published_id = study_v1.publish("study", files=study_files)
 
@@ -102,7 +103,7 @@ def test_v1_publish(study_v1, test_server_v1, test_apikey_v1):
 def test_v1_delete(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 delete a study."""
     study_id = 100
-    
+
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -110,7 +111,7 @@ def test_v1_delete(study_v1, test_server_v1, test_apikey_v1):
             f'<oml:study_delete xmlns:oml="http://openml.org/openml">\n'
             f"  <oml:id>{study_id}</oml:id>\n"
             f"</oml:study_delete>\n"
-        ).encode("utf-8")
+        ).encode()
 
         result = study_v1.delete(study_id)
 
@@ -130,7 +131,7 @@ def test_v1_tag(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 tag a study."""
     study_id = 100
     tag_name = "important-tag"
-    
+
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -139,7 +140,7 @@ def test_v1_tag(study_v1, test_server_v1, test_apikey_v1):
             f"<oml:id>{study_id}</oml:id>"
             f"<oml:tag>{tag_name}</oml:tag>"
             f"</oml:study_tag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = study_v1.tag(study_id, tag_name)
 
@@ -163,7 +164,7 @@ def test_v1_untag(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 untag a study."""
     study_id = 100
     tag_name = "important-tag"
-    
+
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -171,7 +172,7 @@ def test_v1_untag(study_v1, test_server_v1, test_apikey_v1):
             f'<oml:study_untag xmlns:oml="http://openml.org/openml">'
             f"<oml:id>{study_id}</oml:id>"
             f"</oml:study_untag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = study_v1.untag(study_id, tag_name)
 

@@ -61,6 +61,6 @@ jobs:
           repository: openml/openml-python
           short-description: "pre-installed openml-python environment"
           readme-filepath: ./docker/readme.md
-          
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

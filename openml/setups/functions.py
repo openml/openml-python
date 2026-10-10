@@ -16,6 +16,9 @@ from openml.flows import OpenMLFlow, flow_exists
 if TYPE_CHECKING:
     from .setup import OpenMLSetup
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 def setup_exists(flow: OpenMLFlow) -> int:
     """

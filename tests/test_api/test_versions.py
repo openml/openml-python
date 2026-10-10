@@ -1,10 +1,14 @@
-import pytest
-from requests import Session, Response
+from __future__ import annotations
+
 from unittest.mock import patch
+
+import pytest
+from requests import Response, Session
+
+import openml
 from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API
 from openml.enums import ResourceType
 from openml.exceptions import OpenMLNotSupportedError
-import openml
 
 
 class DummyTaskAPI(ResourceAPI):
@@ -47,7 +51,7 @@ def test_v1_publish(dummy_task_v1, test_server_v1, test_apikey_v1):
             f'<oml:upload_task xmlns:oml="http://openml.org/openml">\n'
             f"\t<oml:id>{resource_id}</oml:id>\n"
             f"</oml:upload_task>\n"
-        ).encode("utf-8")
+        ).encode()
 
         published_resource_id = resource.publish(
             resource_name,
@@ -78,18 +82,13 @@ def test_v1_delete(dummy_task_v1, test_server_v1, test_apikey_v1):
             f'<oml:task_delete xmlns:oml="http://openml.org/openml">\n'
             f"  <oml:id>{resource_id}</oml:id>\n"
             f"</oml:task_delete>\n"
-        ).encode("utf-8")
+        ).encode()
 
         resource.delete(resource_id)
 
         mock_request.assert_called_once_with(
             method="DELETE",
-            url=(
-                test_server_v1
-                + resource_name
-                + "/"
-                + str(resource_id)
-            ),
+            url=(test_server_v1 + resource_name + "/" + str(resource_id)),
             params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
@@ -110,7 +109,7 @@ def test_v1_tag(dummy_task_v1, test_server_v1, test_apikey_v1):
             f"<oml:id>{resource_id}</oml:id>"
             f"<oml:tag>{resource_tag}</oml:tag>"
             f"</oml:task_tag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = resource.tag(resource_id, resource_tag)
 
@@ -118,11 +117,7 @@ def test_v1_tag(dummy_task_v1, test_server_v1, test_apikey_v1):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=(
-                test_server_v1
-                + resource.resource_type
-                + "/tag"
-            ),
+            url=(test_server_v1 + resource.resource_type + "/tag"),
             params={},
             data={
                 "api_key": test_apikey_v1,
@@ -146,7 +141,7 @@ def test_v1_untag(dummy_task_v1, test_server_v1, test_apikey_v1):
             f'<oml:task_untag xmlns:oml="http://openml.org/openml">'
             f"<oml:id>{resource_id}</oml:id>"
             f"</oml:task_untag>"
-        ).encode("utf-8")
+        ).encode()
 
         tags = resource.untag(resource_id, resource_tag)
 
@@ -154,11 +149,7 @@ def test_v1_untag(dummy_task_v1, test_server_v1, test_apikey_v1):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=(
-                test_server_v1
-                + resource.resource_type
-                + "/untag"
-            ),
+            url=(test_server_v1 + resource.resource_type + "/untag"),
             params={},
             data={
                 "api_key": test_apikey_v1,

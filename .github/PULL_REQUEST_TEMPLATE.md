@@ -19,7 +19,7 @@ Please make sure that:
 * Change Log Entry: <!-- Short String, example: "Add new function `foo()` to module `bar`"; or "Fixes a bug with `bar`" -->
 
 
-#### Details 
+#### Details
 <!--
 if necessary, please share the following:
 
@@ -28,4 +28,3 @@ if necessary, please share the following:
 * How can I reproduce the issue this PR is solving and its solution?
 * Any other comments?
 -->
-
