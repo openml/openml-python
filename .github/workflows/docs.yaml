@@ -38,7 +38,7 @@ jobs:
           CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAGES_BRANCH: gh-pages
-        if: contains(github.ref, 'main')) && github.event_name == 'push'
+        if: contains(github.ref, 'main') && github.event_name == 'push'
         run: |
           git config user.name doc-bot
           git config user.email doc-bot@openml.com
