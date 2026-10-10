@@ -905,6 +905,29 @@ def edit_dataset(
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
 
+    if not any(
+        field
+        for field in [
+            description,
+            creator,
+            contributor,
+            collection_date,
+            language,
+            default_target_attribute,
+            ignore_attribute,
+            citation,
+            row_id_attribute,
+            original_data_url,
+            paper_url,
+        ]
+    ):
+        raise ValueError(
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, "
+            "original_data_url, default_target_attribute, row_id_attribute, "
+            "ignore_attribute or paper_url to edit.",
+        )
+
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
     xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
