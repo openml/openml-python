@@ -3669,17 +3669,17 @@
 <p>This document highlights some of the more advanced features of
 <code>openml-python</code>. </p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
-<p>The configuration file resides in a directory <code>.config/openml</code> in the
+<p>The configuration file resides in a directory <code>~/.config/openml</code> in the
 home directory of the user and is called config (More specifically, it
-resides in the <a href="https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html">configuration directory specified by the XDGB Base
+resides in the <a href="https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html">configuration directory specified by the XDG Base
 Directory
 Specification</a>).
 It consists of <code>key = value</code> pairs which are separated by newlines. The
 following keys are defined:</p>
 <ul>
 <li>apikey: required to access the server.</li>
-<li>server: the server to connect to (default: <code>http://www.openml.org</code>).
-          For connection to the test server, set this to <code>test.openml.org</code>.</li>
+<li>server: the server to connect to (default: <code>https://www.openml.org</code>).
+          For connection to the test server, set this to <code>https://test.openml.org</code>.</li>
 <li>cachedir: the root folder where the cache file directories should be created.
     If not given, will default to <code>~/.openml/cache</code></li>
 <li>avoid_duplicate_runs: if set to <code>True</code> (default), when certain functions

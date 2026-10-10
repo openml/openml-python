@@ -3745,8 +3745,8 @@ to upload it. However, in order to simplify the process of uploading
 flows and runs from a specific library, an additional interface can be
 built. The OpenML-Python team does not have the capacity to develop and
 maintain such interfaces on its own. For this reason, we have built an
-extension interface to allows others to contribute back. Building a
-suitable extension for therefore requires an understanding of the
+extension interface to allow others to contribute back. Building a
+suitable extension therefore requires an understanding of the
 current OpenML-Python support.</p>
 <p><a href="../examples/Basics/simple_flows_and_runs_tutorial">This tutorial</a> shows how the scikit-learn 
 extension works with OpenML-Python.</p>
@@ -3779,8 +3779,8 @@ and can be implemented in several lines of code.</p>
     Typically, the flow-dependency field is used to check whether
     the specific library is present, and no unknown libraries are
     present there.</li>
-<li><code>can_handle_model</code>: Similar as
-    <code>can_handle_flow</code>:, except that in
+<li><code>can_handle_model</code>: Similar to
+    <code>can_handle_flow</code>, except that in
     this case a Python object is given. As such, in many cases, this
     method can be implemented by checking whether this adheres to a
     certain base class.</li>
@@ -3858,7 +3858,7 @@ and can be implemented in several lines of code.</p>
 <p>Each extension created should be a stand-alone repository, compatible
 with the <a href="https://github.com/openml/openml-python">OpenML-Python repository</a>. 
 The extension repository should work off-the-shelf with <em>OpenML-Python</em> installed.</p>
-<p>Create a public Github repo with the following directory structure:</p>
+<p>Create a public GitHub repo with the following directory structure:</p>
 <div class="highlight"><pre><span></span><code>| [repo name]
 |    |-- [extension name]
 |    |    |-- __init__.py
@@ -3868,7 +3868,7 @@ The extension repository should work off-the-shelf with <em>OpenML-Python</em> i
 <h3 id="recommended">Recommended<a class="headerlink" href="#recommended" title="Permanent link">#</a></h3>
 <ul>
 <li>Test cases to keep the extension up to date with the
-    Openml-Python upstream changes.</li>
+    OpenML-Python upstream changes.</li>
 <li>Documentation of the extension API, especially if any new
     functionality added to OpenML-Python\'s extension design.</li>
 <li>Examples to show how the new extension interfaces and works with
