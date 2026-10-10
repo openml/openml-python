@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import xml.parsers.expat
 from collections.abc import Mapping
 from typing import Any, cast
 
@@ -7,6 +8,7 @@ import xmltodict
 
 from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
+    OpenMLServerError,
     OpenMLServerException,
 )
 
@@ -72,7 +74,11 @@ class ResourceV1API(ResourceAPI):
             If the server returns an error during upload.
         """
         response = self._http.post(path, files=files)
-        parsed_response = xmltodict.parse(response.content)
+        try:
+            parsed_response = xmltodict.parse(response.content)
+        except xml.parsers.expat.ExpatError as e:
+            msg = f"Unexpected response to {path}Could not parse: {response.content!r}"
+            raise OpenMLServerError(msg) from e
         return self._extract_id_from_upload(parsed_response)
 
     def delete(self, resource_id: int) -> bool:
@@ -107,8 +113,12 @@ class ResourceV1API(ResourceAPI):
         path = f"{endpoint_name}/{resource_id}"
         try:
             response = self._http.delete(path)
-            result = xmltodict.parse(response.content)
-            return f"oml:{endpoint_name}_delete" in result
+            try:
+                parsed_response = xmltodict.parse(response.content)
+            except xml.parsers.expat.ExpatError as e:
+                msg = f"Unexpected response to {path}Could not parse: {response.content!r}"
+                raise OpenMLServerError(msg) from e
+            return f"oml:{endpoint_name}_delete" in parsed_response
         except OpenMLServerException as e:
             self._handle_delete_exception(endpoint_name, e)
             raise
@@ -144,7 +154,11 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
+        try:
+            parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
+        except xml.parsers.expat.ExpatError as e:
+            msg = f"Unexpected response to {path}Could not parse: {response.content!r}"
+            raise OpenMLServerError(msg) from e
         result = parsed_response[f"oml:{endpoint_name}_tag"]
         tags: list[str] = result.get("oml:tag", [])
 
@@ -181,7 +195,11 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
+        try:
+            parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
+        except xml.parsers.expat.ExpatError as e:
+            msg = f"Unexpected response to {path}Could not parse: {response.content!r}"
+            raise OpenMLServerError(msg) from e
         result = parsed_response[f"oml:{endpoint_name}_untag"]
         tags: list[str] = result.get("oml:tag", [])
 
