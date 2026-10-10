@@ -5,14 +5,12 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - "v*.*.*"
 
   pull_request:
     branches:
       - main
-      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,7 +38,7 @@ jobs:
           CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAGES_BRANCH: gh-pages
-        if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
+        if: contains(github.ref, 'main')) && github.event_name == 'push'
         run: |
           git config user.name doc-bot
           git config user.email doc-bot@openml.com
