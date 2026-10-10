@@ -315,3 +315,50 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_server_v1, 
     task_url = test_server_v1 + "task/9999999"
     assert task_url == mock_delete.call_args.args[0]
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+
+
+@mock.patch("openml.tasks.functions._get_task_description")
+@mock.patch.object(requests.Session, "post")
+def test_create_task_publish_populates_estimation_procedure(
+    mock_post,
+    mock_get_task_description,
+    test_files_directory,
+):
+    """After publish(), estimation_procedure must be populated from the server."""
+    # Mock the POST (publish) response
+    content_file = (
+        test_files_directory / "mock_responses" / "tasks" / "task_upload_successful.xml"
+    )
+    mock_post.return_value = create_request_response(
+        status_code=200,
+        content_filepath=content_file,
+    )
+
+    # Mock the follow-up GET (what _get_task_description returns)
+    from openml.tasks import OpenMLClassificationTask, TaskType
+    fake_task = OpenMLClassificationTask(
+        task_id=999,
+        task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+        task_type="Supervised Classification",
+        data_set_id=128,
+        target_name="class",
+        estimation_procedure_id=1,
+        estimation_procedure_type="crossvalidation",
+        estimation_parameters={"number_folds": "10", "number_repeats": "1"},
+        data_splits_url="https://www.openml.org/api_splits/get/999/Task_999_splits.arff",
+    )
+    mock_get_task_description.return_value = fake_task
+
+    task = openml.tasks.create_task(
+        task_type=TaskType.SUPERVISED_CLASSIFICATION,
+        dataset_id=128,
+        target_name="class",
+        evaluation_measure="predictive_accuracy",
+        estimation_procedure_id=1,
+    )
+    task.publish()
+
+    assert task.task_id == 999
+    assert task.estimation_procedure["type"] == "crossvalidation"
+    assert task.estimation_procedure["data_splits_url"] is not None
+    assert task.estimation_procedure["parameters"] is not None
