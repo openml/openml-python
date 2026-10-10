@@ -5,7 +5,7 @@ the contribution guidelines: https://github.com/openml/openml-python/blob/main/C
 Please make sure that:
 
 * the title of the pull request is descriptive
-* this pull requests is against the `develop` branch
+* this pull requests is against the `main` branch
 * for any new functionality, consider adding a relevant example
 * add unit tests for new functionalities
     * collect files uploaded to test server using _mark_entity_for_removal()

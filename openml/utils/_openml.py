@@ -2,12 +2,21 @@
 from __future__ import annotations
 
 import contextlib
+import re
 import shutil
 import warnings
+from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Mapping, Sequence, Sized
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, Sized, TypeVar, overload
-from typing_extensions import Literal, ParamSpec
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Literal,
+    TypeVar,
+    overload,
+)
+from typing_extensions import ParamSpec
 
 import numpy as np
 import xmltodict
@@ -17,8 +26,6 @@ from tqdm import tqdm
 import openml
 import openml._api_calls
 import openml.exceptions
-
-from . import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -103,7 +110,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT001, FBT002
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT002
     api_type_alias = _get_rest_api_type_alias(oml_object)
     if oml_object.id is None:
         raise openml.exceptions.ObjectNotPublishedError(
@@ -198,7 +205,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
     if entity_type not in legal_entities:
         raise ValueError(f"Can't delete a {entity_type}")
 
-    url_suffix = "%s/%d" % (entity_type, entity_id)
+    url_suffix = f"{entity_type}/{entity_id}"
     try:
         result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
         result = xmltodict.parse(result_xml)
@@ -328,7 +335,7 @@ def _list_all(  # noqa: C901
 
 
 def _get_cache_dir_for_key(key: str) -> Path:
-    return Path(config.get_cache_directory()) / key
+    return Path(openml.config.get_cache_directory()) / key
 
 
 def _create_cache_directory(key: str) -> Path:
@@ -344,7 +351,7 @@ def _create_cache_directory(key: str) -> Path:
     return cache_dir
 
 
-def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT001, FBT002
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT002
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
     return Path(cache_dir) / str(id_)
 
@@ -427,8 +434,20 @@ def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
         return func
 
 
+def get_cache_size() -> int:
+    """Calculate the size of OpenML cache directory
+
+    Returns
+    -------
+    cache_size: int
+        Total size of cache in bytes
+    """
+    path = Path(openml.config.get_cache_directory())
+    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+
+
 def _create_lockfiles_dir() -> Path:
-    path = Path(config.get_cache_directory()) / "locks"
+    path = Path(openml.config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
@@ -469,3 +488,57 @@ class ProgressBar(ProgressType):
         self._progress_bar.update(length)
         if self._progress_bar.total <= self._progress_bar.n:
             self._progress_bar.close()
+
+
+class ReprMixin(ABC):
+    """A mixin class that provides a customizable string representation for OpenML objects.
+
+    This mixin standardizes the __repr__ output format across OpenML classes.
+    Classes inheriting from this mixin should implement the
+    _get_repr_body_fields method to specify which fields to display.
+    """
+
+    def __repr__(self) -> str:
+        body_fields = self._get_repr_body_fields()
+        return self._apply_repr_template(body_fields)
+
+    @abstractmethod
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body.
+
+        Returns
+        -------
+        body_fields : List[Tuple[str, Union[str, int, List[str]]]]
+            A list of (name, value) pairs to display in the body of the __repr__.
+            E.g.: [('metric', 'accuracy'), ('dataset', 'iris')]
+            If value is a List of str, then each item of the list will appear in a separate row.
+        """
+        # Should be implemented in the base class.
+
+    def _apply_repr_template(
+        self,
+        body_fields: Iterable[tuple[str, str | int | list[str] | None]],
+    ) -> str:
+        """Generates the header and formats the body for string representation of the object.
+
+        Parameters
+        ----------
+        body_fields: List[Tuple[str, str]]
+           A list of (name, value) pairs to display in the body of the __repr__.
+        """
+        # We add spaces between capitals, e.g. ClassificationTask -> Classification Task
+        name_with_spaces = re.sub(
+            r"(\w)([A-Z])",
+            r"\1 \2",
+            self.__class__.__name__[len("OpenML") :],
+        )
+        header_text = f"OpenML {name_with_spaces}"
+        header = f"{header_text}\n{'=' * len(header_text)}\n"
+
+        _body_fields: list[tuple[str, str | int | list[str]]] = [
+            (k, "None" if v is None else v) for k, v in body_fields
+        ]
+        longest_field_name_length = max(len(name) for name, _ in _body_fields)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
+        body = "\n".join(field_line_format.format(name, value) for name, value in _body_fields)
+        return header + body

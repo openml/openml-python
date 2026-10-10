@@ -5,11 +5,13 @@ import collections
 import copy
 import hashlib
 import re
+import os
 import time
 from packaging.version import Version
 from unittest import mock
 
 import pytest
+import requests
 import scipy.stats
 import sklearn
 import sklearn.datasets
@@ -29,9 +31,8 @@ from openml_sklearn import SklearnExtension
 import openml
 import openml.exceptions
 import openml.utils
-from openml._api_calls import _perform_api_call
-from openml.testing import SimpleImputer, TestBase
 
+from openml.testing import SimpleImputer, TestBase
 
 
 class TestFlow(TestBase):
@@ -44,7 +45,7 @@ class TestFlow(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
         # test server
@@ -77,7 +78,8 @@ class TestFlow(TestBase):
         assert subflow_3.parameters["L"] == "-1"
         assert len(subflow_3.components) == 0
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the
@@ -102,6 +104,7 @@ class TestFlow(TestBase):
                 subflow = flow.get_subflow(structure)
                 assert subflow.flow_id == sub_flow_id
 
+    @pytest.mark.test_server()
     def test_tagging(self):
         flows = openml.flows.list_flows(size=1)
         flow_id = flows["id"].iloc[0]
@@ -114,11 +117,13 @@ class TestFlow(TestBase):
         flow.push_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 1
-        assert flow_id in flows["id"]
+        assert flow_id in flows["id"].values
         flow.remove_tag(tag)
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
 
+
+    @pytest.mark.test_server()
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
         # TODO maybe get this via get_flow(), which would have to be refactored
@@ -130,7 +135,7 @@ class TestFlow(TestBase):
             7,
             9,
         ]:
-            flow_xml = _perform_api_call("flow/%d" % flow_id, request_method="get")
+            flow_xml = openml._backend.http_client.get(f"flow/{flow_id}").text
             flow_dict = xmltodict.parse(flow_xml)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)
@@ -178,6 +183,7 @@ class TestFlow(TestBase):
         assert new_flow is not flow
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_publish_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -219,6 +225,7 @@ class TestFlow(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
             [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))],
@@ -269,6 +276,7 @@ class TestFlow(TestBase):
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
@@ -295,20 +303,27 @@ class TestFlow(TestBase):
     @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
+    @mock.patch("requests.Session.request")
+    def test_publish_error(self, mock_request, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
-        api_call_mock.return_value = (
-            "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
-        )
-        flow_exists_mock.return_value = False
+        
+        # Create mock response directly
+        response = requests.Response()
+        response.status_code = 200
+        response._content = (
+            '<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
+            "    <oml:id>1</oml:id>\n"
+            "</oml:upload_flow>"
+        ).encode()
+        mock_request.return_value = response
+        flow_exists_mock.return_value = False  # Flow doesn't exist yet, so try to publish
         get_flow_mock.return_value = flow
 
         flow.publish()
-        # Not collecting flow_id for deletion since this is a test for failed upload
+        # The first publish succeeds, so we don't collect flow_id for deletion since this is a mocked test.
 
-        assert api_call_mock.call_count == 1
+        assert mock_request.call_count == 1
         assert get_flow_mock.call_count == 1
         assert flow_exists_mock.call_count == 1
 
@@ -360,6 +375,7 @@ class TestFlow(TestBase):
         )
         self.assertRaises(ValueError, self.extension.model_to_flow, illegal)
 
+    @pytest.mark.test_server()
     def test_nonexisting_flow_exists(self):
         def get_sentinel():
             # Create a unique prefix for the flow. Necessary because the flow
@@ -377,6 +393,7 @@ class TestFlow(TestBase):
         assert not flow_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
@@ -417,6 +434,7 @@ class TestFlow(TestBase):
             assert downloaded_flow_id == flow.flow_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.test_server()
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data
@@ -556,7 +574,7 @@ class TestFlow(TestBase):
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
         assert tags == ["OpenmlWeka", "weka"]
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_download_non_scikit_learn_flows(self):
         self.use_production_server()
 

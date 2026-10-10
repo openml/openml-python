@@ -4,12 +4,11 @@ from __future__ import annotations
 import pickle
 import time
 from collections import OrderedDict
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Sequence,
 )
 
 import arff
@@ -17,7 +16,6 @@ import numpy as np
 import pandas as pd
 
 import openml
-import openml._api_calls
 from openml.base import OpenMLBase
 from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow, get_flow
@@ -155,10 +153,11 @@ class OpenMLRun(OpenMLBase):
     def predictions(self) -> pd.DataFrame:
         """Return a DataFrame with predictions for this run"""
         if self._predictions is None:
+            arff_dict: dict[str, Any]
             if self.data_content:
                 arff_dict = self._generate_arff_dict()
             elif self.predictions_url:
-                arff_text = openml._api_calls._download_text_file(self.predictions_url)
+                arff_text = openml._backend.run.download_text_file(self.predictions_url)
                 arff_dict = arff.loads(arff_text)
             else:
                 raise RuntimeError("Run has no predictions.")
@@ -280,7 +279,7 @@ class OpenMLRun(OpenMLBase):
         ]
 
     @classmethod
-    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT001, FBT002
+    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT002
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -344,10 +343,41 @@ class OpenMLRun(OpenMLBase):
 
         return run
 
+    def publish(self) -> OpenMLRun:
+        """Publish the run object on the OpenML server."""
+        file_elements = self._get_file_elements()
+
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+
+        result = openml._backend.run.publish(path="run", files=file_elements)
+        self.run_id = result
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Push a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot tag a run that has not been published yet."
+                " Please publish the run first before being able to tag it.",
+            )
+
+        openml._backend.run.tag(self.run_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Remove a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot untag a run that has not been published yet."
+                " Please publish the run first before being able to untag it.",
+            )
+
+        openml._backend.run.untag(self.run_id, tag)
+
     def to_filesystem(
         self,
         directory: str | Path,
-        store_model: bool = True,  # noqa: FBT001, FBT002
+        store_model: bool = True,  # noqa: FBT002
     ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
@@ -365,7 +395,7 @@ class OpenMLRun(OpenMLBase):
             model.
         """
         if self.data_content is None or self.model is None:
-            raise ValueError("Run should have been executed (and contain " "model / predictions)")
+            raise ValueError("Run should have been executed (and contain model / predictions)")
         directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -390,6 +420,57 @@ class OpenMLRun(OpenMLBase):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
+    def _get_arff_attributes_for_task(self, task: OpenMLTask) -> list[tuple[str, Any]]:
+        """Get ARFF attributes based on task type.
+
+        Parameters
+        ----------
+        task : OpenMLTask
+            The task for which to generate attributes.
+
+        Returns
+        -------
+        list[tuple[str, Any]]
+            List of attribute tuples (name, type).
+        """
+        instance_specifications = [
+            ("repeat", "NUMERIC"),
+            ("fold", "NUMERIC"),
+        ]
+
+        if isinstance(task, (OpenMLLearningCurveTask, OpenMLClassificationTask)):
+            instance_specifications.append(("sample", "NUMERIC"))
+
+        instance_specifications.append(("row_id", "NUMERIC"))
+
+        if isinstance(task, (OpenMLLearningCurveTask, OpenMLClassificationTask)):
+            class_labels = task.class_labels
+            if class_labels is None:
+                raise ValueError("The task has no class labels")
+
+            prediction_confidences = [
+                ("confidence." + class_labels[i], "NUMERIC") for i in range(len(class_labels))
+            ]
+            prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
+            return instance_specifications + prediction_and_true + prediction_confidences
+
+        if isinstance(task, OpenMLRegressionTask):
+            return [*instance_specifications, ("prediction", "NUMERIC"), ("truth", "NUMERIC")]
+
+        if isinstance(task, OpenMLClusteringTask):
+            return [*instance_specifications, ("cluster", "NUMERIC")]
+
+        supported_task_types = [
+            TaskType.SUPERVISED_CLASSIFICATION,
+            TaskType.SUPERVISED_REGRESSION,
+            TaskType.CLUSTERING,
+            TaskType.LEARNING_CURVE,
+        ]
+        raise NotImplementedError(
+            f"Task type {task.task_type!s} for task_id {getattr(task, 'task_id', None)!s} "
+            f"is not yet supported. Supported task types are: {supported_task_types!r}"
+        )
+
     def _generate_arff_dict(self) -> OrderedDict[str, Any]:
         """Generates the arff dictionary for uploading predictions to the
         server.
@@ -407,7 +488,8 @@ class OpenMLRun(OpenMLBase):
         if self.data_content is None:
             raise ValueError("Run has not been executed.")
         if self.flow is None:
-            assert self.flow_id is not None, "Run has no associated flow id!"
+            if self.flow_id is None:
+                raise ValueError("Run has no associated flow id!")
             self.flow = get_flow(self.flow_id)
 
         if self.description_text is None:
@@ -418,69 +500,7 @@ class OpenMLRun(OpenMLBase):
         arff_dict["data"] = self.data_content
         arff_dict["description"] = self.description_text
         arff_dict["relation"] = f"openml_task_{task.task_id}_predictions"
-
-        if isinstance(task, OpenMLLearningCurveTask):
-            class_labels = task.class_labels
-            instance_specifications = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("sample", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-            ]
-
-            arff_dict["attributes"] = instance_specifications
-            if class_labels is not None:
-                arff_dict["attributes"] = (
-                    arff_dict["attributes"]
-                    + [("prediction", class_labels), ("correct", class_labels)]
-                    + [
-                        ("confidence." + class_labels[i], "NUMERIC")
-                        for i in range(len(class_labels))
-                    ]
-                )
-            else:
-                raise ValueError("The task has no class labels")
-
-        elif isinstance(task, OpenMLClassificationTask):
-            class_labels = task.class_labels
-            instance_specifications = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("sample", "NUMERIC"),  # Legacy
-                ("row_id", "NUMERIC"),
-            ]
-
-            arff_dict["attributes"] = instance_specifications
-            if class_labels is not None:
-                prediction_confidences = [
-                    ("confidence." + class_labels[i], "NUMERIC") for i in range(len(class_labels))
-                ]
-                prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
-                arff_dict["attributes"] = (
-                    arff_dict["attributes"] + prediction_and_true + prediction_confidences
-                )
-            else:
-                raise ValueError("The task has no class labels")
-
-        elif isinstance(task, OpenMLRegressionTask):
-            arff_dict["attributes"] = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-                ("prediction", "NUMERIC"),
-                ("truth", "NUMERIC"),
-            ]
-
-        elif isinstance(task, OpenMLClusteringTask):
-            arff_dict["attributes"] = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-                ("cluster", "NUMERIC"),
-            ]
-
-        else:
-            raise NotImplementedError(f"Task type {task.task_type!s} is not yet supported.")
+        arff_dict["attributes"] = self._get_arff_attributes_for_task(task)
 
         return arff_dict
 
@@ -505,19 +525,20 @@ class OpenMLRun(OpenMLBase):
             metric results
         """
         kwargs = kwargs if kwargs else {}
+        predictions_arff: dict[str, Any]
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif (self.output_files is not None) and ("predictions" in self.output_files):
-            predictions_file_url = openml._api_calls._file_id_to_url(
+            predictions_file_url = openml._backend.run.file_id_to_url(
                 self.output_files["predictions"],
                 "predictions.arff",
             )
-            response = openml._api_calls._download_text_file(predictions_file_url)
-            predictions_arff = arff.loads(response)
+            predictions_text = openml._backend.run.download_text_file(predictions_file_url)
+            predictions_arff = arff.loads(predictions_text)
             # TODO: make this a stream reader
         else:
             raise ValueError(
-                "Run should have been locally executed or " "contain outputfile reference.",
+                "Run should have been locally executed or contain outputfile reference.",
             )
 
         # Need to know more about the task to compute scores correctly
@@ -528,11 +549,11 @@ class OpenMLRun(OpenMLBase):
             task.task_type_id in [TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE]
             and "correct" not in attribute_names
         ):
-            raise ValueError('Attribute "correct" should be set for ' "classification task runs")
+            raise ValueError('Attribute "correct" should be set for classification task runs')
         if task.task_type_id == TaskType.SUPERVISED_REGRESSION and "truth" not in attribute_names:
-            raise ValueError('Attribute "truth" should be set for ' "regression task runs")
+            raise ValueError('Attribute "truth" should be set for regression task runs')
         if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
-            raise ValueError('Attribute "predict" should be set for ' "supervised task runs")
+            raise ValueError('Attribute "prediction" should be set for supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):  # type: ignore
             # convenience function: Creates a mapping to map from the name of
@@ -566,7 +587,7 @@ class OpenMLRun(OpenMLBase):
             pred = predictions_arff["attributes"][predicted_idx][1]
             corr = predictions_arff["attributes"][correct_idx][1]
             raise ValueError(
-                "Predicted and Correct do not have equal values:" f" {pred!s} Vs. {corr!s}",
+                f"Predicted and Correct do not have equal values: {pred!s} Vs. {corr!s}",
             )
 
         # TODO: these could be cached
@@ -602,7 +623,7 @@ class OpenMLRun(OpenMLBase):
             values_correct[rep][fold][samp].append(correct)
 
         scores = []
-        for rep in values_predict:
+        for rep in values_predict:  # noqa: PLC0206
             for fold in values_predict[rep]:
                 last_sample = len(values_predict[rep][fold]) - 1
                 y_pred = values_predict[rep][fold][last_sample]
@@ -637,7 +658,10 @@ class OpenMLRun(OpenMLBase):
 
         if self.parameter_settings is None:
             if self.flow is None:
-                assert self.flow_id is not None  # for mypy
+                if self.flow_id is None:
+                    raise ValueError(
+                        "Run has no associated flow_id and cannot obtain parameter values."
+                    )
                 self.flow = openml.flows.get_flow(self.flow_id)
             self.parameter_settings = self.flow.extension.obtain_parameter_values(
                 self.flow,

@@ -47,9 +47,7 @@ class TestBase(unittest.TestCase):
         "user": [],
     }
     flow_name_tracker: ClassVar[list[str]] = []
-    test_server = "https://test.openml.org/api/v1/xml"
-    # amueller's read/write key that he will throw away later
-    apikey = "610344db6388d9ba34f6db45a3cf71de"
+    admin_key = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR)
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
@@ -80,7 +78,7 @@ class TestBase(unittest.TestCase):
         for _ in range(n_levels):
             static_cache_dir = static_cache_dir.parent.absolute()
 
-        content = os.listdir(static_cache_dir)
+        content = os.listdir(static_cache_dir)  # noqa: PTH208
         if "files" in content:
             static_cache_dir = static_cache_dir / "files"
         else:
@@ -99,8 +97,6 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.apikey
-        self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
@@ -114,8 +110,7 @@ class TestBase(unittest.TestCase):
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.server = self.production_server
-        openml.config.apikey = ""
+        openml.config.use_production_servers()
 
     def tearDown(self) -> None:
         """Tear down the test"""
@@ -166,7 +161,11 @@ class TestBase(unittest.TestCase):
                 delete_index = next(
                     i
                     for i, (id_, _) in enumerate(
-                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker),
+                        zip(
+                            TestBase.publish_tracker[entity_type],
+                            TestBase.flow_name_tracker,
+                            strict=False,
+                        ),
                     )
                     if id_ == entity
                 )
@@ -352,9 +351,9 @@ def create_request_response(
 
 
 __all__ = [
-    "TestBase",
-    "SimpleImputer",
     "CustomImputer",
+    "SimpleImputer",
+    "TestBase",
     "check_task_existence",
     "create_request_response",
 ]
