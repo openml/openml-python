@@ -41,6 +41,22 @@ class TaskType(Enum):
     SUBGROUP_DISCOVERY = 8
     MULTITASK_REGRESSION = 9
 
+    @property
+    def type_str(self) -> str:
+        """Return the OpenML string representation of the task type."""
+        mapping = {
+            TaskType.SUPERVISED_CLASSIFICATION: "Supervised Classification",
+            TaskType.SUPERVISED_REGRESSION: "Supervised Regression",
+            TaskType.LEARNING_CURVE: "Learning Curve",
+            TaskType.SUPERVISED_DATASTREAM_CLASSIFICATION: "Supervised Data Stream Classification",
+            TaskType.CLUSTERING: "Clustering",
+            TaskType.MACHINE_LEARNING_CHALLENGE: "Machine Learning Challenge",
+            TaskType.SURVIVAL_ANALYSIS: "Survival Analysis",
+            TaskType.SUBGROUP_DISCOVERY: "Subgroup Discovery",
+            TaskType.MULTITASK_REGRESSION: "Multi-task Regression",
+        }
+        return mapping[self]
+
 
 class _EstimationProcedure(TypedDict):
     type: str | None
@@ -90,7 +106,7 @@ class OpenMLTask(OpenMLBase):
     ):
         self.task_id = int(task_id) if task_id is not None else None
         self.task_type_id = task_type_id
-        self.task_type = task_type
+        self.task_type = task_type if task_type is not None else task_type_id.type_str
         self.dataset_id = int(data_set_id)
         self.target_name = target_name
         resolved_estimation_procedure_id = self._resolve_estimation_procedure_id(

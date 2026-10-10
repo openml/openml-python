@@ -315,3 +315,56 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_server_v1, 
     task_url = test_server_v1 + "task/9999999"
     assert task_url == mock_delete.call_args.args[0]
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+
+
+def test_create_task_sets_task_type() -> None:
+    task = openml.tasks.create_task(
+        TaskType.SUPERVISED_CLASSIFICATION,
+        dataset_id=1,
+        target_name="class",
+        estimation_procedure_id=1,
+    )
+    assert task.task_type == "Supervised Classification"
+    assert task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION
+
+    task_reg = openml.tasks.create_task(
+        TaskType.SUPERVISED_REGRESSION,
+        dataset_id=1,
+        target_name="target",
+        estimation_procedure_id=7,
+    )
+    assert task_reg.task_type == "Supervised Regression"
+    assert task_reg.task_type_id == TaskType.SUPERVISED_REGRESSION
+
+    task_cluster = openml.tasks.create_task(
+        TaskType.CLUSTERING,
+        dataset_id=1,
+        estimation_procedure_id=17,
+    )
+    assert task_cluster.task_type == "Clustering"
+    assert task_cluster.task_type_id == TaskType.CLUSTERING
+
+    task_lc = openml.tasks.create_task(
+        TaskType.LEARNING_CURVE,
+        dataset_id=1,
+        target_name="class",
+        estimation_procedure_id=13,
+    )
+    assert task_lc.task_type == "Learning Curve"
+    assert task_lc.task_type_id == TaskType.LEARNING_CURVE
+
+
+def test_task_type_str() -> None:
+    expected = {
+        TaskType.SUPERVISED_CLASSIFICATION: "Supervised Classification",
+        TaskType.SUPERVISED_REGRESSION: "Supervised Regression",
+        TaskType.LEARNING_CURVE: "Learning Curve",
+        TaskType.SUPERVISED_DATASTREAM_CLASSIFICATION: "Supervised Data Stream Classification",
+        TaskType.CLUSTERING: "Clustering",
+        TaskType.MACHINE_LEARNING_CHALLENGE: "Machine Learning Challenge",
+        TaskType.SURVIVAL_ANALYSIS: "Survival Analysis",
+        TaskType.SUBGROUP_DISCOVERY: "Subgroup Discovery",
+        TaskType.MULTITASK_REGRESSION: "Multi-task Regression",
+    }
+    for task_type, expected_str in expected.items():
+        assert task_type.type_str == expected_str

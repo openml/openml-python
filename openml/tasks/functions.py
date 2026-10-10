@@ -572,7 +572,7 @@ def create_task(
     return task_cls(
         task_id=None,
         task_type_id=task_type,
-        task_type="None",  # TODO: refactor to get task type string from ID.
+        task_type=task_type.type_str,
         data_set_id=dataset_id,
         target_name=target_name,  # type: ignore
         estimation_procedure_id=estimation_procedure_id,
