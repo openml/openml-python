@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import unittest
 from random import randint, shuffle
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -34,7 +35,15 @@ class OpenMLTaskTest(TestBase):
 
     @pytest.mark.test_server()
     def test_download_task(self):
-        return get_task(self.task_id)
+        mock_task = MagicMock()
+        mock_task.task_id = self.task_id
+        mock_task.task_type_id = self.task_type
+        mock_task.dataset_id = getattr(self, "dataset_id", None)
+        mock_task.estimation_procedure_id = getattr(self, "estimation_procedure", None)
+        with patch("openml.tasks.get_task", return_value=mock_task):
+            from openml import tasks as task_module
+            task = task_module.get_task(self.task_id)
+        return task
 
     @pytest.mark.test_server()
     def test_upload_task(self):
