@@ -18,9 +18,11 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from . import (
     _api_calls,
-    config,
+    _config as _config_module,
     datasets,
     evaluations,
     exceptions,
@@ -33,10 +35,14 @@ from . import (
     utils,
 )
 from .__version__ import __version__
+from ._api import _backend
 from .datasets import OpenMLDataFeature, OpenMLDataset
+from .datasets.functions import get_dataset, list_datasets
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
+from .flows.functions import get_flow, list_flows
 from .runs import OpenMLRun
+from .runs.functions import get_run, list_runs
 from .setups import OpenMLParameter, OpenMLSetup
 from .study import OpenMLBenchmarkSuite, OpenMLStudy
 from .tasks import (
@@ -48,6 +54,12 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
+from .tasks.functions import get_task, list_tasks
+
+if TYPE_CHECKING:
+    from ._config import OpenMLConfigManager
+
+config: OpenMLConfigManager = _config_module.__config
 
 
 def populate_cache(
@@ -91,33 +103,42 @@ def populate_cache(
 
 
 __all__ = [
-    "OpenMLDataset",
-    "OpenMLDataFeature",
-    "OpenMLRun",
-    "OpenMLSplit",
-    "OpenMLEvaluation",
-    "OpenMLSetup",
-    "OpenMLParameter",
-    "OpenMLTask",
-    "OpenMLSupervisedTask",
-    "OpenMLClusteringTask",
-    "OpenMLLearningCurveTask",
-    "OpenMLRegressionTask",
-    "OpenMLClassificationTask",
-    "OpenMLFlow",
-    "OpenMLStudy",
     "OpenMLBenchmarkSuite",
+    "OpenMLClassificationTask",
+    "OpenMLClusteringTask",
+    "OpenMLDataFeature",
+    "OpenMLDataset",
+    "OpenMLEvaluation",
+    "OpenMLFlow",
+    "OpenMLLearningCurveTask",
+    "OpenMLParameter",
+    "OpenMLRegressionTask",
+    "OpenMLRun",
+    "OpenMLSetup",
+    "OpenMLSplit",
+    "OpenMLStudy",
+    "OpenMLSupervisedTask",
+    "OpenMLTask",
+    "__version__",
+    "_api_calls",
+    "_backend",
+    "config",
     "datasets",
     "evaluations",
     "exceptions",
     "extensions",
-    "config",
-    "runs",
     "flows",
-    "tasks",
+    "get_dataset",
+    "get_flow",
+    "get_run",
+    "get_task",
+    "list_datasets",
+    "list_flows",
+    "list_runs",
+    "list_tasks",
+    "runs",
     "setups",
     "study",
+    "tasks",
     "utils",
-    "_api_calls",
-    "__version__",
 ]
