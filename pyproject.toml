@@ -389,9 +389,8 @@ module = [
   "tests.test_utils.test_utils",
   ]
 
-# TODO(eddiebergman): This should be re-enabled after tests get refactored
 ignore_errors = true
-disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
-disallow_untyped_decorators = false    # Test decorators are not properly typed
-disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
+disallow_untyped_defs = false
+disallow_untyped_decorators = false
+disallow_incomplete_defs = false
 disable_error_code = ["var-annotated"]
