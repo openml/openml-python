@@ -153,8 +153,7 @@ in the PR description.
 
 The preferred workflow for contributing to openml-python is to
 fork the [main repository](https://github.com/openml/openml-python) on
-GitHub, clone, check out the branch `main`, and develop on a new branch
-branch. Steps:
+GitHub, clone, and develop on a new branch:
 
 0. Make sure you have git installed, and a GitHub account.
 
@@ -169,12 +168,6 @@ local disk:
    ```bash
    git clone git@github.com:YourLogin/openml-python.git
    cd openml-python
-   ```
-
-3. Switch to the ``develop`` branch:
-
-   ```bash
-   git checkout main
    ```
 
 3. Create a ``feature`` branch to hold your development changes:

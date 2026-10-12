@@ -7,14 +7,12 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - "v*.*.*"
 
   pull_request:
     branches:
       - main
-      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -100,7 +98,7 @@ jobs:
         if [[ "$major" -gt 1 ]] || { [[ "$major" -eq 1 ]] && [[ "$minor" -ge 7 ]]; }; then
           pip install "pandas==3.*"
         else
-          pip install "pandas==2.*"
+          pip install "pandas==2.*" "pyarrow<26"
         fi
 
     - name: Store repository status
@@ -196,7 +194,10 @@ jobs:
 
     - name: Cleanup Docker setup
       if: always() && steps.clone-services.outcome == 'success'
+      working-directory: ./services
       run: |
+        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        cd ..
         sudo rm -rf services
 
     - name: Check for files left behind by test

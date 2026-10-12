@@ -445,31 +445,19 @@ class HTTPClient:
         if response.status_code == requests.codes.URI_TOO_LONG:
             raise OpenMLServerError(f"URI too long! ({url})")
 
-        exception: Exception | None = None
-        code: int | None = None
-        message: str = ""
-
         try:
             code, message = self._parse_exception_response(response)
-
-        except (requests.exceptions.JSONDecodeError, xml.parsers.expat.ExpatError) as e:
-            if method != "GET":
-                extra = f"Status code: {response.status_code}\n{response.text}"
-                raise OpenMLServerError(
-                    f"Unexpected server error when calling {url}. Please contact the "
-                    f"developers!\n{extra}"
-                ) from e
-
-            exception = e
-
         except Exception as e:
-            # If we failed to parse it out,
-            # then something has gone wrong in the body we have sent back
-            # from the server and there is little extra information we can capture.
-            raise OpenMLServerError(
-                f"Unexpected server error when calling {url}. Please contact the developers!\n"
-                f"Status code: {response.status_code}\n{response.text}",
-            ) from e
+            error = OpenMLServerError(
+                f"Unexpected server error when calling {url}. Please contact the "
+                f"developers!\nStatus code: {response.status_code}\n{response.text}"
+            )
+            if method == "GET" and isinstance(
+                e, (requests.exceptions.JSONDecodeError, xml.parsers.expat.ExpatError)
+            ):
+                error.__cause__ = e
+                return error
+            raise error from e
 
         if code is not None:
             self._raise_code_specific_error(
@@ -479,10 +467,7 @@ class HTTPClient:
                 files=files,
             )
 
-        if exception is None:
-            exception = OpenMLServerException(code=code, message=message, url=url)
-
-        return exception
+        return OpenMLServerException(code=code, message=message, url=url)
 
     def __request(  # noqa: PLR0913
         self,

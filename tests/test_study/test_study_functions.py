@@ -151,6 +151,7 @@ class TestStudyFunctions(TestBase):
     def test_publish_empty_study_implicit(self):
         self._test_publish_empty_study_is_allowed(explicit=False)
 
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     @pytest.mark.flaky()
     @pytest.mark.test_server()
     def test_publish_study(self):

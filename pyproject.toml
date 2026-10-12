@@ -105,7 +105,8 @@ docs=[
     "mkdocs-section-index",
     "mkdocs-jupyter",
     "mkdocs-linkcheck",
-    "mike"
+    "mike",
+    "pymdown-extensions<12.2",  # 2026-10-10: incompatibility of 12.2 with mkdocstrings
 ]
 
 [project.urls]

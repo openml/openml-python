@@ -5,17 +5,17 @@ This document highlights some of the more advanced features of
 
 ## Configuration
 
-The configuration file resides in a directory `.config/openml` in the
+The configuration file resides in a directory `~/.config/openml` in the
 home directory of the user and is called config (More specifically, it
-resides in the [configuration directory specified by the XDGB Base
+resides in the [configuration directory specified by the XDG Base
 Directory
 Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)).
 It consists of `key = value` pairs which are separated by newlines. The
 following keys are defined:
 
 - apikey: required to access the server.
-- server: the server to connect to (default: `http://www.openml.org`).
-          For connection to the test server, set this to `test.openml.org`.
+- server: the server to connect to (default: `https://www.openml.org`).
+          For connection to the test server, set this to `https://test.openml.org`.
 - cachedir: the root folder where the cache file directories should be created.
     If not given, will default to `~/.openml/cache`
 - avoid_duplicate_runs: if set to `True` (default), when certain functions
