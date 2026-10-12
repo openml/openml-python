@@ -77,7 +77,7 @@ def list_setups(  # noqa: PLR0913
     flow: int | None = None,
     tag: str | None = None,
     setup: Iterable[int] | None = None,
-    output_format: Literal["object", "dataframe"] = "object",
+    output_format: Literal["object", "dataframe"] = "dataframe",
 ) -> dict[int, OpenMLSetup] | pd.DataFrame:
     """
     List all setups matching all of the given filters.
@@ -89,7 +89,7 @@ def list_setups(  # noqa: PLR0913
     flow : int, optional
     tag : str, optional
     setup : Iterable[int], optional
-    output_format: str, optional (default='object')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dataframe' the output is a pandas DataFrame
         - If 'object' the output is a dictionary of OpenMLSetup objects
@@ -115,7 +115,11 @@ def list_setups(  # noqa: PLR0913
         return {setup.setup_id: setup for setup in flattened}
 
     records = [setup._to_dict() for setup in flattened]
-    return pd.DataFrame.from_records(records, index="setup_id")
+    return pd.DataFrame.from_records(
+        records,
+        columns=["setup_id", "flow_id", "parameters"],
+        index="setup_id",
+    )
 
 
 def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:

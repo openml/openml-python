@@ -17,6 +17,21 @@ import openml.exceptions
 from openml.testing import TestBase
 
 
+@pytest.mark.parametrize(
+    ("batches", "expected_index"),
+    [([[openml.setups.setup.OpenMLSetup(7, 11, None)]], [7]), ([], [])],
+)
+def test_list_setups_defaults_to_dataframe(mocker, batches, expected_index):
+    mocker.patch("openml.utils._list_all", return_value=batches)
+
+    setups = openml.setups.list_setups()
+
+    assert isinstance(setups, pd.DataFrame)
+    assert setups.index.name == "setup_id"
+    assert list(setups.index) == expected_index
+    assert list(setups.columns) == ["flow_id", "parameters"]
+
+
 def get_sentinel():
     # Create a unique prefix for the flow. Necessary because the flow is
     # identified by its name and external version online. Having a unique
@@ -141,7 +156,7 @@ class TestSetupFunctions(TestBase):
 
         flow_id = 5873
 
-        setups = openml.setups.list_setups(flow=flow_id)
+        setups = openml.setups.list_setups(flow=flow_id, output_format="object")
 
         assert len(setups) >= 2
         for setup_id in setups:
@@ -150,22 +165,22 @@ class TestSetupFunctions(TestBase):
     @pytest.mark.test_server()
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
-        if len(setups) > 0:
-            raise ValueError("UnitTest Outdated, got somehow results")
-
-        assert isinstance(setups, dict)
+        assert isinstance(setups, pd.DataFrame)
+        assert setups.empty
+        assert setups.index.name == "setup_id"
+        assert list(setups.columns) == ["flow_id", "parameters"]
 
     @pytest.mark.production_server()
     def test_list_setups_output_format(self):
         self.use_production_server()
         flow_id = 6794
         setups = openml.setups.list_setups(flow=flow_id, size=10)
-        assert isinstance(setups, dict)
-        assert isinstance(setups[next(iter(setups.keys()))], openml.setups.setup.OpenMLSetup)
+        assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
-        setups = openml.setups.list_setups(flow=flow_id, size=10, output_format="dataframe")
-        assert isinstance(setups, pd.DataFrame)
+        setups = openml.setups.list_setups(flow=flow_id, size=10, output_format="object")
+        assert isinstance(setups, dict)
+        assert isinstance(setups[next(iter(setups))], openml.setups.setup.OpenMLSetup)
         assert len(setups) == 10
 
     @pytest.mark.test_server()
@@ -176,7 +191,7 @@ class TestSetupFunctions(TestBase):
         setups2 = openml.setups.list_setups(offset=size, size=size)
         assert len(setups2) == size
 
-        all = set(setups.keys()).union(setups2.keys())
+        all = set(setups.index).union(setups2.index)
 
         assert len(all) == size * 2
 
