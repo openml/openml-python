@@ -805,6 +805,111 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         assert isinstance(y, pd.Series)
         return x, y, categorical_mask, attribute_names
 
+    def get_class_distribution(
+        self, target: str | None = None, *, dropna: bool = True
+    ) -> pd.DataFrame:
+        """Return observed class counts and proportions for one nominal target.
+
+        Parameters
+        ----------
+        target : str or None, default=None
+            Exact name of a nominal column. If omitted, use
+            ``default_target_attribute``, which must identify a single column.
+            Row-ID and ignored columns cannot be selected.
+        dropna : bool, default=True
+            Exclude missing labels and divide by the number of nonmissing
+            observations. If False, combine missing labels into one final row
+            and divide by the total number of observations.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Columns ``count`` (int64) and ``proportion`` (float64), indexed by
+            observed labels in first-appearance order. The object index is
+            named ``class``. Unused categories are omitted. The optional
+            missing row has a NaN index label; select it with ``index.isna()``.
+            If no observations are included, return an empty frame with the
+            same columns and dtypes.
+
+        Raises
+        ------
+        TypeError
+            If target is neither a string nor None, or dropna is not a bool.
+        ValueError
+            If the target is missing, unknown, ambiguous, excluded, or not
+            nominal. String and numeric regression targets are not supported.
+        NotImplementedError
+            If the default target specifies multiple columns rather than one
+            exact feature name.
+
+        Notes
+        -----
+        Uses existing feature metadata and data loading, which may download
+        the entire dataset. Local unpublished datasets need feature metadata.
+        Counts describe the chosen target, not necessarily the target used by
+        server-computed dataset qualities. Labels retain their decoded values;
+        no resampling or imbalance threshold is applied.
+
+        Examples
+        --------
+        For a dataset with target labels A, A, A, B and a missing value,
+        the default proportions are 0.75 and 0.25. With ``dropna=False``,
+        they are 0.6, 0.2 and 0.2 (missing).
+
+        For an already loaded dataset::
+
+            distribution = dataset.get_class_distribution(target="class")
+            nonmissing_count = distribution["count"].sum()
+        """
+        if not isinstance(dropna, bool):
+            raise TypeError("dropna must be a bool.")
+        target_name = self._get_class_distribution_target(target)
+        # Selecting directly preserves a Series even for a one-row dataset.
+        data, _, _, _ = self.get_data()
+        if list(data.columns).count(target_name) != 1:
+            raise ValueError(f"Target {target_name!r} must identify exactly one data column.")
+        labels = data[target_name]
+        if isinstance(labels.dtype, pd.SparseDtype):
+            labels = labels.sparse.to_dense()
+        missing = labels.isna()
+        observed = labels[~missing]
+        # Categorical value_counts includes unused levels and follows category
+        # order. Reindex to observed labels to enforce our public contract.
+        counts = observed.value_counts(sort=False).reindex(observed.unique())
+        values = counts.to_numpy(dtype="int64")
+        classes = list(counts.index)
+        if not dropna and missing.any():
+            values = np.append(values, np.int64(missing.sum()))
+            classes.append(np.nan)
+        index = pd.Index(classes, dtype=object, name="class")
+        total = values.sum()
+        proportions = values.astype("float64")
+        if total:
+            proportions /= total
+        return pd.DataFrame({"count": values, "proportion": proportions}, index=index)
+
+    def _get_class_distribution_target(self, target: str | None) -> str:
+        """Resolve and validate a single nominal target before loading data."""
+        if target is not None and not isinstance(target, str):
+            raise TypeError("target must be a string or None.")
+        target_name = self.default_target_attribute if target is None else target
+        if not isinstance(target_name, str) or not target_name.strip():
+            raise ValueError("Specify a target or set a nonempty default_target_attribute.")
+        features = [feature for feature in self.features.values() if feature.name == target_name]
+        if not features and target is None and "," in target_name:
+            raise NotImplementedError(
+                "Select a single target; multi-target defaults are unsupported."
+            )
+        if len(features) != 1:
+            raise ValueError(f"Target {target_name!r} must identify exactly one feature.")
+        for excluded in (self.row_id_attribute, self.ignore_attribute):
+            names = [excluded] if isinstance(excluded, str) else excluded or []
+            if target_name in names:
+                raise ValueError(f"Target {target_name!r} is a row-ID or ignored column.")
+        if features[0].data_type != "nominal":
+            raise ValueError(f"Target {target_name!r} must be nominal for class distribution.")
+        return target_name
+
     def _load_features(self) -> None:
         """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
