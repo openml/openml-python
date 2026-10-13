@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'develop'
+      - 'main'
       - 'docker'
     tags:
       - 'v*'
@@ -54,13 +54,13 @@ jobs:
 
       - name: Update repo description
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@v5
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: openml/openml-python
           short-description: "pre-installed openml-python environment"
           readme-filepath: ./docker/readme.md
-          
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
