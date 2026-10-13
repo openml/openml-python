@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import warnings
 from abc import ABC
-from collections.abc import Sequence
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
@@ -19,6 +18,8 @@ from openml.utils import _create_cache_directory_for_id
 from .split import OpenMLSplit
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import numpy as np
     import pandas as pd
 

@@ -1,10 +1,6 @@
+exclude: '^tests/files/'
 default_language_version:
   python: python3
-files: |
-  (?x)^(
-    openml|
-    tests
-  )/.*\.py$
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.0
@@ -31,18 +27,15 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-        files: ".*"
       - id: check-case-conflict
-        files: ".*"
       - id: check-merge-conflict
-        files: ".*"
       - id: check-yaml
-        files: ".*"
+        exclude: ^mkdocs\.yml$
       - id: end-of-file-fixer
-        files: ".*"
-        types: ["yaml"]
       - id: check-toml
-        files: ".*"
         types: ["toml"]
       - id: debug-statements
         files: '^src/.*\.py$'
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: trailing-whitespace

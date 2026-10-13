@@ -1,10 +1,12 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import pytest
 import unittest
 
+import pytest
+
 import openml
+
 
 class TestEvaluationsExample(unittest.TestCase):
     @pytest.mark.skip(reason="Affected by lowered result limit #1757")
@@ -19,6 +21,8 @@ class TestEvaluationsExample(unittest.TestCase):
         ):
             import matplotlib.pyplot as plt
             import numpy as np
+
+            import openml
 
             df = openml.evaluations.list_evaluations_setups(
                 "predictive_accuracy",
