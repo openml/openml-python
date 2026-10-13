@@ -32,8 +32,8 @@ import openml
 # flows, and runs locally before going offline.
 
 openml.populate_cache(
-    task_ids=[31, 37],       # Download specific tasks
-    dataset_ids=[31, 40],    # Download specific datasets
+    task_ids=[31, 37],  # Download specific tasks
+    dataset_ids=[31, 40],  # Download specific datasets
 )
 
 print("Cache populated successfully. You can now work offline.")
@@ -47,7 +47,7 @@ print("Cache populated successfully. You can now work offline.")
 cache_dir = openml.config.get_cache_directory()
 print(f"Cache directory: {cache_dir}")
 
-#%%
+# %%
 # Step 3 - Load a dataset from cache (no internet needed)
 # ========================================================
 # Once cached, datasets load directly from disk:
