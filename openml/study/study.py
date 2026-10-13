@@ -2,11 +2,13 @@
 # TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import openml
 from openml.base import OpenMLBase
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class BaseStudy(OpenMLBase):
