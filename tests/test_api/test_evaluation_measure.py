@@ -1,7 +1,8 @@
-# License: BSD 3-Clause  
-from __future__ import annotations  
-  
-import pytest    
+# License: BSD 3-Clause
+from __future__ import annotations
+
+import pytest
+
 from openml._api import EvaluationMeasureV1API, EvaluationMeasureV2API
 
 
@@ -15,24 +16,24 @@ def evaluation_measure_v2(http_client_v2, minio_client) -> EvaluationMeasureV2AP
     return EvaluationMeasureV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_v1_list(evaluation_measure_v1):
-    measures = evaluation_measure_v1.list()   
+    measures = evaluation_measure_v1.list()
     assert isinstance(measures, list)
     assert all(isinstance(s, str) for s in measures)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_v2_list(evaluation_measure_v2):
-    measures = evaluation_measure_v2.list()   
+    measures = evaluation_measure_v2.list()
     assert isinstance(measures, list)
     assert all(isinstance(s, str) for s in measures)
 
 
-@pytest.mark.test_server()
-def test_list_matches(evaluation_measure_v1,evaluation_measure_v2):
+@pytest.mark.test_server
+def test_list_matches(evaluation_measure_v1, evaluation_measure_v2):
     output_v1 = evaluation_measure_v1.list()
     output_v2 = evaluation_measure_v2.list()
 
-    assert type(output_v1) == type(output_v2)
+    assert type(output_v1) is type(output_v2)
     assert output_v1 == output_v2
