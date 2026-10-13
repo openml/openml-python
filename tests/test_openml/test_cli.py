@@ -5,16 +5,16 @@ import shutil
 import subprocess
 import sys
 
-import openml
 import pytest
+
+import openml
 
 
 def test_cli_version_prints_package_version():
     # Invoke the CLI via module to avoid relying on console script installation
-    result = subprocess.run(
+    result = subprocess.run(  # noqa: S603
         [sys.executable, "-m", "openml.cli", "--version"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         text=True,
         check=False,
     )
@@ -31,10 +31,9 @@ def test_console_script_version_prints_package_version():
     if console is None:
         pytest.skip("'openml' console script not found in PATH")
 
-    result = subprocess.run(
+    result = subprocess.run(  # noqa: S603
         [console, "--version"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         text=True,
         check=False,
     )

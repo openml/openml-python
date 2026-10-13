@@ -1,18 +1,19 @@
-# License: BSD 3-Clause  
-from __future__ import annotations  
-  
-import pytest  
+# License: BSD 3-Clause
+from __future__ import annotations
+
 import uuid
-import sklearn.tree
+
+import pytest
 import sklearn.naive_bayes
-import openml
+import sklearn.tree
 from openml_sklearn import SklearnExtension
+
+import openml
+from openml._api import SetupV1API, SetupV2API
+from openml.exceptions import OpenMLNotSupportedError
+from openml.setups.setup import OpenMLSetup
 from openml.testing import TestBase
 
-  
-from openml._api import SetupV1API, SetupV2API
-from openml.setups.setup import OpenMLSetup
-from openml.exceptions import OpenMLNotSupportedError
 
 def get_sentinel():
     # Create a unique prefix for the flow. Necessary because the flow is
@@ -21,35 +22,37 @@ def get_sentinel():
     sentinel = uuid.uuid4().hex[:10]
     return f"TEST{sentinel}"
 
+
 @pytest.fixture
 def setup_v1(http_client_v1, minio_client) -> SetupV1API:
     return SetupV1API(http=http_client_v1, minio=minio_client)
+
 
 @pytest.fixture
 def setup_v2(http_client_v2, minio_client) -> SetupV2API:
     return SetupV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_v1_list(setup_v1):
     setups = setup_v1.list(limit=10, offset=0)
-    
+
     assert isinstance(setups, list)
     assert len(setups) > 0
     assert all(isinstance(s, OpenMLSetup) for s in setups)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_v1_get(setup_v1):
     setup_id = 1
     setup = setup_v1.get(setup_id)
-    
+
     assert isinstance(setup, OpenMLSetup)
     assert setup.setup_id == setup_id
 
 
-@pytest.mark.sklearn()
-@pytest.mark.test_server()
+@pytest.mark.sklearn
+@pytest.mark.test_server
 def test_v1_exists_nonexisting_setup(setup_v1):
     """Test exists() returns False when setup doesn't exist"""
     # first publish a non-existing flow
@@ -69,13 +72,11 @@ def test_v1_exists_nonexisting_setup(setup_v1):
     assert not setup_id
 
 
-@pytest.mark.sklearn()
-@pytest.mark.test_server()
+@pytest.mark.sklearn
+@pytest.mark.test_server
 def test_v1_exists_existing_setup(setup_v1):
     """Test exists() returns setup_id when setup exists"""
-    flow =SklearnExtension().model_to_flow(
-        sklearn.naive_bayes.GaussianNB()
-    )
+    flow = SklearnExtension().model_to_flow(sklearn.naive_bayes.GaussianNB())
     flow.name = f"{get_sentinel()}{flow.name}"
     flow.publish()
     TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)

@@ -26,17 +26,17 @@ class OpenMLTaskTest(TestBase):
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLTaskTest:
-            raise unittest.SkipTest("Skip OpenMLTaskTest tests," " it's a base class")
+            raise unittest.SkipTest("Skip OpenMLTaskTest tests, it's a base class")
         super().setUpClass()
 
-    def setUp(self, n_levels: int = 1):
+    def setUp(self, n_levels: int = 1):  # noqa: ARG002
         super().setUp()
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_download_task(self):
         return get_task(self.task_id)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_upload_task(self):
         # We don't know if the task in question already exists, so we try a few times. Checking
         # beforehand would not be an option because a concurrent unit test could potentially
@@ -67,8 +67,7 @@ class OpenMLTaskTest(TestBase):
                 # (# https://www.openml.org/api_docs#!/task/post_task)
                 if e.code == 614:
                     continue
-                else:
-                    raise e
+                raise e
         else:
             raise ValueError(
                 f"Could not create a valid task for task type ID {self.task_type}",
@@ -92,21 +91,20 @@ class OpenMLTaskTest(TestBase):
         shuffle(compatible_datasets)
         return compatible_datasets
 
-        # random_dataset_pos = randint(0, len(compatible_datasets) - 1)
+        # random_dataset_pos = randint(0, len(compatible_datasets) - 1)  # noqa: ERA001
         #
-        # return compatible_datasets[random_dataset_pos]
+        # return compatible_datasets[random_dataset_pos]  # noqa: ERA001
 
     def _get_random_feature(self, dataset_id: int) -> str:
         random_dataset = get_dataset(dataset_id)
         # necessary loop to overcome string and date type
         # features.
         while True:
-            random_feature_index = randint(0, len(random_dataset.features) - 1)
+            random_feature_index = randint(0, len(random_dataset.features) - 1)  # noqa: S311
             random_feature = random_dataset.features[random_feature_index]
             if self.task_type == TaskType.SUPERVISED_REGRESSION:
                 if random_feature.data_type == "numeric":
                     break
-            else:
-                if random_feature.data_type == "nominal":
-                    break
+            elif random_feature.data_type == "nominal":
+                break
         return random_feature.name

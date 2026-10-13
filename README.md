@@ -17,6 +17,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/openml/openml-python)](https://github.com/openml/openml-python/releases)
 [![Python Versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://pypi.org/project/openml/)
 [![Downloads](https://static.pepy.tech/badge/openml)](https://pepy.tech/project/openml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.PLACEHOLDER)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 <!-- Add green badges for CI and precommit -->
 
@@ -93,7 +94,7 @@ Bibtex entry:
 
 We welcome contributions from both new and experienced developers!
 
-If you would like to contribute to OpenML-Python, please read our  
+If you would like to contribute to OpenML-Python, please read our
 [Contribution Guidelines](https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md).
 
 If you are new to open-source development, a great way to get started is by
