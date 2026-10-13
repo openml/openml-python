@@ -2,11 +2,13 @@
 # TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import openml
 from openml.base import OpenMLBase
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class BaseStudy(OpenMLBase):
@@ -57,7 +59,7 @@ class BaseStudy(OpenMLBase):
         a list of setup ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         study_id: int | None,
         alias: str | None,
@@ -235,7 +237,7 @@ class OpenMLStudy(BaseStudy):
         a list of setup ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         study_id: int | None,
         alias: str | None,
@@ -309,7 +311,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
         a list of task ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         suite_id: int | None,
         alias: str | None,

@@ -34,7 +34,7 @@ Use the following code to get the [credit-g](https://www.openml.org/search?type=
 ```python
 import openml
 
-dataset = openml.datasets.get_dataset("credit-g") # or by ID get_dataset(31)
+dataset = openml.datasets.get_dataset("credit-g")  # or by ID get_dataset(31)
 X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
 ```
 
@@ -54,7 +54,9 @@ Use an [OpenML benchmarking suite](https://docs.openml.org/concepts/benchmarking
 ```python
 import openml
 
-suite = openml.study.get_suite("amlb-classification-all")  # Get a curated list of tasks for classification
+suite = openml.study.get_suite(
+    "amlb-classification-all"
+)  # Get a curated list of tasks for classification
 for task_id in suite.tasks:
     task = openml.tasks.get_task(task_id)
 ```
@@ -94,7 +96,7 @@ Bibtex entry:
 
 We welcome contributions from both new and experienced developers!
 
-If you would like to contribute to OpenML-Python, please read our  
+If you would like to contribute to OpenML-Python, please read our
 [Contribution Guidelines](https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md).
 
 If you are new to open-source development, a great way to get started is by
