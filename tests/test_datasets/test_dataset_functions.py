@@ -672,7 +672,7 @@ class TestOpenMLDataset(TestBase):
             attributes_arff_from_df(df)
 
     def test_attributes_arff_from_df_integer_categories(self):
-        df = pd.DataFrame({"category": [1,2,1]})
+        df = pd.DataFrame({"category": [1, 2, 1]})
         df["category"] = df["category"].astype("category")
 
         attributes = attributes_arff_from_df(df)

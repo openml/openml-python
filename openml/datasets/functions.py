@@ -582,7 +582,7 @@ def attributes_arff_from_df(df: pd.DataFrame) -> list[tuple[str, list[str] | str
                     new_categories = categories.astype(str)
                     df[column_name] = df[column_name].cat.rename_categories(new_categories)
                     categories = df[column_name].cat.categories
-                except Exception as e:
+                except Exception:
                     raise ValueError(
                         f"The column '{column_name}' of the dataframe is of "
                         "'category' dtype. Therefore, all values in "
