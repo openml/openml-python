@@ -285,4 +285,3 @@ $env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 ```bash
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
-
