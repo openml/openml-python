@@ -74,7 +74,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     return setup
 
 
-def list_setups(  # noqa: PLR0913
+def list_setups(  # noqa: PLR0913,PLR0917
     offset: int | None = None,
     size: int | None = None,
     flow: int | None = None,

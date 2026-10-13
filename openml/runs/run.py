@@ -94,7 +94,7 @@ class OpenMLRun(OpenMLBase):
         Description of the run stored in the run meta-data.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_id: int,
         flow_id: int | None,

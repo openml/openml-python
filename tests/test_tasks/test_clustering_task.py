@@ -59,7 +59,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
             except OpenMLServerException as e:
                 # Error code for 'task already exists'
                 # Should be 533 according to the docs
-                # (# https://www.openml.org/api_docs#!/task/post_task)
+                # (https://www.openml.org/api_docs#!/task/post_task)
                 if e.code == 614:
                     continue
                 raise e

@@ -33,7 +33,7 @@ class OpenMLDataFeature:  # noqa: PLW1641, RUF100
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         index: int,
         name: str,

@@ -123,7 +123,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
         Path to the local file.
     """
 
-    def __init__(  # noqa: C901, PLR0912, PLR0913, PLR0915
+    def __init__(  # noqa: C901, PLR0912, PLR0913,PLR0917, PLR0915
         self,
         name: str,
         description: str | None,

@@ -255,7 +255,7 @@ def configure_retry_policy(value: str) -> None:
     )
 
 
-def configure_field(  # noqa: PLR0913
+def configure_field(  # noqa: PLR0913,PLR0917
     field: str,
     value: str | None,
     check_with_message: Callable[[str], str],
