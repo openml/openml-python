@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
-import openml.config
 import openml.datasets
 import openml.flows
 import openml.runs

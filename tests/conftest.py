@@ -18,7 +18,7 @@ disable file deletions, without editing any of the test case files.
 Possible Future: class TestBase from openml/testing.py can be included
     under this file and there would not be any requirements to import
     testing.py in each of the unit test modules.
-"""
+"""  # noqa: D404
 
 # License: BSD 3-Clause
 from __future__ import annotations
@@ -27,18 +27,18 @@ import multiprocessing
 
 multiprocessing.set_start_method("spawn", force=True)
 
-from collections.abc import Iterator
-import logging
-import os
-import shutil
-from pathlib import Path
-import pytest
-import openml_sklearn
+import logging  # noqa: E402
+import os  # noqa: E402
+import shutil  # noqa: E402
+from collections.abc import Iterator  # noqa: E402
+from pathlib import Path  # noqa: E402
 
-import openml
-from openml.testing import TestBase
+import pytest  # noqa: E402
 
-import inspect
+import openml  # noqa: E402
+from openml._api import HTTPClient, MinIOClient  # noqa: E402
+from openml.enums import APIVersion  # noqa: E402
+from openml.testing import TestBase  # noqa: E402
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -57,8 +57,7 @@ def worker_id() -> str:
     vars_ = list(os.environ.keys())
     if "PYTEST_XDIST_WORKER" in vars_ or "PYTEST_XDIST_WORKER_COUNT" in vars_:
         return os.environ["PYTEST_XDIST_WORKER"]
-    else:
-        return "master"
+    return "master"
 
 
 def read_file_list() -> list[Path]:
@@ -79,7 +78,7 @@ def compare_delete_files(old_list: list[Path], new_list: list[Path]) -> None:
     """
     file_list = list(set(new_list) - set(old_list))
     for file in file_list:
-        os.remove(file)
+        os.remove(file)  # noqa: PTH107
         logger.info(f"Deleted from local: {file}")
 
 
@@ -97,13 +96,12 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.user_key
+    openml.config.use_test_servers()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
     if "flow" in tracker:
-        to_sort = list(zip(tracker["flow"], flow_names))
+        to_sort = list(zip(tracker["flow"], flow_names, strict=False))
         flow_deletion_order = [
             entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
         ]
@@ -118,7 +116,7 @@ def delete_remote_files(tracker, flow_names) -> None:
             try:
                 openml.utils._delete_entity(entity_type, entity)
                 logger.info(f"Deleted ({entity_type}, {entity})")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 logger.warning(f"Cannot delete ({entity_type},{entity}): {e}")
 
 
@@ -138,7 +136,7 @@ def pytest_sessionstart() -> None:
     :return: None
     """
     # file_list is global to maintain the directory snapshot during tear down
-    global file_list
+    global file_list  # noqa: PLW0603
     worker = worker_id()
     if worker == "master":
         file_list = read_file_list()
@@ -161,7 +159,7 @@ def pytest_sessionfinish() -> None:
     :return: None
     """
     # allows access to the file_list read in the set up phase
-    global file_list
+    global file_list  # noqa: PLW0602
     worker = worker_id()
     logger.info(f"Finishing worker {worker}")
 
@@ -204,7 +202,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    for _d in ["datasets", "tasks", "runs", "setups"]:
+    for _d in ["datasets", "tasks"]:
         res_paths.append(_c_root_dir / _d)
 
     for _id in ["-1", "2"]:
@@ -219,8 +217,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         )
 
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
-    res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
-    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
@@ -230,6 +226,17 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
                 tmp_p / "task.xml",
             ]
         )
+
+    res_paths.extend(
+        [
+            _c_root_dir / "api" / "v1" / "xml" / "setup",
+            _c_root_dir / "api" / "v1" / "xml" / "setup" / "1",
+            _c_root_dir / "api" / "v1" / "xml" / "setup" / "1" / "body.xml",
+            _c_root_dir / "api" / "v1" / "xml" / "run",
+            _c_root_dir / "api" / "v1" / "xml" / "run" / "1",
+            _c_root_dir / "api" / "v1" / "xml" / "run" / "1" / "body.xml",
+        ]
+    )
 
     return res_paths
 
@@ -250,11 +257,26 @@ def test_files_directory() -> Path:
 
 
 @pytest.fixture(scope="session")
-def test_api_key() -> str:
-    return TestBase.user_key
+def test_server_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["server"]
 
 
-@pytest.fixture(autouse=True, scope="function")
+@pytest.fixture(scope="session")
+def test_apikey_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["apikey"]
+
+
+@pytest.fixture(scope="session")
+def test_server_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
+
+
+@pytest.fixture(autouse=True)
 def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
@@ -272,34 +294,43 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    if "production" in request.keywords:
-        openml.config.server = "https://www.openml.org/api/v1/xml"
-        openml.config.apikey = None
+    openml.config.set_api_version(APIVersion.V1)
+
+    if "production_server" in request.keywords:
+        openml.config.use_production_servers()
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = TestBase.user_key
+
+    openml.config.use_test_servers()
     yield
 
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
-        
+
 
 @pytest.fixture
 def static_cache_dir():
-    return Path(__file__).parent / "files" 
+    return Path(__file__).parent / "files"
+
 
 @pytest.fixture
 def workdir(tmp_path):
@@ -307,3 +338,20 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    if openml.config.servers[APIVersion.V2]["server"] is None:
+        pytest.skip("V2 server is not configured")
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()

@@ -18,6 +18,7 @@ following rules before submitting:
 Example:
 ```python
 import openml
+
 openml.flows.get_flow(1)
 ```
 If the code is too long, feel free to put it in a public gist and link
@@ -46,4 +47,3 @@ import openml; print("OpenML", openml.__version__)
 
 
 <!-- Thanks for contributing! -->
-

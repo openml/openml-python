@@ -65,6 +65,7 @@ nav:
   - Advanced User Guide: details.md
   - API: reference/
   - Contributing: contributing.md
+  - Developer Setup: developer_setup.md
 
 markdown_extensions:
   - pymdownx.highlight:

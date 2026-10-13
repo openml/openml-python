@@ -4,14 +4,16 @@ from __future__ import annotations
 import re
 import webbrowser
 from abc import ABC, abstractmethod
-from typing import Iterable, Sequence
+from typing import TYPE_CHECKING
 
 import xmltodict
 
 import openml._api_calls
-import openml.config
 
 from .utils import _get_rest_api_type_alias, _tag_openml_base
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 
 class OpenMLBase(ABC):

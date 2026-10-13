@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from typing import TYPE_CHECKING, Any
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from collections import OrderedDict
+
     import numpy as np
     import scipy.sparse
 
@@ -63,8 +64,8 @@ class Extension(ABC):
     def flow_to_model(
         self,
         flow: OpenMLFlow,
-        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
-        strict_version: bool = True,  # noqa: FBT002, FBT001
+        initialize_with_defaults: bool = False,  # noqa: FBT002
+        strict_version: bool = True,  # noqa: FBT002
     ) -> Any:
         """Instantiate a model from the flow representation.
 
@@ -156,7 +157,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def _run_model_on_fold(  # noqa: PLR0913
+    def _run_model_on_fold(  # noqa: PLR0913,PLR0917
         self,
         model: Any,
         task: OpenMLTask,
