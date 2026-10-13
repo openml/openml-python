@@ -38,7 +38,7 @@ def _get_cached_tasks() -> dict[int, OpenMLTask]:
         OpenMLTask.
     """
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
+    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208, RUF100
     directory_content.sort()
 
     # Find all dataset ids for which we have downloaded the dataset
@@ -80,53 +80,11 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
-    url_suffix = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(url_suffix, "get")
-
-    procs_dict = xmltodict.parse(xml_string)
-    # Minimalistic check if the XML is useful
-    if "oml:estimationprocedures" not in procs_dict:
-        raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
-
-    if "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
-        raise ValueError(
-            "Error in return XML, does not contain tag "
-            "@xmlns:oml as a child of oml:estimationprocedures.",
-        )
-
-    if procs_dict["oml:estimationprocedures"]["@xmlns:oml"] != "http://openml.org/openml":
-        raise ValueError(
-            "Error in return XML, value of "
-            "oml:estimationprocedures/@xmlns:oml is not "
-            "http://openml.org/openml, but {}".format(
-                str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"])
-            ),
-        )
-
-    procs: list[dict[str, Any]] = []
-    for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
-        task_type_int = int(proc_["oml:ttid"])
-        try:
-            task_type_id = TaskType(task_type_int)
-            procs.append(
-                {
-                    "id": int(proc_["oml:id"]),
-                    "task_type_id": task_type_id,
-                    "name": proc_["oml:name"],
-                    "type": proc_["oml:type"],
-                },
-            )
-        except ValueError as e:
-            warnings.warn(
-                f"Could not create task type id for {task_type_int} due to error {e}",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-
-    return procs
+    result = openml._backend.estimation_procedure.list()
+    return [i._to_dict() for i in result]
 
 
-def list_tasks(  # noqa: PLR0913
+def list_tasks(  # noqa: PLR0913,PLR0917
     task_type: TaskType | None = None,
     offset: int | None = None,
     size: int | None = None,
@@ -380,7 +338,11 @@ def get_tasks(
     tasks = []
     for task_id in task_ids:
         tasks.append(
-            get_task(task_id, download_data=download_data, download_qualities=download_qualities)
+            get_task(
+                task_id,
+                download_data=download_data,
+                download_qualities=download_qualities,
+            )
         )
     return tasks
 
@@ -411,6 +373,12 @@ def get_task(
     Returns
     -------
     task: OpenMLTask
+
+    Examples
+    --------
+    >>> import openml
+    >>> task = openml.tasks.get_task(1)  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(1, download_splits=True)  # doctest: +SKIP
     """
     if not isinstance(task_id, int):
         raise TypeError(f"Task id should be integer, is {type(task_id)}")
