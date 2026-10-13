@@ -89,7 +89,7 @@ class DummyExtension(Extension):
         model.seed = seed
         return model
 
-    def _run_model_on_fold(  # noqa: PLR0913
+    def _run_model_on_fold(  # noqa: PLR0913,PLR0917
         self,
         model,  # noqa: ARG002
         task,  # noqa: ARG002

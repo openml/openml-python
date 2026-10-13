@@ -59,7 +59,7 @@ class BaseStudy(OpenMLBase):
         a list of setup ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         study_id: int | None,
         alias: str | None,
@@ -237,7 +237,7 @@ class OpenMLStudy(BaseStudy):
         a list of setup ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         study_id: int | None,
         alias: str | None,
@@ -311,7 +311,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
         a list of task ids associated with this study
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         suite_id: int | None,
         alias: str | None,

@@ -76,7 +76,7 @@ class OpenMLTask(OpenMLBase):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_id: int | None,
         task_type_id: TaskType,
@@ -272,7 +272,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -380,7 +380,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_type_id: TaskType,
         task_type: str,

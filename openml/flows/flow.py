@@ -93,7 +93,7 @@ class OpenMLFlow(OpenMLBase):
         OpenML version of the flow. Assigned by the server.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         name: str,
         description: str,

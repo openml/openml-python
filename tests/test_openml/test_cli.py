@@ -12,7 +12,7 @@ import openml
 
 def test_cli_version_prints_package_version():
     # Invoke the CLI via module to avoid relying on console script installation
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [sys.executable, "-m", "openml.cli", "--version"],
         capture_output=True,
         text=True,

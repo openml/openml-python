@@ -3,20 +3,20 @@ default_language_version:
   python: python3
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.1
+    rev: v0.17.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --no-cache]
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v2.4.0
     hooks:
       - id: mypy
         additional_dependencies:
           - types-requests
           - types-python-dateutil
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.36.2
+    rev: 0.38.2
     hooks:
       - id: check-github-workflows
         files: '^github/workflows/.*\.ya?ml$'

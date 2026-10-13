@@ -255,7 +255,7 @@ class TestRun(TestBase):
             check_dtype=False,  # Loaded ARFF reads NUMERIC as float, even if integer.
         )
 
-    def _perform_run(  # noqa: PLR0913, PLR0915
+    def _perform_run(  # noqa: PLR0913,PLR0917, PLR0915
         self,
         task_id,
         num_instances,
@@ -506,7 +506,7 @@ class TestRun(TestBase):
     # execution of the unit tests without the need to add an additional module
     # like unittest2
 
-    def _run_and_upload(  # noqa: C901, PLR0913
+    def _run_and_upload(  # noqa: C901, PLR0913,PLR0917
         self,
         clf,
         task_id,
@@ -622,7 +622,7 @@ class TestRun(TestBase):
 
         return run
 
-    def _run_and_upload_classification(  # noqa: PLR0913
+    def _run_and_upload_classification(  # noqa: PLR0913,PLR0917
         self,
         clf,
         task_id,
@@ -651,7 +651,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    def _run_and_upload_regression(  # noqa: PLR0913
+    def _run_and_upload_regression(  # noqa: PLR0913,PLR0917
         self,
         clf,
         task_id,
