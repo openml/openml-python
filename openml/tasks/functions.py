@@ -84,7 +84,7 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     return [i._to_dict() for i in result]
 
 
-def list_tasks(  # noqa: PLR0913
+def list_tasks(  # noqa: PLR0913,PLR0917
     task_type: TaskType | None = None,
     offset: int | None = None,
     size: int | None = None,

@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
+# ruff: noqa: PLR0913,PLR0917
 from __future__ import annotations
 
 import logging

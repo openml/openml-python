@@ -101,7 +101,7 @@ class StudyAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.STUDY
 
     @abstractmethod
-    def list(  # noqa: PLR0913
+    def list(  # noqa: PLR0913,PLR0917
         self,
         limit: int | None = None,
         offset: int | None = None,

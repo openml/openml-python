@@ -157,7 +157,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def _run_model_on_fold(  # noqa: PLR0913
+    def _run_model_on_fold(  # noqa: PLR0913,PLR0917
         self,
         model: Any,
         task: OpenMLTask,

@@ -471,7 +471,7 @@ class HTTPClient:
 
         return OpenMLServerException(code=code, message=message, url=url)
 
-    def __request(  # noqa: PLR0913
+    def __request(  # noqa: PLR0913,PLR0917
         self,
         session: requests.Session,
         method: str,
