@@ -4205,7 +4205,7 @@ E.g.: {"Iris-Setosa": 0.2, "Iris-Versicolor": 0.7, "Iris-Virginica": 0.1}</p>
 <span class="normal"><a href="#__codelineno-0-1350">1350</a></span>
 <span class="normal"><a href="#__codelineno-0-1351">1351</a></span>
 <span class="normal"><a href="#__codelineno-0-1352">1352</a></span>
-<span class="normal"><a href="#__codelineno-0-1353">1353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1286" name="__codelineno-0-1286"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_prediction</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<span class="normal"><a href="#__codelineno-0-1353">1353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1286" name="__codelineno-0-1286"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_prediction</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
 <a id="__codelineno-0-1287" name="__codelineno-0-1287"></a>    <span class="n">task</span><span class="p">:</span> <span class="n">OpenMLSupervisedTask</span><span class="p">,</span>
 <a id="__codelineno-0-1288" name="__codelineno-0-1288"></a>    <span class="n">repeat</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-1289" name="__codelineno-0-1289"></a>    <span class="n">fold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -5363,7 +5363,7 @@ prediction file).</p>
 <span class="normal"><a href="#__codelineno-0-1280">1280</a></span>
 <span class="normal"><a href="#__codelineno-0-1281">1281</a></span>
 <span class="normal"><a href="#__codelineno-0-1282">1282</a></span>
-<span class="normal"><a href="#__codelineno-0-1283">1283</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1208" name="__codelineno-0-1208"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<span class="normal"><a href="#__codelineno-0-1283">1283</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1208" name="__codelineno-0-1208"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
 <a id="__codelineno-0-1209" name="__codelineno-0-1209"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-1210" name="__codelineno-0-1210"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-1211" name="__codelineno-0-1211"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: A002</span>
@@ -5919,7 +5919,7 @@ If <code>-1</code>, then the job uses as many cores available.</p>
 <span class="normal"><a href="#__codelineno-0-517">517</a></span>
 <span class="normal"><a href="#__codelineno-0-518">518</a></span>
 <span class="normal"><a href="#__codelineno-0-519">519</a></span>
-<span class="normal"><a href="#__codelineno-0-520">520</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_flow_on_task</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<span class="normal"><a href="#__codelineno-0-520">520</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_flow_on_task</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a>    <span class="n">flow</span><span class="p">:</span> <span class="n">OpenMLFlow</span><span class="p">,</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="n">task</span><span class="p">:</span> <span class="n">OpenMLTask</span><span class="p">,</span>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="n">avoid_duplicate_runs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6423,7 +6423,7 @@ If <code>-1</code>, then the job uses as many cores available.</p>
 <span class="normal"><a href="#__codelineno-0-406">406</a></span>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_model_on_task</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_model_on_task</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">task</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">OpenMLTask</span><span class="p">,</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="n">avoid_duplicate_runs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
