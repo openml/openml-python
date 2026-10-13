@@ -663,13 +663,29 @@ class TestOpenMLDataset(TestBase):
         ]
 
     def test_attributes_arff_from_df_mixed_dtype_categories(self):
-        # liac-arff imposed categorical attributes to be of sting dtype. We
+        # liac-arff imposed categorical attributes to be of string dtype. We
         # raise an error if this is not the case.
         df = pd.DataFrame([[1], ["2"], [3.0]])
         df[0] = df[0].astype("category")
         err_msg = "The column '0' of the dataframe is of 'category' dtype."
         with pytest.raises(ValueError, match=err_msg):
             attributes_arff_from_df(df)
+
+    def test_attributes_arff_from_df_integer_categories(self):
+        df = pd.DataFrame({"category": [1,2,1]})
+        df["category"] = df["category"].astype("category")
+
+        attributes = attributes_arff_from_df(df)
+        assert attributes == [("category", ["1", "2"])]
+
+    def test_attributes_arff_from_df_missing_values(self):
+        df = pd.DataFrame({"category": [1, None, 2]})
+        df["category"] = df["category"].astype("category")
+
+        attributes = attributes_arff_from_df(df)
+
+        assert attributes == [("category", ["1", "2"])]
+        assert df["category"].isna().sum() == 1
 
     def test_attributes_arff_from_df_unknown_dtype(self):
         # check that an error is raised when the dtype is not supptagorted by
