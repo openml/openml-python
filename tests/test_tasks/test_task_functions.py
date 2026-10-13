@@ -324,9 +324,7 @@ def test_create_task_publish_populates_estimation_procedure(
 ):
     """After publish(), estimation_procedure must be populated from the server."""
     # Mock the POST (publish) response
-    content_file = (
-        test_files_directory / "mock_responses" / "tasks" / "task_upload_successful.xml"
-    )
+    content_file = test_files_directory / "mock_responses" / "tasks" / "task_upload_successful.xml"
     mock_post.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
@@ -334,6 +332,7 @@ def test_create_task_publish_populates_estimation_procedure(
 
     # Mock the follow-up GET (what _get_task_description returns)
     from openml.tasks import OpenMLClassificationTask, TaskType
+
     fake_task = OpenMLClassificationTask(
         task_id=999,
         task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
