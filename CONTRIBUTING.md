@@ -28,8 +28,8 @@ Great! You've decided you want to help out. Now what?
 All contributions should be linked to issues on the [GitHub issue tracker](https://github.com/openml/openml-python/issues).
 In particular for new contributors, the *good first issue* label should help you find
 issues which are suitable for beginners.  Resolving these issues allows you to start
-contributing to the project without much prior knowledge. Your assistance in this area 
-will be greatly appreciated by the more experienced developers as it helps free up 
+contributing to the project without much prior knowledge. Your assistance in this area
+will be greatly appreciated by the more experienced developers as it helps free up
 their time to concentrate on other issues.
 
 If you encounter a particular part of the documentation or code that you want to improve,
@@ -39,16 +39,16 @@ This is important since you can first get feedback or pointers from experienced 
 To let everyone know you are working on an issue, please leave a comment that states you will work on the issue
 (or, if you have the permission, *assign* yourself to the issue). This avoids double work!
 
-## Contributing Workflow Overview 
+## Contributing Workflow Overview
 To contribute to the openml-python package, follow these steps:
 
 0. Determine how you want to contribute (see above).
 1. Set up your local development environment.
-   1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``main`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.   
+   1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``main`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.
    2. [Install the local dependencies](#install-local-dependencies) to run the tests for your contribution.
    3. [Test your installation](#testing-your-installation) to ensure everything is set up correctly.
 4. Implement your contribution. If contributing to the documentation, see [here](#contributing-to-the-documentation).
-5. [Create a pull request](#pull-request-checklist). 
+5. [Create a pull request](#pull-request-checklist).
 
 ### Install Local Dependencies
 
@@ -56,11 +56,11 @@ We recommend following the instructions below to install all requirements locall
 However, it is also possible to use the [openml-python docker image](https://github.com/openml/openml-python/blob/main/docker/readme.md) for testing and building documentation. Moreover, feel free to use any alternative package managers, such as `pip`.
 
 
-1. To ensure a smooth development experience, we recommend using the `uv` package manager. Thus, first install `uv`. If any Python version already exists on your system, follow the steps below, otherwise see [here](https://docs.astral.sh/uv/getting-started/installation/). 
+1. To ensure a smooth development experience, we recommend using the `uv` package manager. Thus, first install `uv`. If any Python version already exists on your system, follow the steps below, otherwise see [here](https://docs.astral.sh/uv/getting-started/installation/).
     ```bash
     pip install uv
     ```
-2. Create a virtual environment using `uv` and activate it. This will ensure that the dependencies for `openml-python` do not interfere with other Python projects on your system. 
+2. Create a virtual environment using `uv` and activate it. This will ensure that the dependencies for `openml-python` do not interfere with other Python projects on your system.
    ```bash
    uv venv --seed --python 3.8 ~/.venvs/openml-python
    source ~/.venvs/openml-python/bin/activate
@@ -148,6 +148,31 @@ You can replicate this setup locally:
 
 For more details, see the [Developer Setup Guide](https://openml.github.io/openml-python/main/developer_setup.html).
 
+#### Diagnosing Slow Tests
+
+If you suspect a test (or the suite as a whole) is running too slowly, `pytest` already exposes everything you need to investigate it. A few invocations that are useful when looking into test runtimes:
+
+```bash
+# Show the 20 slowest tests (use 0 to list every test's duration)
+pytest tests --durations=20
+
+# Fail any test that exceeds the given timeout (requires pytest-timeout)
+pytest tests --timeout=600
+
+# Investigate only fixture/setup costs without actually running the tests
+pytest tests --setup-only
+
+# Profile a specific module, class, or test
+pytest tests/test_datasets/test_dataset.py --durations=0
+
+# Skip the slow live-server tests while profiling locally
+pytest tests --durations=0 -m "not production_server and not test_server"
+
+# Run the suite in parallel to reproduce CI behaviour (requires pytest-xdist)
+pytest tests -n 4 --dist=load --durations=0
+```
+
+Combining these with the marker filters (`production_server`, `test_server`, `sklearn`) makes it straightforward to narrow the investigation down to the slow tests without changing project configuration.
 
 ### Pull Request Checklist
 
@@ -161,7 +186,7 @@ Drafts often benefit from the inclusion of a
 [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
 in the PR description.
 
---- 
+---
 
 # Appendix
 
@@ -169,8 +194,7 @@ in the PR description.
 
 The preferred workflow for contributing to openml-python is to
 fork the [main repository](https://github.com/openml/openml-python) on
-GitHub, clone, check out the branch `main`, and develop on a new branch
-branch. Steps:
+GitHub, clone, and develop on a new branch:
 
 0. Make sure you have git installed, and a GitHub account.
 
@@ -187,19 +211,13 @@ local disk:
    cd openml-python
    ```
 
-3. Switch to the ``develop`` branch:
-
-   ```bash
-   git checkout main
-   ```
-
 3. Create a ``feature`` branch to hold your development changes:
 
    ```bash
    git checkout -b feature/my-feature
    ```
 
-   Always use a ``feature`` branch. It's good practice to never work on the ``main`` branch! 
+   Always use a ``feature`` branch. It's good practice to never work on the ``main`` branch!
    To make the nature of your pull request easily visible, please prepend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
 
 4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
@@ -231,7 +249,7 @@ Before each commit, it will automatically run:
    if the resulting code is very bloated, consider a (small) refactor.
  - [mypy](https://mypy.readthedocs.io/en/stable/) a static type checker.
    In particular, make sure each function you work on has type hints.
-    
+
 If you want to run the pre-commit tests without doing a commit, run:
 ```bash
 $ make check

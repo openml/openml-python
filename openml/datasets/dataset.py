@@ -41,7 +41,7 @@ def _ensure_dataframe(
     raise TypeError(f"Data type {type(data)} not supported.")
 
 
-class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
+class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -123,7 +123,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         Path to the local file.
     """
 
-    def __init__(  # noqa: C901, PLR0912, PLR0913, PLR0915
+    def __init__(  # noqa: C901, PLR0912, PLR0913,PLR0917, PLR0915
         self,
         name: str,
         description: str | None,
@@ -838,7 +838,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         else:
             self._qualities = _read_qualities(qualities_file)
 
-    def retrieve_class_labels(self, target_name: str = "class") -> None | list[str]:
+    def retrieve_class_labels(self, target_name: str = "class") -> list[str] | None:
         """Reads the datasets arff to determine the class-labels.
 
         If the task has no class labels (for example a regression problem)
