@@ -84,13 +84,7 @@ class OpenMLDataFeature(ReprMixin):
             "Name": self.name,
             "Data Type": self.data_type,
         }
-
-        order = [
-            "Index",
-            "Name",
-            "Data Type",
-        ]
-        return [(key, fields[key]) for key in order if key in fields]
+        return list(fields.items())
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
