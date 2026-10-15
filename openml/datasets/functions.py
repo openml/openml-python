@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
+# ruff: noqa: PLR0913,PLR0917
 from __future__ import annotations
 
 import logging
@@ -19,9 +19,9 @@ import urllib3
 import xmltodict
 from scipy.sparse import coo_matrix
 
+import openml
 import openml._api_calls
 import openml.utils
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
@@ -364,6 +364,11 @@ def get_datasets(
     -------
     datasets : list of datasets
         A list of dataset objects.
+
+    Examples
+    --------
+    >>> import openml
+    >>> datasets = openml.datasets.get_datasets([1, 2, 3])  # doctest: +SKIP
     """
     datasets = []
     for dataset_id in dataset_ids:
@@ -446,6 +451,13 @@ def get_dataset(  # noqa: C901, PLR0912
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
+
+    Examples
+    --------
+    >>> import openml
+    >>> dataset = openml.datasets.get_dataset(1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset("iris", version=1)  # doctest: +SKIP
+    >>> dataset = openml.datasets.get_dataset(1, download_data=True)  # doctest: +SKIP
     """
     if download_all_files:
         warnings.warn(
@@ -492,7 +504,9 @@ def get_dataset(  # noqa: C901, PLR0912
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         parquet_file = None
-        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        skip_parquet = (
+            os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        )
         download_parquet = "oml:parquet_url" in description and not skip_parquet
         if download_parquet and (download_data or download_all_files):
             try:
@@ -890,6 +904,29 @@ def edit_dataset(
     """
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
+    if not any(
+        field
+        for field in [
+            description,
+            creator,
+            contributor,
+            collection_date,
+            language,
+            default_target_attribute,
+            ignore_attribute,
+            citation,
+            row_id_attribute,
+            original_data_url,
+            paper_url,
+        ]
+    ):
+        raise ValueError(
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, "
+            "original_data_url, default_target_attribute, row_id_attribute, "
+            "ignore_attribute or paper_url to edit.",
+        )
 
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE

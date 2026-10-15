@@ -5,7 +5,6 @@ from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any
 
-import openml.config
 import openml.flows
 from openml.utils import ReprMixin
 

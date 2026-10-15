@@ -14,7 +14,10 @@ import openml
 # ## List datasets stored on OpenML
 
 # %%
-datasets_df = openml.datasets.list_datasets()
+# New: top-level convenience alias
+datasets_df = openml.list_datasets()
+# Old path still works for backwards compatibility:
+# datasets_df = openml.datasets.list_datasets()
 print(datasets_df.head(n=10))
 
 # %% [markdown]
@@ -22,7 +25,10 @@ print(datasets_df.head(n=10))
 
 # %%
 # Iris dataset https://www.openml.org/d/61
-dataset = openml.datasets.get_dataset(dataset_id=61)
+# New: top-level convenience alias
+dataset = openml.get_dataset(dataset_id=61)
+# Old path still works:
+# dataset = openml.datasets.get_dataset(dataset_id=61)
 
 # Print a summary
 print(

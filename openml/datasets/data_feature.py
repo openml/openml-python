@@ -1,10 +1,11 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from IPython.lib import pretty
 
 from openml.utils import ReprMixin
@@ -34,7 +35,7 @@ class OpenMLDataFeature(ReprMixin):
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         index: int,
         name: str,
