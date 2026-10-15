@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+# mypy: disable-error-code=untyped-decorator
 from __future__ import annotations
 
 import unittest.mock
