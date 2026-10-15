@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import gzip
 import logging
 import os
@@ -295,15 +296,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | None]]:
         """Collect all information to display in the __repr__ body."""
-        # Obtain number of features in accordance with lazy loading.
-        n_features: int | None = None
-        if self._qualities is not None:
-            n_features_quality = self._qualities.get("NumberOfFeatures")
-            if n_features_quality is not None and not pd.isna(n_features_quality):
-                n_features = int(n_features_quality)
-        elif self._features is not None:
-            n_features = len(self._features)
-
         fields: dict[str, int | str | None] = {
             "Name": self.name,
             "Version": self.version,
@@ -315,16 +307,22 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 str(self.data_pickle_file) if self.data_pickle_file is not None else None
             ),
         }
-        if n_features is not None:
-            fields["# of features"] = n_features
+
+        # We don't consider these fields critical to display, so we use the internal
+        # attribute to avoid downloading extra files just to generate the repr.
+        try:
+            fields["# of features"] = int(self._qualities["NumberOfFeatures"])  # type: ignore[index]
+        except (TypeError, KeyError, ValueError):
+            if self._features is not None:
+                fields["# of features"] = len(self._features)
+
+        with contextlib.suppress(TypeError, KeyError, ValueError):
+            fields["# of instances"] = int(self._qualities["NumberOfInstances"])  # type: ignore[index]
+
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.dataset_id is not None:
             fields["OpenML URL"] = self.openml_url
-        if self._qualities is not None:
-            n_instances_quality = self._qualities.get("NumberOfInstances")
-            if n_instances_quality is not None and not pd.isna(n_instances_quality):
-                fields["# of instances"] = int(n_instances_quality)
 
         # determines the order in which the information will be printed
         order = [
