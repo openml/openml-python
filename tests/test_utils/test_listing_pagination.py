@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import unittest.mock
+from typing import Any, Literal
 
 import pandas as pd
 import pytest
@@ -10,10 +11,10 @@ import openml
 
 
 @pytest.mark.parametrize("batch_size", [None, 10_000])
-def test_list_all_caps_batch_size(batch_size):
-    calls = []
+def test_list_all_caps_batch_size(batch_size: int | None) -> None:
+    calls: list[tuple[int, int]] = []
 
-    def listing_call(size, offset):
+    def listing_call(size: int, offset: int) -> list[int]:
         calls.append((size, offset))
         return list(range(offset, min(offset + size, 2_500)))
 
@@ -34,7 +35,12 @@ def test_list_all_caps_batch_size(batch_size):
         (400, 1_050, 125, [(400, 125), (400, 525), (250, 925)]),
     ],
 )
-def test_list_all_preserves_limit_and_offset(batch_size, limit, offset, expected_calls):
+def test_list_all_preserves_limit_and_offset(
+    batch_size: int | None,
+    limit: int,
+    offset: int,
+    expected_calls: list[tuple[int, int]],
+) -> None:
     listing_call = unittest.mock.Mock(
         side_effect=lambda size, start: list(range(start, start + size)),
     )
@@ -52,7 +58,7 @@ def test_list_all_preserves_limit_and_offset(batch_size, limit, offset, expected
 
 @pytest.mark.parametrize("limit", [None, 5_000])
 @pytest.mark.parametrize("available", [0, 1_000, 1_250])
-def test_list_all_stops_when_results_end(limit, available):
+def test_list_all_stops_when_results_end(limit: int | None, available: int) -> None:
     offset = 125
     listing_call = unittest.mock.Mock(
         side_effect=lambda size, start: list(range(start, min(start + size, offset + available))),
@@ -72,7 +78,7 @@ def test_list_all_stops_when_results_end(limit, available):
     assert [item for batch in batches for item in batch] == list(range(offset, offset + available))
 
 
-def test_list_all_stops_on_no_result():
+def test_list_all_stops_on_no_result() -> None:
     listing_call = unittest.mock.Mock(
         side_effect=[list(range(125, 1_125)), openml.exceptions.OpenMLServerNoResult("No results")],
     )
@@ -86,8 +92,8 @@ def test_list_all_stops_on_no_result():
     assert batches == [list(range(125, 1_125))]
 
 
-def test_list_datasets_pages_preserve_filters():
-    def listing_call(size, offset, **filters):
+def test_list_datasets_pages_preserve_filters() -> None:
+    def listing_call(size: int, offset: int, **filters: Any) -> pd.DataFrame:
         assert filters["tag"] == "pagination-test"
         assert filters["status"] == "active"
         assert filters["data_name"] == "example"
@@ -114,8 +120,8 @@ def test_list_datasets_pages_preserve_filters():
     assert datasets["did"].tolist() == list(range(125, 2_625))
 
 
-def test_list_runs_pages_preserve_filters():
-    def listing_call(size, offset, **filters):
+def test_list_runs_pages_preserve_filters() -> None:
+    def listing_call(size: int, offset: int, **filters: Any) -> pd.DataFrame:
         assert filters["tag"] == "pagination-test"
         assert filters["task"] == [42]
         return pd.DataFrame({"run_id": range(offset, offset + size)})
@@ -137,8 +143,12 @@ def test_list_runs_pages_preserve_filters():
 
 
 @pytest.mark.parametrize("output_format", ["object", "dataframe"])
-def test_list_evaluations_pages_preserve_output(output_format):
-    def listing_call(size, offset, **filters):
+def test_list_evaluations_pages_preserve_output(
+    output_format: Literal["object", "dataframe"],
+) -> None:
+    def listing_call(
+        size: int, offset: int, **filters: Any
+    ) -> list[openml.evaluations.OpenMLEvaluation]:
         assert filters["function"] == "predictive_accuracy"
         assert filters["tag"] == "pagination-test"
         return [
