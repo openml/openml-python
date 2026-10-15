@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 
 import xmltodict
 
+import openml
 import openml._api_calls
-import openml.config
 from openml.utils import ReprMixin
 
 from .utils import _get_rest_api_type_alias, _tag_openml_base
