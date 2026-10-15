@@ -725,7 +725,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
-    def get_data(  # noqa: C901
+    def get_data(  # noqa: C901, PLR0912
         self,
         target: list[str] | str | None = None,
         include_row_id: bool = False,  # noqa: FBT002
@@ -797,17 +797,22 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             )
 
         target_name = target_names[0]
-        if target_name not in data.columns:
-            available_columns = list(data.columns)
+        available_columns = list(data.columns)
+        if target_name in to_exclude:
             msg = (
                 f"Target column '{target_name}' was removed because it is listed as a "
                 f"row_id or ignore attribute. "
                 f"Available columns after filtering: {available_columns}"
-                if target_name in to_exclude
-                else f"Target column '{target_name}' does not exist in this dataset. "
+            )
+            raise ValueError(msg)
+
+        if target_name not in data.columns:
+            msg = (
+                f"Target column '{target_name}' does not exist in this dataset. "
                 f"Available columns: {available_columns}"
             )
             raise ValueError(msg)
+
         x = data.drop(columns=[target_name])
         y = data[target_name].squeeze()
 
