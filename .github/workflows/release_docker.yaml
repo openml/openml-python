@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'develop'
+      - 'main'
       - 'docker'
     tags:
       - 'v*'
@@ -34,17 +34,17 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Check out the repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Extract metadata (tags, labels) for Docker Hub
         id: meta_dockerhub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: "openml/openml-python"
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./docker/
           tags: ${{ steps.meta_dockerhub.outputs.tags }}
@@ -54,13 +54,13 @@ jobs:
 
       - name: Update repo description
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: peter-evans/dockerhub-description@v4
+        uses: peter-evans/dockerhub-description@v5
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: openml/openml-python
           short-description: "pre-installed openml-python environment"
           readme-filepath: ./docker/readme.md
-          
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
