@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-import builtins
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import xmltodict
 
 from openml.evaluations import OpenMLEvaluation
 
 from .base import EvaluationAPI, ResourceV1API, ResourceV2API
+
+if TYPE_CHECKING:
+    import builtins
 
 
 class EvaluationV1API(ResourceV1API, EvaluationAPI):

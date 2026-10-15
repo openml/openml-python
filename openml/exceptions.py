@@ -22,7 +22,7 @@ class OpenMLServerException(OpenMLServerError):  # noqa: N818
     """
 
     # Code needs to be optional to allow the exception to be picklable:
-    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
+    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable
     def __init__(self, message: str, code: int | None = None, url: str | None = None):
         self.message = message
         self.code = code

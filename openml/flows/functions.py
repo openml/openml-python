@@ -282,7 +282,7 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
             stack.append(component)
 
 
-def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
+def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913,PLR0917, PLR0915
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
     ignore_parameter_values_on_older_children: str | None = None,

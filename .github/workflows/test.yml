@@ -7,14 +7,12 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - "v*.*.*"
 
   pull_request:
     branches:
       - main
-      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -82,7 +80,7 @@ jobs:
         fetch-depth: 2
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -100,7 +98,7 @@ jobs:
         if [[ "$major" -gt 1 ]] || { [[ "$major" -eq 1 ]] && [[ "$minor" -ge 7 ]]; }; then
           pip install "pandas==3.*"
         else
-          pip install "pandas==2.*"
+          pip install "pandas==2.*" "pyarrow<26"
         fi
 
     - name: Store repository status
@@ -182,10 +180,11 @@ jobs:
 
     - name: Upload coverage
       if: matrix.code-cov && always()
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v7
       with:
         files: coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
+        cleanup: true
         fail_ci_if_error: true
         verbose: true
 
@@ -196,7 +195,10 @@ jobs:
 
     - name: Cleanup Docker setup
       if: always() && steps.clone-services.outcome == 'success'
+      working-directory: ./services
       run: |
+        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        cd ..
         sudo rm -rf services
 
     - name: Check for files left behind by test
@@ -210,30 +212,3 @@ jobs:
             echo "Not all generated files have been deleted!"
             exit 1
         fi
-
-  dummy_windows_py_sk024:
-    name: (windows-latest, Py, sk0.24.*, sk-only:false)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy job."
-          echo "Always succeeds."
-
-  dummy_windows_py_sk023:
-    name: (ubuntu-latest, Py3.8, sk0.23.1, sk-only:false)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy job."
-          echo "Always succeeds."
-
-  dummy_docker:
-    name: docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy docker job."
-          echo "Always succeeds."

@@ -8,12 +8,15 @@ import sys
 from collections.abc import Callable
 from dataclasses import fields
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 
 import openml
 from openml.__version__ import __version__
 from openml.enums import APIVersion
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def is_hex(string_: str) -> bool:
@@ -252,9 +255,9 @@ def configure_retry_policy(value: str) -> None:
     )
 
 
-def configure_field(  # noqa: PLR0913
+def configure_field(  # noqa: PLR0913,PLR0917
     field: str,
-    value: None | str,
+    value: str | None,
     check_with_message: Callable[[str], str],
     intro_message: str,
     input_message: str,
