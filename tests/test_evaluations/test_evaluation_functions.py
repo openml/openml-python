@@ -257,9 +257,11 @@ class TestEvaluationFunctions(TestBase):
                 type="crossvalidation",
             )
         ]
-        with patch.object(openml._backend.estimation_procedure, "list", return_value=procedures):
-            with pytest.warns(FutureWarning, match="output will change"):
-                result = openml.evaluations.list_estimation_procedures()
+        with (
+            patch.object(openml._backend.estimation_procedure, "list", return_value=procedures),
+            pytest.warns(FutureWarning, match="output will change"),
+        ):
+            result = openml.evaluations.list_estimation_procedures()
 
         assert result == ["10-fold Crossvalidation"]
 
