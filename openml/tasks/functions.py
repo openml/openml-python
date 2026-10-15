@@ -38,7 +38,7 @@ def _get_cached_tasks() -> dict[int, OpenMLTask]:
         OpenMLTask.
     """
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
+    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208, RUF100
     directory_content.sort()
 
     # Find all dataset ids for which we have downloaded the dataset
@@ -84,7 +84,7 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     return [i._to_dict() for i in result]
 
 
-def list_tasks(  # noqa: PLR0913
+def list_tasks(  # noqa: PLR0913,PLR0917
     task_type: TaskType | None = None,
     offset: int | None = None,
     size: int | None = None,
