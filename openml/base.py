@@ -14,7 +14,7 @@ from openml.utils import ReprMixin
 from .utils import _get_rest_api_type_alias, _tag_openml_base
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Sequence
 
 
 class OpenMLBase(ReprMixin, ABC):

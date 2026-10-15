@@ -3,14 +3,16 @@ from __future__ import annotations
 
 import pickle
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 from typing_extensions import NamedTuple
 
 import arff  # type: ignore
 import numpy as np
 
 from openml.utils import ReprMixin
+
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from pathlib import Path
 
 

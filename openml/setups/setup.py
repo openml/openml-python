@@ -1,12 +1,14 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import openml.flows
 from openml.utils import ReprMixin
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 @dataclass(repr=False)
