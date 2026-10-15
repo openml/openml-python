@@ -9,6 +9,21 @@ import pytest
 import openml
 
 
+@pytest.mark.parametrize("batch_size", [None, 10_000])
+def test_list_all_caps_batch_size(batch_size):
+    calls = []
+
+    def listing_call(size, offset):
+        calls.append((size, offset))
+        return list(range(offset, min(offset + size, 2_500)))
+
+    kwargs = {} if batch_size is None else {"batch_size": batch_size}
+    batches = openml.utils._list_all(listing_call, limit=2_500, **kwargs)
+
+    assert calls == [(1_000, 0), (1_000, 1_000), (500, 2_000)]
+    assert sum(len(batch) for batch in batches) == 2_500
+
+
 @pytest.mark.parametrize(
     ("batch_size", "limit", "offset", "expected_calls"),
     [
