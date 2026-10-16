@@ -3,14 +3,17 @@ from __future__ import annotations
 
 import unittest
 
-from openml.config import overwrite_config_context
+import pytest
+
+import openml
 
 
 class TestEvaluationsExample(unittest.TestCase):
+    @pytest.mark.skip(reason="Affected by lowered result limit #1757")
     def test_example_python_paper(self):
         # Example script which will appear in the upcoming OpenML-Python paper
         # This test ensures that the example will keep running!
-        with overwrite_config_context(
+        with openml.config.overwrite_config_context(  # noqa: F823
             {
                 "server": "https://www.openml.org/api/v1/xml",
                 "apikey": None,
@@ -18,6 +21,7 @@ class TestEvaluationsExample(unittest.TestCase):
         ):
             import matplotlib.pyplot as plt
             import numpy as np
+
             import openml
 
             df = openml.evaluations.list_evaluations_setups(

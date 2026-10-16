@@ -7,7 +7,6 @@ import unittest.mock
 
 import pandas as pd
 import pytest
-import sklearn.base
 import sklearn.naive_bayes
 import sklearn.tree
 from openml_sklearn import SklearnExtension
@@ -21,13 +20,13 @@ def get_sentinel():
     # Create a unique prefix for the flow. Necessary because the flow is
     # identified by its name and external version online. Having a unique
     #  name allows us to publish the same flow in each test run
-    md5 = hashlib.md5()
+    md5 = hashlib.md5()  # noqa: S324
     md5.update(str(time.time()).encode("utf-8"))
     sentinel = md5.hexdigest()[:10]
     return f"TEST{sentinel}"
 
 
-@pytest.fixture()
+@pytest.fixture
 def sklearn_extension():
     """Fixture to provide SklearnExtension instance."""
     return SklearnExtension()
@@ -43,8 +42,6 @@ def _existing_setup_exists(sklearn_extension, classif):
 
     # although the flow exists, we can be sure there are no
     # setups (yet) as it hasn't been ran
-    setup_id = openml.setups.setup_exists(flow)
-    assert not setup_id
     setup_id = openml.setups.setup_exists(flow)
     assert not setup_id
 
@@ -64,7 +61,8 @@ def _existing_setup_exists(sklearn_extension, classif):
     assert setup_id == run.setup_id
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
+@pytest.mark.test_server
 def test_nonexisting_setup_exists(sklearn_extension):
     # first publish a non-existing flow
     sentinel = get_sentinel()
@@ -83,7 +81,8 @@ def test_nonexisting_setup_exists(sklearn_extension):
     assert not setup_id
 
 
-@pytest.mark.sklearn()
+@pytest.mark.test_server
+@pytest.mark.sklearn
 def test_existing_setup_exists_1(sklearn_extension):
     def side_effect(self):
         self.var_smoothing = 1e-9
@@ -99,13 +98,15 @@ def test_existing_setup_exists_1(sklearn_extension):
         _existing_setup_exists(sklearn_extension, nb)
 
 
-@pytest.mark.sklearn()
+@pytest.mark.test_server
+@pytest.mark.sklearn
 def test_exisiting_setup_exists_2(sklearn_extension):
     # Check a flow with one hyperparameter
     _existing_setup_exists(sklearn_extension, sklearn.naive_bayes.GaussianNB())
 
 
-@pytest.mark.sklearn()
+@pytest.mark.test_server
+@pytest.mark.sklearn
 def test_existing_setup_exists_3(sklearn_extension):
     # Check a flow with many hyperparameters
     _existing_setup_exists(
@@ -120,7 +121,7 @@ def test_existing_setup_exists_3(sklearn_extension):
     )
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_setup():
     # no setups in default test server
     openml.config.server = "https://www.openml.org/api/v1/xml/"
@@ -139,12 +140,10 @@ def test_get_setup():
             assert len(current.parameters) == num_params[idx]
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_setup_list_filter_flow():
     openml.config.server = "https://www.openml.org/api/v1/xml/"
-
     flow_id = 5873
-
     setups = openml.setups.list_setups(flow=flow_id)
 
     assert len(setups) > 0  # TODO: please adjust 0
@@ -152,15 +151,14 @@ def test_setup_list_filter_flow():
         assert setups[setup_id].flow_id == flow_id
 
 
+@pytest.mark.test_server
 def test_list_setups_empty():
     setups = openml.setups.list_setups(setup=[0])
-    if len(setups) > 0:
-        raise ValueError("UnitTest Outdated, got somehow results")
-
+    assert not setups
     assert isinstance(setups, dict)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_list_setups_output_format():
     openml.config.server = "https://www.openml.org/api/v1/xml/"
     flow_id = 6794
@@ -174,6 +172,7 @@ def test_list_setups_output_format():
     assert len(setups) == 10
 
 
+@pytest.mark.production_server
 def test_setuplist_offset():
     size = 10
     setups = openml.setups.list_setups(offset=0, size=size)
@@ -181,9 +180,9 @@ def test_setuplist_offset():
     setups2 = openml.setups.list_setups(offset=size, size=size)
     assert len(setups2) == size
 
-    all = set(setups.keys()).union(setups2.keys())
+    all_setups = set(setups.keys()).union(setups2.keys())
 
-    assert len(all) == size * 2
+    assert len(all_setups) == size * 2
 
 
 def test_get_cached_setup(static_cache_dir):
