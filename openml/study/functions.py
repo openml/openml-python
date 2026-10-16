@@ -1,16 +1,14 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import xmltodict
 
 import openml._api_calls
-import openml.config
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
@@ -31,6 +29,12 @@ def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
     -------
     OpenMLSuite
         The OpenML suite object
+
+    Examples
+    --------
+    >>> import openml
+    >>> suite = openml.study.get_suite(99)  # doctest: +SKIP
+    >>> suite = openml.study.get_suite("OpenML-CC18")  # doctest: +SKIP
     """
     study = _get_study(suite_id, entity_type="task")
     assert isinstance(study, OpenMLBenchmarkSuite)
@@ -60,6 +64,11 @@ def get_study(
     -------
     OpenMLStudy
         The OpenML study object
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.get_study(1)  # doctest: +SKIP
     """
     if study_id == "OpenML100":
         message = (
@@ -110,7 +119,10 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     tags = []
     if "oml:tag" in result_dict:
         for tag in result_dict["oml:tag"]:
-            current_tag = {"name": tag["oml:name"], "write_access": tag["oml:write_access"]}
+            current_tag = {
+                "name": tag["oml:name"],
+                "write_access": tag["oml:write_access"],
+            }
             if "oml:window_start" in tag:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
@@ -193,8 +205,6 @@ def create_study(
 
     Parameters
     ----------
-    benchmark_suite : int (optional)
-        the benchmark suite (another study) upon which this study is ran.
     name : str
         the name of the study (meta-info)
     description : str
@@ -211,6 +221,15 @@ def create_study(
     -------
     OpenMLStudy
         A local OpenML study object (call publish method to upload to server)
+
+    Examples
+    --------
+    >>> import openml
+    >>> study = openml.study.create_study(  # doctest: +SKIP
+    ...     name="My Study",
+    ...     description="A study on decision trees",
+    ...     run_ids=[1, 2, 3],
+    ... )
     """
     return OpenMLStudy(
         study_id=None,
@@ -338,7 +357,8 @@ def delete_study(study_id: int) -> bool:
     bool
         True iff the deletion was successful. False otherwise
     """
-    return openml.utils._delete_entity("study", study_id)
+    result: bool = openml._backend.study.delete(study_id)
+    return result
 
 
 def attach_to_suite(suite_id: int, task_ids: list[int]) -> int:
@@ -422,7 +442,7 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
         new size of the study (in terms of explicitly linked entities)
     """
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
-    uri = "study/%d/detach" % study_id
+    uri = f"study/{study_id}/detach"
     post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
         call=uri,
@@ -467,7 +487,7 @@ def list_suites(
         - creation_date
     """
     listing_call = partial(
-        _list_studies,
+        openml._backend.study.list,
         main_entity_type="task",
         status=status,
         uploader=uploader,
@@ -483,7 +503,7 @@ def list_studies(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
-    uploader: list[str] | None = None,
+    uploader: list[int] | None = None,
     benchmark_suite: int | None = None,
 ) -> pd.DataFrame:
     """
@@ -518,7 +538,7 @@ def list_studies(
         these are also returned.
     """
     listing_call = partial(
-        _list_studies,
+        openml._backend.study.list,
         main_entity_type="run",
         status=status,
         uploader=uploader,
@@ -529,81 +549,3 @@ def list_studies(
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
-    """Perform api call to return a list of studies.
-
-    Parameters
-    ----------
-    limit: int
-        The maximum number of studies to return.
-    offset: int
-        The number of studies to skip, starting from the first.
-    kwargs : dict, optional
-        Legal filter operators (keys in the dict):
-        status, main_entity_type, uploader, benchmark_suite
-
-    Returns
-    -------
-    studies : dataframe
-    """
-    api_call = "study/list"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-    return __list_studies(api_call=api_call)
-
-
-def __list_studies(api_call: str) -> pd.DataFrame:
-    """Retrieves the list of OpenML studies and
-    returns it in a dictionary or a Pandas DataFrame.
-
-    Parameters
-    ----------
-    api_call : str
-        The API call for retrieving the list of OpenML studies.
-
-    Returns
-    -------
-    pd.DataFrame
-        A Pandas DataFrame of OpenML studies
-    """
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
-        study_dict["oml:study_list"],
-    )
-    assert study_dict["oml:study_list"]["@xmlns:oml"] == "http://openml.org/openml", study_dict[
-        "oml:study_list"
-    ]["@xmlns:oml"]
-
-    studies = {}
-    for study_ in study_dict["oml:study_list"]["oml:study"]:
-        # maps from xml name to a tuple of (dict name, casting fn)
-        expected_fields = {
-            "oml:id": ("id", int),
-            "oml:alias": ("alias", str),
-            "oml:main_entity_type": ("main_entity_type", str),
-            "oml:benchmark_suite": ("benchmark_suite", int),
-            "oml:name": ("name", str),
-            "oml:status": ("status", str),
-            "oml:creation_date": ("creation_date", str),
-            "oml:creator": ("creator", int),
-        }
-        study_id = int(study_["oml:id"])
-        current_study = {}
-        for oml_field_name, (real_field_name, cast_fn) in expected_fields.items():
-            if oml_field_name in study_:
-                current_study[real_field_name] = cast_fn(study_[oml_field_name])
-        current_study["id"] = int(current_study["id"])
-        studies[study_id] = current_study
-
-    return pd.DataFrame.from_dict(studies, orient="index")

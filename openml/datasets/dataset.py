@@ -1,15 +1,16 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import gzip
 import logging
 import os
 import pickle
 import re
 import warnings
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Iterable, Sequence
-from typing_extensions import Literal
+from typing import Any, Literal
 
 import arff
 import numpy as np
@@ -17,8 +18,8 @@ import pandas as pd
 import scipy.sparse
 import xmltodict
 
+import openml
 from openml.base import OpenMLBase
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 
 from .data_feature import OpenMLDataFeature
 
@@ -41,7 +42,7 @@ def _ensure_dataframe(
     raise TypeError(f"Data type {type(data)} not supported.")
 
 
-class OpenMLDataset(OpenMLBase):
+class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -123,7 +124,7 @@ class OpenMLDataset(OpenMLBase):
         Path to the local file.
     """
 
-    def __init__(  # noqa: C901, PLR0912, PLR0913, PLR0915
+    def __init__(  # noqa: C901, PLR0912, PLR0913,PLR0917, PLR0915
         self,
         name: str,
         description: str | None,
@@ -295,13 +296,6 @@ class OpenMLDataset(OpenMLBase):
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | None]]:
         """Collect all information to display in the __repr__ body."""
-        # Obtain number of features in accordance with lazy loading.
-        n_features: int | None = None
-        if self._qualities is not None and self._qualities["NumberOfFeatures"] is not None:
-            n_features = int(self._qualities["NumberOfFeatures"])
-        elif self._features is not None:
-            n_features = len(self._features)
-
         fields: dict[str, int | str | None] = {
             "Name": self.name,
             "Version": self.version,
@@ -312,14 +306,23 @@ class OpenMLDataset(OpenMLBase):
             "Pickle file": (
                 str(self.data_pickle_file) if self.data_pickle_file is not None else None
             ),
-            "# of features": n_features,
         }
+
+        # We don't consider these fields critical to display, so we use the internal
+        # attribute to avoid downloading extra files just to generate the repr.
+        try:
+            fields["# of features"] = int(self._qualities["NumberOfFeatures"])  # type: ignore[index]
+        except (TypeError, KeyError, ValueError):
+            if self._features is not None:
+                fields["# of features"] = len(self._features)
+
+        with contextlib.suppress(TypeError, KeyError, ValueError):
+            fields["# of instances"] = int(self._qualities["NumberOfInstances"])  # type: ignore[index]
+
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.dataset_id is not None:
             fields["OpenML URL"] = self.openml_url
-        if self._qualities is not None and self._qualities["NumberOfInstances"] is not None:
-            fields["# of instances"] = int(self._qualities["NumberOfInstances"])
 
         # determines the order in which the information will be printed
         order = [
@@ -375,7 +378,9 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        skip_parquet = (
+            os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        )
         if self._parquet_url is not None and not skip_parquet:
             parquet_file = _get_dataset_parquet(self)
             self.parquet_file = None if parquet_file is None else str(parquet_file)
@@ -420,7 +425,11 @@ class OpenMLDataset(OpenMLBase):
             file_size = filepath.stat().st_size
             if file_size > MB_120:
                 raise NotImplementedError(
-                    f"File {filename} too big for {file_size}-bit system ({bits} bytes).",
+                    f"File '{filename}' ({file_size / 1e6:.1f} MB)"
+                    f"exceeds the maximum supported size of 120 MB. "
+                    f"This limitation applies to {bits}-bit systems. "
+                    f"Large dataset handling is currently not fully supported. "
+                    f"Please consider using a smaller dataset"
                 )
 
         if format.lower() == "arff":
@@ -484,7 +493,7 @@ class OpenMLDataset(OpenMLBase):
                 try:
                     # checks if the strings which should be the class labels
                     # can be encoded into integers
-                    pd.factorize(type_)[0]
+                    pd.factorize(np.array(type_))[0]
                 except ValueError as e:
                     raise ValueError(
                         "Categorical data needs to be numeric when using sparse ARFF."
@@ -716,11 +725,11 @@ class OpenMLDataset(OpenMLBase):
         raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
-    def get_data(  # noqa: C901
+    def get_data(  # noqa: C901, PLR0912
         self,
         target: list[str] | str | None = None,
-        include_row_id: bool = False,  # noqa: FBT001, FBT002
-        include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
+        include_row_id: bool = False,  # noqa: FBT002
+        include_ignore_attribute: bool = False,  # noqa: FBT002
     ) -> tuple[pd.DataFrame, pd.Series | None, list[bool], list[str]]:
         """Returns dataset content as dataframes.
 
@@ -766,8 +775,8 @@ class OpenMLDataset(OpenMLBase):
             logger.info(f"Going to remove the following attributes: {to_exclude}")
             keep = np.array([column not in to_exclude for column in attribute_names])
             data = data.drop(columns=to_exclude)
-            categorical_mask = [cat for cat, k in zip(categorical_mask, keep) if k]
-            attribute_names = [att for att, k in zip(attribute_names, keep) if k]
+            categorical_mask = [cat for cat, k in zip(categorical_mask, keep, strict=False) if k]
+            attribute_names = [att for att, k in zip(attribute_names, keep, strict=False) if k]
 
         if target is None:
             return data, None, categorical_mask, attribute_names
@@ -780,9 +789,30 @@ class OpenMLDataset(OpenMLBase):
         # All the assumptions below for the target are dependant on the number of targets being 1
         n_targets = len(target_names)
         if n_targets > 1:
-            raise NotImplementedError(f"Number of targets {n_targets} not implemented.")
+            raise NotImplementedError(
+                f"Multi-target prediction is not yet supported."
+                f"Found {n_targets} target columns: {target_names}. "
+                f"Currently, only single-target datasets are supported. "
+                f"Please select a single target column."
+            )
 
         target_name = target_names[0]
+        available_columns = list(data.columns)
+        if target_name in to_exclude:
+            msg = (
+                f"Target column '{target_name}' was removed because it is listed as a "
+                f"row_id or ignore attribute. "
+                f"Available columns after filtering: {available_columns}"
+            )
+            raise ValueError(msg)
+
+        if target_name not in data.columns:
+            msg = (
+                f"Target column '{target_name}' does not exist in this dataset. "
+                f"Available columns: {available_columns}"
+            )
+            raise ValueError(msg)
+
         x = data.drop(columns=[target_name])
         y = data[target_name].squeeze()
 
@@ -827,7 +857,7 @@ class OpenMLDataset(OpenMLBase):
         else:
             self._qualities = _read_qualities(qualities_file)
 
-    def retrieve_class_labels(self, target_name: str = "class") -> None | list[str]:
+    def retrieve_class_labels(self, target_name: str = "class") -> list[str] | None:
         """Reads the datasets arff to determine the class-labels.
 
         If the task has no class labels (for example a regression problem)
@@ -863,8 +893,8 @@ class OpenMLDataset(OpenMLBase):
         self,
         data_type: str,
         exclude: list[str] | None = None,
-        exclude_ignore_attribute: bool = True,  # noqa: FBT002, FBT001
-        exclude_row_id_attribute: bool = True,  # noqa: FBT002, FBT001
+        exclude_ignore_attribute: bool = True,  # noqa: FBT002
+        exclude_row_id_attribute: bool = True,  # noqa: FBT002
     ) -> list[int]:
         """
         Return indices of features of a given type, e.g. all nominal features.
