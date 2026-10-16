@@ -24,7 +24,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
@@ -34,17 +34,17 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Check out the repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Extract metadata (tags, labels) for Docker Hub
         id: meta_dockerhub
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: "openml/openml-python"
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./docker/
           tags: ${{ steps.meta_dockerhub.outputs.tags }}
