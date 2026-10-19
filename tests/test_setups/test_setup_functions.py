@@ -122,22 +122,32 @@ def test_existing_setup_exists_3(sklearn_extension):
 
 
 @pytest.mark.production_server
-def test_get_setup():
+@pytest.mark.parametrize(
+    ("setup_id", "num_params"),
+    # contains all special cases, 0 params, 1 param, n params.
+    # Non scikitlearn flows.
+    [(18, 8), (19, 0), (20, 3), (118, 1)],
+)
+def test_get_setup(setup_id: int, num_params: int):
     # no setups in default test server
     openml.config.server = "https://www.openml.org/api/v1/xml/"
 
-    # contains all special cases, 0 params, 1 param, n params.
-    # Non scikitlearn flows.
-    setups = [18, 19, 20, 118]
-    num_params = [8, 0, 3, 1]
+    current = openml.setups.get_setup(setup_id)
+    assert current.flow_id > 0
+    if num_params == 0:
+        assert current.parameters is None
+    else:
+        assert len(current.parameters) == num_params
 
-    for idx in range(len(setups)):
-        current = openml.setups.get_setup(setups[idx])
-        assert current.flow_id > 0
-        if num_params[idx] == 0:
-            assert current.parameters is None
-        else:
-            assert len(current.parameters) == num_params[idx]
+
+@pytest.mark.test_server
+def test_get_cached_setup(test_files_directory):
+    openml.config.set_root_cache_directory(test_files_directory)
+
+    with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+        setup = openml.setups.get_setup(1)
+        mock_request.assert_not_called()
+        assert setup is not None
 
 
 @pytest.mark.production_server
@@ -183,14 +193,3 @@ def test_setuplist_offset():
     all_setups = set(setups.keys()).union(setups2.keys())
 
     assert len(all_setups) == size * 2
-
-
-def test_get_cached_setup(static_cache_dir):
-    openml.config.set_root_cache_directory(static_cache_dir)
-    openml.setups.functions._get_cached_setup(1)
-
-
-def test_get_uncached_setup(static_cache_dir):
-    openml.config.set_root_cache_directory(static_cache_dir)
-    with pytest.raises(openml.exceptions.OpenMLCacheException):
-        openml.setups.functions._get_cached_setup(10)
