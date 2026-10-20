@@ -270,6 +270,7 @@ class TestFlowFunctions(TestBase):
         )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -277,7 +278,6 @@ class TestFlowFunctions(TestBase):
         "No known models with list of lists parameters in older versions.",
     )
     @pytest.mark.test_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
 
@@ -521,7 +521,6 @@ def test_delete_flow_success(mock_request, test_files_directory, test_server_v1,
 
 
 @mock.patch.object(requests.Session, "request")
-@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_delete_unknown_flow(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
     mock_request.return_value = create_request_response(
