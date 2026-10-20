@@ -100,7 +100,7 @@ def objective(trial: optuna.Trial) -> Pipeline:
             run.publish()
 
             logger.log(1, f"Run was uploaded to - {run.openml_url}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.log(1, f"Could not publish run - {e}")
     else:
         logger.log(

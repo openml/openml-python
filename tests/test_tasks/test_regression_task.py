@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 
 import pandas as pd
+import pytest
 
 import openml
 from openml.exceptions import OpenMLServerException
@@ -16,13 +17,13 @@ from .test_supervised_task import OpenMLSupervisedTaskTest
 class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
     __test__ = True
 
-    def setUp(self, n_levels: int = 1):
+    def setUp(self, n_levels: int = 1):  # noqa: ARG002
         super().setUp()
         self.estimation_procedure = 9
         task_meta_data = {
             "task_type": TaskType.SUPERVISED_REGRESSION,
             "dataset_id": 105,  # wisconsin
-            "estimation_procedure_id": self.estimation_procedure, # non default value to test estimation procedure id
+            "estimation_procedure_id": self.estimation_procedure,  # non default value to test estimation procedure id  # noqa: E501
             "target_name": "time",
         }
         _task_id = check_task_existence(**task_meta_data)
@@ -40,14 +41,14 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
             except OpenMLServerException as e:
                 if e.code == 614:  # Task already exists
                     # the exception message contains the task_id that was matched in the format
-                    # 'Task already exists. - matched id(s): [xxxx]'
+                    # 'Task already exists. - matched id(s): [xxxx]'  # noqa: ERA001
                     task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
                 else:
-                    raise Exception(repr(e))
+                    raise Exception(repr(e))  # noqa: B904
         self.task_id = task_id
         self.task_type = TaskType.SUPERVISED_REGRESSION
 
-
+    @pytest.mark.test_server
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (194, 32)
@@ -56,6 +57,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         assert isinstance(Y, pd.Series)
         assert pd.api.types.is_numeric_dtype(Y)
 
+    @pytest.mark.test_server
     def test_download_task(self):
         task = super().test_download_task()
         assert task.task_id == self.task_id
