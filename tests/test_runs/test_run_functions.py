@@ -1626,8 +1626,8 @@ class TestRun(TestBase):
         )
         assert len(runs) == 2
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.production_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_runs_list_by_tag(self):
         # We don't have tagged runs on the test server
         self.use_production_server()

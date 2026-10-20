@@ -75,8 +75,8 @@ class TestFlow(TestBase):
         assert subflow_3.parameters["L"] == "-1"
         assert len(subflow_3.components) == 0
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.production_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the
