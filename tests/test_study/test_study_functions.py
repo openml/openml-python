@@ -8,8 +8,8 @@ import openml.study
 from openml.testing import TestBase
 
 
+# 2026-10-20: Removed skip marker, test just works (#1544)
 @pytest.mark.production_server
-@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_get_study_old():
     study = openml.study.get_study(34)
     assert len(study.data) == 105

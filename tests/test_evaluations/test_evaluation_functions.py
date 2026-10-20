@@ -262,8 +262,8 @@ class TestEvaluationFunctions(TestBase):
         keys = list(evals["parameters"].values[0].keys())
         assert all(elem in columns for elem in keys)
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.production_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_evaluations_setups_filter_task(self):
         self.use_production_server()
         task_id = [6]

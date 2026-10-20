@@ -54,8 +54,8 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.production_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
         self.use_production_server()
         # as shown by #383, clustering tasks can give list/dict casting problems
