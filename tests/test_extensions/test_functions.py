@@ -59,14 +59,14 @@ def _unregister():
             break
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def clean_test_extensions():
     _unregister()
     yield
     _unregister()
 
 
-def test_get_extension_by_flow(clean_test_extensions):
+def test_get_extension_by_flow():
     assert get_extension_by_flow(DummyFlow()) is None
     with pytest.raises(ValueError, match="No extension registered which can handle flow:"):
         get_extension_by_flow(DummyFlow(), raise_if_no_extension=True)
@@ -81,7 +81,7 @@ def test_get_extension_by_flow(clean_test_extensions):
         get_extension_by_flow(DummyFlow())
 
 
-def test_get_extension_by_model(clean_test_extensions):
+def test_get_extension_by_model():
     assert get_extension_by_model(DummyModel()) is None
     with pytest.raises(ValueError, match="No extension registered which can handle model:"):
         get_extension_by_model(DummyModel(), raise_if_no_extension=True)
