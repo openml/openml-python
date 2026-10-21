@@ -1,9 +1,8 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import pytest
-
 import pandas as pd
+import pytest
 
 from openml.tasks import get_task
 
@@ -24,9 +23,10 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
             pytest.skip("Skip OpenMLSupervisedTaskTest tests, it's a base class")
         super().setUpClass()
 
-    def setUp(self, n_levels: int = 1):
+    def setUp(self, n_levels: int = 1):  # noqa: ARG002
         super().setUp()
 
+    @pytest.mark.test_server
     def test_get_X_and_Y(self) -> tuple[pd.DataFrame, pd.Series]:
         task = get_task(self.task_id)
         X, Y = task.get_X_and_y()
