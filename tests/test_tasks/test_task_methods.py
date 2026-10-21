@@ -47,17 +47,8 @@ class OpenMLTaskMethodsTest(TestBase):
         assert train_indices[-1] == 681
         assert test_indices[0] == 583
         assert test_indices[-1] == 24
-        self.assertRaisesRegex(  # noqa: PT027
-            ValueError,
-            "Fold 10 not known",
-            task.get_train_test_split_indices,
-            10,
-            0,
-        )
-        self.assertRaisesRegex(  # noqa: PT027
-            ValueError,
-            "Repeat 10 not known",
-            task.get_train_test_split_indices,
-            0,
-            10,
-        )
+        with pytest.raises(ValueError, match="Fold 10 not known"):
+            task.get_train_test_split_indices(10, 0)
+
+        with pytest.raises(ValueError, match="Repeat 10 not known"):
+            task.get_train_test_split_indices(0, 10)

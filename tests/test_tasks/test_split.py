@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from openml import OpenMLSplit
 from openml.testing import TestBase
@@ -87,17 +88,8 @@ class OpenMLSplitTest(TestBase):
         train_split, test_split = split.get(fold=5, repeat=2)
         assert train_split.shape[0] == 808
         assert test_split.shape[0] == 90
-        self.assertRaisesRegex(  # noqa: PT027
-            ValueError,
-            "Repeat 10 not known",
-            split.get,
-            10,
-            2,
-        )
-        self.assertRaisesRegex(  # noqa: PT027
-            ValueError,
-            "Fold 10 not known",
-            split.get,
-            2,
-            10,
-        )
+        with pytest.raises(ValueError, match="Repeat 10 not known"):
+            split.get(10, 2)
+
+        with pytest.raises(ValueError, match="Fold 10 not known"):
+            split.get(2, 10)
