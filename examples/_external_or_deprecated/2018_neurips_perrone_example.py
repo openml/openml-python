@@ -27,16 +27,17 @@ In the following section, we shall do the following:
 
 # License: BSD 3-Clause
 
-import openml
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+
+import openml
 
 flow_type = "svm"  # this example will use the smaller svm flow evaluations
 ############################################################################
@@ -44,7 +45,7 @@ flow_type = "svm"  # this example will use the smaller svm flow evaluations
 # a tabular format that can be used to build models.
 
 
-def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_curve"):
+def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_curve"):  # noqa: FBT002
     """
     Fetch a list of evaluations based on the flows and tasks used in the experiments.
 
@@ -101,7 +102,10 @@ def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_cu
 
 
 def create_table_from_evaluations(
-    eval_df, flow_type="svm", run_count=np.iinfo(np.int64).max, task_ids=None
+    eval_df,
+    flow_type="svm",
+    run_count=np.iinfo(np.int64).max,  # noqa: B008
+    task_ids=None,
 ):
     """
     Create a tabular data with its ground truth from a dataframe of evaluations.
@@ -206,7 +210,7 @@ X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type="svm
 model.fit(X, y)
 y_pred = model.predict(X)
 
-print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
+print(f"Training RMSE : {mean_squared_error(y, y_pred):.5}")
 
 
 #############################################################################
@@ -231,9 +235,9 @@ def random_sample_configurations(num_samples=100):
     X = pd.DataFrame(np.nan, index=range(num_samples), columns=colnames)
     for i in range(len(colnames)):
         if len(ranges[i]) == 2:
-            col_val = np.random.uniform(low=ranges[i][0], high=ranges[i][1], size=num_samples)
+            col_val = np.random.uniform(low=ranges[i][0], high=ranges[i][1], size=num_samples)  # noqa: NPY002
         else:
-            col_val = np.random.choice(ranges[i], size=num_samples)
+            col_val = np.random.choice(ranges[i], size=num_samples)  # noqa: NPY002
         X.iloc[:, i] = col_val
     return X
 

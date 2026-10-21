@@ -7,10 +7,10 @@ import hashlib
 import os
 import re
 import time
-from packaging.version import Version
 from unittest import mock
 
 import pytest
+import requests
 import scipy.stats
 import sklearn
 import sklearn.datasets
@@ -24,17 +24,13 @@ import sklearn.pipeline
 import sklearn.preprocessing
 import sklearn.tree
 import xmltodict
-
 from openml_sklearn import SklearnExtension
+from packaging.version import Version
 
 import openml
 import openml.exceptions
 import openml.utils
-from openml._api_calls import _perform_api_call
 from openml.testing import SimpleImputer, TestBase
-
-
-pytestmark = pytest.mark.usefixtures("with_test_cache", "with_server")
 
 
 @pytest.fixture
@@ -71,7 +67,7 @@ def _add_sentinel_to_flow_name(
     return flow, sentinel
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_flow():
     # We need to use the production server here because 4024 is not the
     # test server
@@ -104,7 +100,8 @@ def test_get_flow():
     assert len(subflow_3.components) == 0
 
 
-@pytest.mark.production()
+# 2026-10-20 skip marker removed: no longer experiencing flakiness (#1544)
+@pytest.mark.production_server
 def test_get_structure():
     # also responsible for testing: flow.get_subflow
     # We need to use the production server here because 4024 is not the
@@ -141,7 +138,7 @@ def test_tagging():
     flow.push_tag(tag)
     flows = openml.flows.list_flows(tag=tag)
     assert len(flows) == 1
-    assert flow_id in flows["id"]
+    assert flow_id in flows["id"].values
     flow.remove_tag(tag)
     flows = openml.flows.list_flows(tag=tag)
     assert len(flows) == 0
@@ -158,7 +155,7 @@ def test_from_xml_to_xml():
         7,
         9,
     ]:
-        flow_xml = _perform_api_call("flow/%d" % flow_id, request_method="get")
+        flow_xml = openml._backend.http_client.get(f"flow/{flow_id}").text
         flow_dict = xmltodict.parse(flow_xml)
 
         flow = openml.OpenMLFlow._from_dict(flow_dict)
@@ -184,7 +181,7 @@ def test_from_xml_to_xml():
         assert new_xml == flow_xml
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_to_xml_from_xml(extension):
     scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
     estimator_name = (
@@ -207,7 +204,7 @@ def test_to_xml_from_xml(extension):
     assert new_flow is not flow
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_publish_flow(extension):
     flow = openml.OpenMLFlow(
         name="sklearn.dummy.DummyClassifier",
@@ -234,7 +231,7 @@ def test_publish_flow(extension):
     assert isinstance(flow.flow_id, int)
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 @mock.patch("openml.flows.functions.flow_exists")
 def test_publish_existing_flow(flow_exists_mock, extension):
     clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
@@ -250,7 +247,7 @@ def test_publish_existing_flow(flow_exists_mock, extension):
     )
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_publish_flow_with_similar_components(extension):
     clf = sklearn.ensemble.VotingClassifier(
         [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))],
@@ -301,7 +298,7 @@ def test_publish_flow_with_similar_components(extension):
     TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_semi_legal_flow(extension):
     # TODO: Test if parameters are set correctly!
     # should not throw error as it contains two differentiable forms of
@@ -326,23 +323,31 @@ def test_semi_legal_flow(extension):
     TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 @mock.patch("openml.flows.functions.get_flow")
 @mock.patch("openml.flows.functions.flow_exists")
-@mock.patch("openml._api_calls._perform_api_call")
-def test_publish_error(api_call_mock, flow_exists_mock, get_flow_mock, extension):
+@mock.patch("requests.Session.request")
+def test_publish_error(mock_request, flow_exists_mock, get_flow_mock, extension):
     model = sklearn.ensemble.RandomForestClassifier()
     flow = extension.model_to_flow(model)
-    api_call_mock.return_value = (
-        "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
+
+    # Create mock response directly
+    response = requests.Response()
+    response.status_code = 200
+    response._content = (
+        b'<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
+        b"    <oml:id>1</oml:id>\n"
+        b"</oml:upload_flow>"
     )
-    flow_exists_mock.return_value = False
+    mock_request.return_value = response
+    flow_exists_mock.return_value = False  # Flow doesn't exist yet, so try to publish
     get_flow_mock.return_value = flow
 
     flow.publish()
-    # Not collecting flow_id for deletion since this is a test for failed upload
+    # The first publish succeeds, so we don't collect flow_id
+    # for deletion since this is a mocked test.
 
-    assert api_call_mock.call_count == 1
+    assert mock_request.call_count == 1
     assert get_flow_mock.call_count == 1
     assert flow_exists_mock.call_count == 1
 
@@ -383,7 +388,7 @@ def test_publish_error(api_call_mock, flow_exists_mock, get_flow_mock, extension
     assert get_flow_mock.call_count == 2
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_illegal_flow(extension):
     # should throw error as it contains two imputers
     illegal = sklearn.pipeline.Pipeline(
@@ -393,7 +398,7 @@ def test_illegal_flow(extension):
             ("classif", sklearn.tree.DecisionTreeClassifier()),
         ],
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Found a second occurence of component"):
         extension.model_to_flow(illegal)
 
 
@@ -414,7 +419,7 @@ def test_nonexisting_flow_exists():
     assert not flow_id
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_existing_flow_exists(extension):
     # create a flow
     nb = sklearn.naive_bayes.GaussianNB()
@@ -455,7 +460,7 @@ def test_existing_flow_exists(extension):
         assert downloaded_flow_id == flow.flow_id
 
 
-@pytest.mark.sklearn()
+@pytest.mark.sklearn
 def test_sklearn_to_upload_to_flow(extension):
     iris = sklearn.datasets.load_iris()
     X = iris.data
@@ -545,9 +550,7 @@ def test_sklearn_to_upload_to_flow(extension):
     assert new_flow is not flow
 
     # OneHotEncoder was moved to _encoders module in 0.20
-    module_name_encoder = (
-        "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
-    )
+    module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
     if Version(sklearn.__version__) < Version("0.22"):
         fixture_name = (
             f"{sentinel}sklearn.model_selection._search.RandomizedSearchCV("
@@ -590,13 +593,13 @@ def test_extract_tags():
     tags = openml.utils.extract_xml_tags("oml:tag", flow_dict)
     assert tags == ["study_14"]
 
-    flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" "<oml:tag>weka</oml:tag></oml:flow>"
+    flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n<oml:tag>weka</oml:tag></oml:flow>"
     flow_dict = xmltodict.parse(flow_xml)
     tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
     assert tags == ["OpenmlWeka", "weka"]
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_download_non_scikit_learn_flows():
     flow = openml.flows.get_flow(6742)
     assert isinstance(flow, openml.OpenMLFlow)

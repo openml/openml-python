@@ -1,13 +1,18 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from typing import Any
+from dataclasses import asdict, dataclass
+from typing import TYPE_CHECKING, Any
 
-import openml.config
 import openml.flows
+from openml.utils import ReprMixin
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
-class OpenMLSetup:
+@dataclass(repr=False)
+class OpenMLSetup(ReprMixin):
     """Setup object (a.k.a. Configuration).
 
     Parameters
@@ -20,19 +25,19 @@ class OpenMLSetup:
         The setting of the parameters
     """
 
-    def __init__(self, setup_id: int, flow_id: int, parameters: dict[int, Any] | None):
-        if not isinstance(setup_id, int):
+    setup_id: int
+    flow_id: int
+    parameters: dict[int, Any] | None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.setup_id, int):
             raise ValueError("setup id should be int")
 
-        if not isinstance(flow_id, int):
+        if not isinstance(self.flow_id, int):
             raise ValueError("flow id should be int")
 
-        if parameters is not None and not isinstance(parameters, dict):
+        if self.parameters is not None and not isinstance(self.parameters, dict):
             raise ValueError("parameters should be dict")
-
-        self.setup_id = setup_id
-        self.flow_id = flow_id
-        self.parameters = parameters
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -43,30 +48,22 @@ class OpenMLSetup:
             else None,
         }
 
-    def __repr__(self) -> str:
-        header = "OpenML Setup"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
             "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
+            "# of Parameters": (len(self.parameters) if self.parameters is not None else "nan"),
         }
 
         # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
 
-class OpenMLParameter:
+@dataclass(repr=False)
+class OpenMLParameter(ReprMixin):
     """Parameter object (used in setup).
 
     Parameters
@@ -91,43 +88,28 @@ class OpenMLParameter:
         If the parameter was set, the value that it was set to.
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        input_id: int,
-        flow_id: int,
-        flow_name: str,
-        full_name: str,
-        parameter_name: str,
-        data_type: str,
-        default_value: str,
-        value: str,
-    ):
-        self.id = input_id
-        self.flow_id = flow_id
-        self.flow_name = flow_name
-        self.full_name = full_name
-        self.parameter_name = parameter_name
-        self.data_type = data_type
-        self.default_value = default_value
-        self.value = value
+    input_id: int
+    flow_id: int
+    flow_name: str
+    full_name: str
+    parameter_name: str
+    data_type: str
+    default_value: str
+    value: str
+
+    def __post_init__(self) -> None:
+        # Map input_id to id for backward compatibility
+        self.id = self.input_id
 
     def _to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "flow_id": self.flow_id,
-            "flow_name": self.flow_name,
-            "full_name": self.full_name,
-            "parameter_name": self.parameter_name,
-            "data_type": self.data_type,
-            "default_value": self.default_value,
-            "value": self.value,
-        }
+        result = asdict(self)
+        # Replaces input_id with id for backward compatibility
+        result["id"] = result.pop("input_id")
+        return result
 
-    def __repr__(self) -> str:
-        header = "OpenML Parameter"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
             "ID": self.id,
             "Flow ID": self.flow_id,
             # "Flow Name": self.flow_name,
@@ -156,9 +138,4 @@ class OpenMLParameter:
             parameter_default,
             parameter_value,
         ]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
