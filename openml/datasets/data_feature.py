@@ -1,13 +1,17 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Sequence
+from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from IPython.lib import pretty
 
+from openml.utils import ReprMixin
 
-class OpenMLDataFeature:
+
+class OpenMLDataFeature(ReprMixin):
     """
     Data Feature (a.k.a. Attribute) object.
 
@@ -31,7 +35,7 @@ class OpenMLDataFeature:
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         index: int,
         name: str,
@@ -51,8 +55,7 @@ class OpenMLDataFeature:
         if data_type == "nominal":
             if nominal_values is None:
                 raise TypeError(
-                    "Dataset features require attribute `nominal_values` for nominal "
-                    "feature type.",
+                    "Dataset features require attribute `nominal_values` for nominal feature type.",
                 )
 
             if not isinstance(nominal_values, list):
@@ -74,11 +77,29 @@ class OpenMLDataFeature:
         self.number_missing_values = number_missing_values
         self.ontologies = ontologies
 
-    def __repr__(self) -> str:
-        return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
+            "Index": self.index,
+            "Name": self.name,
+            "Data Type": self.data_type,
+        }
+        return list(fields.items())
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
 
-    def _repr_pretty_(self, pp: pretty.PrettyPrinter, cycle: bool) -> None:  # noqa: FBT001, ARG002
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.index,
+                self.name,
+                self.data_type,
+                tuple(self.nominal_values) if self.nominal_values is not None else None,
+                self.number_missing_values,
+                tuple(self.ontologies) if self.ontologies is not None else None,
+            )
+        )
+
+    def _repr_pretty_(self, pp: pretty.PrettyPrinter, cycle: bool) -> None:  # noqa: ARG002
         pp.text(str(self))
