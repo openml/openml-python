@@ -1,8 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import unittest
-
 import pandas as pd
 import pytest
 
@@ -22,7 +20,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLSupervisedTaskTest:
-            raise unittest.SkipTest("Skip OpenMLSupervisedTaskTest tests, it's a base class")
+            pytest.skip("Skip OpenMLSupervisedTaskTest tests, it's a base class")
         super().setUpClass()
 
     def setUp(self, n_levels: int = 1):  # noqa: ARG002
