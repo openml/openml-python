@@ -144,41 +144,39 @@ def test_tagging():
     assert len(flows) == 0
 
 
-def test_from_xml_to_xml():
+@pytest.mark.parametrize(
+    "flow_id",
+    [3, 5, 7, 9],
+)
+def test_from_xml_to_xml(flow_id: int) -> None:
     # Get the raw xml thing
     # TODO maybe get this via get_flow(), which would have to be refactored
     # to allow getting only the xml dictionary
     # TODO: no sklearn flows.
-    for flow_id in [
-        3,
-        5,
-        7,
-        9,
-    ]:
-        flow_xml = openml._backend.http_client.get(f"flow/{flow_id}").text
-        flow_dict = xmltodict.parse(flow_xml)
+    flow_xml = openml._backend.http_client.get(f"flow/{flow_id}").text
+    flow_dict = xmltodict.parse(flow_xml)
 
-        flow = openml.OpenMLFlow._from_dict(flow_dict)
-        new_xml = flow._to_xml()
+    flow = openml.OpenMLFlow._from_dict(flow_dict)
+    new_xml = flow._to_xml()
 
-        flow_xml = (
-            flow_xml.replace("  ", "")
-            .replace("\t", "")
-            .strip()
-            .replace("\n\n", "\n")
-            .replace("&quot;", '"')
-        )
-        flow_xml = re.sub(r"^$", "", flow_xml)
-        new_xml = (
-            new_xml.replace("  ", "")
-            .replace("\t", "")
-            .strip()
-            .replace("\n\n", "\n")
-            .replace("&quot;", '"')
-        )
-        new_xml = re.sub(r"^$", "", new_xml)
+    flow_xml = (
+        flow_xml.replace("  ", "")
+        .replace("\t", "")
+        .strip()
+        .replace("\n\n", "\n")
+        .replace("&quot;", '"')
+    )
+    flow_xml = re.sub(r"^$", "", flow_xml)
+    new_xml = (
+        new_xml.replace("  ", "")
+        .replace("\t", "")
+        .strip()
+        .replace("\n\n", "\n")
+        .replace("&quot;", '"')
+    )
+    new_xml = re.sub(r"^$", "", new_xml)
 
-        assert new_xml == flow_xml
+    assert new_xml == flow_xml
 
 
 @pytest.mark.sklearn
