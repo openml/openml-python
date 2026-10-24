@@ -143,6 +143,8 @@ class TestFlow(TestBase):
                 .strip()
                 .replace("\n\n", "\n")
                 .replace("&quot;", '"')
+                # php-rest-api >= v1.3 escapes apostrophes in the returned XML
+                .replace("&#039;", "'")
             )
             flow_xml = re.sub(r"^$", "", flow_xml)
             new_xml = (
