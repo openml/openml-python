@@ -1002,23 +1002,6 @@ def _get_dataset_qualities_file(
     return openml._backend.dataset.download_qualities_file(dataset_id)
 
 
-def _get_online_dataset_arff(dataset_id: int) -> str | None:
-    """Download the ARFF file for a given dataset id
-    from the OpenML website.
-
-    Parameters
-    ----------
-    dataset_id : int
-        A dataset id.
-
-    Returns
-    -------
-    str or None
-        A string representation of an ARFF file. Or None if file already exists.
-    """
-    return openml._backend.dataset.get_online_dataset_arff(dataset_id)
-
-
 def _get_online_dataset_format(dataset_id: int) -> str:
     """Get the dataset format for a given dataset id from the OpenML website.
 

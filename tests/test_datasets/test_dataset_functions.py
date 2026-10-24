@@ -29,7 +29,6 @@ from openml.datasets.functions import (
     _get_dataset_features_file,
     _get_dataset_parquet,
     _get_dataset_qualities_file,
-    _get_online_dataset_arff,
     _get_online_dataset_format,
     _topic_add_dataset,
     _topic_delete_dataset,
@@ -46,6 +45,11 @@ from openml.exceptions import (
 from openml.tasks import TaskType, create_task
 from openml.testing import TestBase, create_request_response
 from openml.utils import _create_cache_directory_for_id, _tag_entity
+
+
+def _get_online_dataset_arff(dataset_id: int) -> str:
+    dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
+    return _get_dataset_arff(dataset).read_text(encoding="utf8")
 
 
 class TestOpenMLDataset(TestBase):
