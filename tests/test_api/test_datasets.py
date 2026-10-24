@@ -190,7 +190,8 @@ def test_v1_feature_add_remove_ontology(dataset_v1):
     assert ontology in dataset_v1.get_features(did, force_refresh_cache=True)[fid].ontologies
     output = dataset_v1.feature_remove_ontology(did, fid, ontology)
     assert output
-    assert ontology not in dataset_v1.get_features(did, force_refresh_cache=True)[fid].ontologies
+    ontologies = dataset_v1.get_features(did, force_refresh_cache=True)[fid].ontologies
+    assert ontologies is None or ontology not in ontologies
 
 
 @pytest.mark.skipif(
