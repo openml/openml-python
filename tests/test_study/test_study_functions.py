@@ -227,17 +227,13 @@ def test_study_attach_illegal():
     TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
     study_original = openml.study.get_study(study.id)
 
-    with pytest.raises(
-        openml.exceptions.OpenMLServerException,
-        match=r"Problem attaching entities.",
-    ):
+    # php-rest-api >= v1.3 answers illegal attaches with a bare HTTP 500 instead of a
+    # "Problem attaching entities." error, so only check that the attach fails
+    with pytest.raises(openml.exceptions.OpenMLServerError):
         # run id does not exists
         openml.study.attach_to_study(study.id, [0])
 
-    with pytest.raises(
-        openml.exceptions.OpenMLServerException,
-        match=r"Problem attaching entities.",
-    ):
+    with pytest.raises(openml.exceptions.OpenMLServerError):
         # some runs already attached
         openml.study.attach_to_study(study.id, list(run_list_more["run_id"]))
     study_downloaded = openml.study.get_study(study.id)
