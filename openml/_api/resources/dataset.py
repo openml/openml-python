@@ -1106,7 +1106,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             raise ValueError('Error in return JSON, does not contain "data_qualities_list"')
 
         if not isinstance(qualities["data_qualities_list"]["quality"], list):
-            raise TypeError('Error  in return JSON, does not contain "quality" as a list')
+            raise TypeError('Error in return JSON, does not contain "quality" as a list')
 
         return qualities["data_qualities_list"]["quality"]
 
