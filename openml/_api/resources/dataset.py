@@ -1,14 +1,13 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
-import builtins
 import json
 import logging
 import os
 import pickle
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import minio
 import pandas as pd
@@ -26,6 +25,9 @@ from openml.exceptions import (
 
 from .base import DatasetAPI, ResourceV1API, ResourceV2API
 
+if TYPE_CHECKING:
+    import builtins
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,12 +40,13 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     def get(
         self,
         dataset_id: int,
-        download_data: bool = False,  # noqa: FBT002
+        *,
+        download_data: bool = False,
         cache_format: Literal["pickle", "feather"] = "pickle",
-        download_qualities: bool = False,  # noqa: FBT002
-        download_features_meta_data: bool = False,  # noqa: FBT002
-        download_all_files: bool = False,  # noqa: FBT002
-        force_refresh_cache: bool = False,  # noqa: FBT002
+        download_qualities: bool = False,
+        download_features_meta_data: bool = False,
+        download_all_files: bool = False,
+        force_refresh_cache: bool = False,
     ) -> OpenMLDataset:
         """Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -114,7 +117,12 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
             raise e
 
         return self._create_dataset_from_xml(
-            description, features_file, qualities_file, arff_file, parquet_file, cache_format
+            description,
+            features_file=features_file,
+            qualities_file=qualities_file,
+            arff_file=arff_file,
+            parquet_file=parquet_file,
+            cache_format=cache_format,
         )
 
     def list(
@@ -169,6 +177,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     def edit(
         self,
         dataset_id: int,
+        *,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,
@@ -329,6 +338,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     def _create_dataset_from_xml(
         self,
         description: dict,
+        *,
         features_file: Path | None = None,
         qualities_file: Path | None = None,
         arff_file: Path | None = None,
@@ -902,12 +912,13 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
     def get(
         self,
         dataset_id: int,
-        download_data: bool = False,  # noqa: FBT002
+        *,
+        download_data: bool = False,
         cache_format: Literal["pickle", "feather"] = "pickle",
-        download_qualities: bool = False,  # noqa: FBT002
-        download_features_meta_data: bool = False,  # noqa: FBT002
-        download_all_files: bool = False,  # noqa: FBT002
-        force_refresh_cache: bool = False,  # noqa: FBT002
+        download_qualities: bool = False,
+        download_features_meta_data: bool = False,
+        download_all_files: bool = False,
+        force_refresh_cache: bool = False,
     ) -> OpenMLDataset:
         """Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -976,7 +987,12 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             raise e
 
         return self._create_dataset_from_json(
-            json_content, features_file, qualities_file, arff_file, parquet_file, cache_format
+            json_content,
+            features_file=features_file,
+            qualities_file=qualities_file,
+            arff_file=arff_file,
+            parquet_file=parquet_file,
+            cache_format=cache_format,
         )
 
     def list(
@@ -1035,6 +1051,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
     def edit(
         self,
         dataset_id: int,
+        *,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,
@@ -1119,6 +1136,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
     def _create_dataset_from_json(
         self,
         json_content: dict,
+        *,
         features_file: Path | None = None,
         qualities_file: Path | None = None,
         arff_file: Path | None = None,

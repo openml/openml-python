@@ -33,12 +33,13 @@ class DatasetAPI(ResourceAPI):
     def get(  # noqa: PLR0913
         self,
         dataset_id: int,
-        download_data: bool = False,  # noqa: FBT002
+        *,
+        download_data: bool = False,
         cache_format: Literal["pickle", "feather"] = "pickle",
-        download_qualities: bool = False,  # noqa: FBT002
-        download_features_meta_data: bool = False,  # noqa: FBT002
-        download_all_files: bool = False,  # noqa: FBT002
-        force_refresh_cache: bool = False,  # noqa: FBT002
+        download_qualities: bool = False,
+        download_features_meta_data: bool = False,
+        download_all_files: bool = False,
+        force_refresh_cache: bool = False,
     ) -> OpenMLDataset: ...
 
     @abstractmethod
@@ -55,6 +56,7 @@ class DatasetAPI(ResourceAPI):
     def edit(  # noqa: PLR0913
         self,
         dataset_id: int,
+        *,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,

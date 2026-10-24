@@ -375,12 +375,12 @@ def get_dataset(
 
     return openml._backend.dataset.get(
         dataset_id,
-        download_data,
-        cache_format,
-        download_qualities,
-        download_features_meta_data,
-        download_all_files,
-        force_refresh_cache,
+        download_data=download_data,
+        cache_format=cache_format,
+        download_qualities=download_qualities,
+        download_features_meta_data=download_features_meta_data,
+        download_all_files=download_all_files,
+        force_refresh_cache=force_refresh_cache,
     )
 
 
@@ -762,17 +762,17 @@ def edit_dataset(
 
     return openml._backend.dataset.edit(
         data_id,
-        description,
-        creator,
-        contributor,
-        collection_date,
-        language,
-        default_target_attribute,
-        ignore_attribute,
-        citation,
-        row_id_attribute,
-        original_data_url,
-        paper_url,
+        description=description,
+        creator=creator,
+        contributor=contributor,
+        collection_date=collection_date,
+        language=language,
+        default_target_attribute=default_target_attribute,
+        ignore_attribute=ignore_attribute,
+        citation=citation,
+        row_id_attribute=row_id_attribute,
+        original_data_url=original_data_url,
+        paper_url=paper_url,
     )
 
 
