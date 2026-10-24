@@ -19,7 +19,6 @@ import scipy.sparse
 
 import openml
 from openml.base import OpenMLBase
-from openml.utils._openml import file_lock
 
 from .data_feature import OpenMLDataFeature
 
@@ -469,15 +468,13 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
             List[bool]: List indicating which columns contain categorical variables.
             List[str]: List of column names.
         """
-        lock_path = str(arff_file_path) + ".lock"
-        with file_lock(lock_path):
-            try:
-                data = self._get_arff(self.format)
-            except OSError as e:
-                logger.critical(
-                    f"Please check that the data file {arff_file_path} is there and can be read.",
-                )
-                raise e
+        try:
+            data = self._get_arff(self.format)
+        except OSError as e:
+            logger.critical(
+                f"Please check that the data file {arff_file_path} is there and can be read.",
+            )
+            raise e
 
         ARFF_DTYPES_TO_PD_DTYPE = {
             "INTEGER": "integer",
@@ -620,15 +617,13 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
         return attribute_names, categorical, data
 
     def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
-        lock_path = str(data_file) + ".lock"
-        with file_lock(lock_path):
-            try:
-                data = pd.read_parquet(data_file)
-            except Exception as e:
-                raise Exception(f"File: {data_file}") from e
-            categorical = [data[c].dtype.name == "category" for c in data.columns]
-            attribute_names = list(data.columns)
-            return attribute_names, categorical, data
+        try:
+            data = pd.read_parquet(data_file)
+        except Exception as e:
+            raise Exception(f"File: {data_file}") from e
+        categorical = [data[c].dtype.name == "category" for c in data.columns]
+        attribute_names = list(data.columns)
+        return attribute_names, categorical, data
 
     def _load_data(self) -> tuple[pd.DataFrame, list[bool], list[str]]:  # noqa: PLR0912, C901, PLR0915
         """Load data from compressed format or arff. Download data if not present on disk."""
@@ -641,13 +636,8 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
 
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
-            cache_file = self._compressed_cache_file_paths(Path(file_to_load))[
-                0 if need_to_create_pickle else 1
-            ]
-            lock_path = str(cache_file) + ".lock"
-            with file_lock(lock_path):
-                data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
-                return _ensure_dataframe(data, attrs), cats, attrs
+            data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
+            return _ensure_dataframe(data, attrs), cats, attrs
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
