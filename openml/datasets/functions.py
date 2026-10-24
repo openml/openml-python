@@ -13,7 +13,6 @@ import pandas as pd
 from scipy.sparse import coo_matrix
 
 import openml
-import openml._api_calls
 import openml.utils
 from openml.utils import (
     _create_cache_directory_for_id,
