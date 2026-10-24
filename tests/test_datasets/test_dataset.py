@@ -444,7 +444,7 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     This test also does some minor checks to ensure that the qualities are read correctly.
     """
     filename_mock = mocker.patch("openml.datasets.dataset._get_qualities_pickle_file")
-    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+    pickle_mock = mocker.patch("openml._api.resources.dataset.pickle")
 
     filename_mock.return_value = os.path.join(workdir, "qualities.xml.pkl")  # noqa: PTH118
     pickle_mock.load.side_effect = FileNotFoundError

@@ -1086,9 +1086,4 @@ def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
         with qualities_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
     except:  # noqa: E722
-        qualities = openml._backend.dataset.parse_qualities_file(
-            qualities_file, qualities_pickle_file
-        )
-        with qualities_pickle_file.open("wb") as fh_binary:
-            pickle.dump(qualities, fh_binary)
-        return qualities
+        return openml._backend.dataset.parse_qualities_file(qualities_file, qualities_pickle_file)

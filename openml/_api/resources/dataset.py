@@ -477,7 +477,6 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         """
         path = f"data/features/{dataset_id}"
         xml = self._http.get(path, enable_cache=True, refresh_cache=force_refresh_cache).text
-        _ = self.download_features_file(dataset_id)  # ensure the file is downloaded and cached
         return self._parse_features_xml(xml)
 
     def get_qualities(
@@ -508,7 +507,6 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
                 return None
 
             raise e
-        _ = self.download_qualities_file(dataset_id)  # ensure the file is downloaded and cached
         return self._parse_qualities_xml(xml)
 
     def parse_features_file(
