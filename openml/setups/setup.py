@@ -2,13 +2,17 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import openml.flows
+from openml.utils import ReprMixin
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
-@dataclass
-class OpenMLSetup:
+@dataclass(repr=False)
+class OpenMLSetup(ReprMixin):
     """Setup object (a.k.a. Configuration).
 
     Parameters
@@ -44,31 +48,22 @@ class OpenMLSetup:
             else None,
         }
 
-    def __repr__(self) -> str:
-        header = "OpenML Setup"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
             "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
+            "# of Parameters": (len(self.parameters) if self.parameters is not None else "nan"),
         }
 
         # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
 
-@dataclass
-class OpenMLParameter:
+@dataclass(repr=False)
+class OpenMLParameter(ReprMixin):
     """Parameter object (used in setup).
 
     Parameters
@@ -112,11 +107,9 @@ class OpenMLParameter:
         result["id"] = result.pop("input_id")
         return result
 
-    def __repr__(self) -> str:
-        header = "OpenML Parameter"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
             "ID": self.id,
             "Flow ID": self.flow_id,
             # "Flow Name": self.flow_name,
@@ -145,9 +138,4 @@ class OpenMLParameter:
             parameter_default,
             parameter_value,
         ]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]

@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
+# ruff: noqa: PLR0913,PLR0917
 from __future__ import annotations
 
 import logging
@@ -450,8 +450,7 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
     # Edit: Found it could also be like ["True", "False"]
     attributes: list[tuple[str, str | list[str]]] | dict[str, str | list[str]] | Literal["auto"],
     data: pd.DataFrame | np.ndarray | scipy.sparse.coo_matrix,
-    # TODO(eddiebergman): Function requires `default_target_attribute` exist but API allows None
-    default_target_attribute: str,
+    default_target_attribute: str | None,
     ignore_attribute: str | list[str] | None,
     citation: str,
     row_id_attribute: str | None = None,
@@ -495,7 +494,8 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
         passing ``attributes='auto'``.
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
-        The default target attribute, if it exists.
+        The default target attribute, if it exists. Use ``None`` for unsupervised datasets
+        (e.g. clustering, anomaly detection) where no natural target column exists.
         Can have multiple values, comma separated.
     ignore_attribute : str | list
         Attributes that should be excluded in modelling,
@@ -735,6 +735,29 @@ def edit_dataset(
     """
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
+    if not any(
+        field
+        for field in [
+            description,
+            creator,
+            contributor,
+            collection_date,
+            language,
+            default_target_attribute,
+            ignore_attribute,
+            citation,
+            row_id_attribute,
+            original_data_url,
+            paper_url,
+        ]
+    ):
+        raise ValueError(
+            "Please provide atleast one field among description, creator, "
+            "contributor, collection_date, language, citation, "
+            "original_data_url, default_target_attribute, row_id_attribute, "
+            "ignore_attribute or paper_url to edit.",
+        )
 
     return openml._backend.dataset.edit(
         data_id,

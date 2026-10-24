@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import builtins
 from abc import abstractmethod
-from collections.abc import Iterable
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 from openml.enums import ResourceType
@@ -11,6 +8,10 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    import builtins
+    from collections.abc import Iterable
+    from pathlib import Path
+
     import pandas as pd
 
     from openml.datasets.data_feature import OpenMLDataFeature
@@ -215,7 +216,7 @@ class StudyAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.STUDY
 
     @abstractmethod
-    def list(  # noqa: PLR0913
+    def list(  # noqa: PLR0913,PLR0917
         self,
         limit: int | None = None,
         offset: int | None = None,
