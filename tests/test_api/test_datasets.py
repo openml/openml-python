@@ -143,6 +143,7 @@ def test_v1_status_update(dataset_v1):
 def test_v1_edit(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
+    TestBase._mark_entity_for_removal("data", result)
     _wait_for_dataset_being_processed(dataset_v1, result, "active")
 
     edited_did = dataset_v1.edit(
@@ -167,13 +168,13 @@ def test_v1_edit(dataset_v1):
 def test_v1_fork(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
+    TestBase._mark_entity_for_removal("data", result)
     assert did != result
     _wait_for_dataset_being_processed(dataset_v1, result, "active", n_tries=30)
 
     listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result], status="all")
 
     assert listing.iloc[0]["name"] == listing.iloc[1]["name"]
-    dataset_v1.delete(result)
 
 
 @pytest.mark.test_server
