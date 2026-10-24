@@ -4,9 +4,9 @@ import os
 import unittest.mock
 
 import pytest
+import requests
 
 import openml
-import requests
 from openml.testing import _check_dataset
 
 
@@ -113,7 +113,9 @@ def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
     assert min_number_evaluations_on_test_server == len(evaluations)
 
 
-@unittest.mock.patch.object(requests.Session, "request", autospec=True, wraps=requests.Session.request)
+@unittest.mock.patch.object(
+    requests.Session, "request", autospec=True, wraps=requests.Session.request
+)
 @pytest.mark.test_server
 def test_list_all_few_results_available(mocked_request):
     datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)

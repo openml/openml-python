@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import warnings
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import arff
@@ -23,6 +22,8 @@ from openml.utils import (
 from .dataset import OpenMLDataset
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     import scipy
 
 DATASETS_CACHE_DIR_NAME = "datasets"

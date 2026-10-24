@@ -104,8 +104,8 @@ class TestOpenMLDataset(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
-    def _get_cache_filename(self, id):
-        return self.http_client.cache_path_from_url(f"data/{id}")
+    def _get_cache_filename(self, did):
+        return self.http_client.cache_path_from_url(f"data/{did}")
 
     @pytest.mark.test_server
     def test_tag_untag_dataset(self):
@@ -335,7 +335,6 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(did)
         assert dataset.row_id_attribute == "Counter"
 
-
     @pytest.mark.test_server
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
@@ -343,7 +342,6 @@ class TestOpenMLDataset(TestBase):
         arff_path = _get_dataset_arff(dataset)
         assert isinstance(arff_path, Path)
         assert arff_path.exists()
-
 
     def test__download_minio_file_object_does_not_exist(self):
         minio = MinIOClient()
@@ -354,7 +352,6 @@ class TestOpenMLDataset(TestBase):
             source="http://data.openml.org/dataset20/i_do_not_exist.pq",
             exists_ok=True,
         )
-
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
         minio = MinIOClient()
@@ -1331,12 +1328,18 @@ class TestOpenMLDataset(TestBase):
 
         # Check if dataset is written to cache directory using feather
         cache_dir = openml.config.get_cache_directory()
-        cache_dir_for_id = os.path.join(cache_dir, "datasets", "128")  # noqa: PTH118
+        os.path.join(cache_dir, "datasets", "128")  # noqa: PTH118
         feather_file = os.path.join(  # noqa: PTH118
             cache_dir, "data", "v1", "download", "128", "iris.arff", "body.feather"
         )
         pickle_file = os.path.join(  # noqa: PTH118
-            cache_dir, "data", "v1", "download", "128", "iris.arff", "body.feather.attributes.pkl.py3"
+            cache_dir,
+            "data",
+            "v1",
+            "download",
+            "128",
+            "iris.arff",
+            "body.feather.attributes.pkl.py3",
         )
         data = pd.read_feather(feather_file)
         assert os.path.isfile(feather_file), "Feather file is missing"  # noqa: PTH113
@@ -1654,7 +1657,7 @@ def test_delete_dataset_not_owned(
 
     dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.kwargs.get("url")
-    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1676,7 +1679,7 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_
 
     dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.kwargs.get("url")
-    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1695,7 +1698,7 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v
 
     dataset_url = test_server_v1 + "data/40000"
     assert dataset_url == mock_delete.call_args.kwargs.get("url")
-    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1717,9 +1720,8 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v
 
     dataset_url = test_server_v1 + "data/9999999"
     assert dataset_url == mock_delete.call_args.kwargs.get("url")
-    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
-    
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
@@ -1818,7 +1820,9 @@ def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
         pq_directory = Path(openml.config.get_minio_download_path(dataset._parquet_url)).parent
         if pq_directory.exists():
             return any(f.suffix == ".pq" for f in pq_directory.iterdir())
-    arff_directory = Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
+    arff_directory = (
+        Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
+    )
     if arff_directory.exists():
         return any(f.suffix == ".arff" for f in arff_directory.iterdir())
     return False

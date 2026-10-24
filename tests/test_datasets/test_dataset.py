@@ -61,8 +61,8 @@ class OpenMLDatasetTest(TestBase):
             self._iris = openml.datasets.get_dataset(61, download_data=False)
         return self._iris
 
-    def _get_cache_filename(self, id):
-        return self.http_client.cache_path_from_url(f"data/{id}")
+    def _get_cache_filename(self, did):
+        return self.http_client.cache_path_from_url(f"data/{did}")
 
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
@@ -468,5 +468,3 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     assert len(qualities) == 106
     assert pickle_mock.load.call_count == 0
     assert pickle_mock.dump.call_count == 1
-
-
