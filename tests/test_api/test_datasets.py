@@ -230,6 +230,31 @@ def test_v1_add_delete_topic_mocked(dataset_v1, test_apikey_v1, method, endpoint
         )
 
 
+def test_v1_delete_mocked(dataset_v1, test_apikey_v1):
+    dataset_id = 456
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            b'<oml:data_delete xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>456</oml:id>\n"
+            b"</oml:data_delete>\n"
+        )
+
+        result = dataset_v1.delete(dataset_id)
+
+        assert result is True
+        mock_request.assert_called_once_with(
+            method="DELETE",
+            url=openml.config.server + f"data/{dataset_id}",
+            params={"api_key": test_apikey_v1},
+            data={},
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
 @pytest.mark.test_server
 def test_v2_get(dataset_v2):
     dataset_id = 2
