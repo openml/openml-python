@@ -14,6 +14,7 @@ from requests import Response, Session
 import openml
 from openml import OpenMLDataset
 from openml._api import DatasetV1API, DatasetV2API
+from openml.enums import APIVersion
 from openml.exceptions import OpenMLNotSupportedError
 from openml.testing import TestBase
 
@@ -323,6 +324,26 @@ def test_v2_get_qualities(dataset_v2):
     output = dataset_v2.get_qualities(2)
     assert isinstance(output, dict)
     assert len(output.keys()) >= 100
+
+
+def test_v2_get_qualities_empty_returns_none(dataset_v2):
+    dataset_id = 2
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.headers["Content-Type"] = "application/json"
+        mock_request.return_value._content = b"[]"
+
+        result = dataset_v2.get_qualities(dataset_id, force_refresh_cache=True)
+
+        assert result is None
+        mock_request.assert_called_once()
+        _, kwargs = mock_request.call_args
+        assert kwargs["method"] == "GET"
+        assert kwargs["url"] == (
+            openml.config.servers[APIVersion.V2]["server"] + f"datasets/qualities/{dataset_id}"
+        )
 
 
 @pytest.mark.test_server

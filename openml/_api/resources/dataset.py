@@ -1234,7 +1234,11 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
 
             raise e
 
-        return self._parse_qualities_json(qualities_json)
+        qualities = self._parse_qualities_json(qualities_json)
+        if not qualities:
+            logger.warning(f"No qualities found for dataset {dataset_id}")
+            return None
+        return qualities
 
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path | None = None
@@ -1465,7 +1469,9 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
                 return None
             raise e
 
-        self.parse_qualities_file(file)
+        if not self.parse_qualities_file(file):
+            logger.warning(f"No qualities found for dataset {dataset_id}")
+            return None
         return file
 
     def download_dataset_parquet(
