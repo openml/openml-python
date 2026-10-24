@@ -1331,23 +1331,13 @@ class TestOpenMLDataset(TestBase):
         dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
-        cache_dir = openml.config.get_cache_directory()
-        os.path.join(cache_dir, "datasets", "128")  # noqa: PTH118
-        feather_file = os.path.join(  # noqa: PTH118
-            cache_dir, "data", "v1", "download", "128", "iris.arff", "body.feather"
-        )
-        pickle_file = os.path.join(  # noqa: PTH118
-            cache_dir,
-            "data",
-            "v1",
-            "download",
-            "128",
-            "iris.arff",
-            "body.feather.attributes.pkl.py3",
-        )
+        assert dataset.data_file is not None
+        arff_file = Path(dataset.data_file)
+        feather_file = arff_file.with_name("body.feather")
+        pickle_file = arff_file.with_name("body.feather.attributes.pkl.py3")
         data = pd.read_feather(feather_file)
-        assert os.path.isfile(feather_file), "Feather file is missing"  # noqa: PTH113
-        assert os.path.isfile(pickle_file), "Attributes pickle file is missing"  # noqa: PTH113
+        assert feather_file.is_file(), "Feather file is missing"
+        assert pickle_file.is_file(), "Attributes pickle file is missing"
         assert data.shape == (150, 5)
 
         # Check if get_data is able to retrieve feather data
