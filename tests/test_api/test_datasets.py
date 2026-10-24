@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import os
 import time
+import uuid
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
+from requests import Response, Session
 
 import openml
 from openml import OpenMLDataset
@@ -194,16 +197,34 @@ def test_v1_feature_add_remove_ontology(dataset_v1):
     assert ontologies is None or ontology not in ontologies
 
 
-@pytest.mark.skipif(
-    not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
-    reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+@pytest.mark.parametrize(
+    ("method", "endpoint"),
+    [("add_topic", "data/topicadd"), ("delete_topic", "data/topicdelete")],
 )
-@pytest.mark.test_server
-def test_v1_add_delete_topic(dataset_v1):
-    openml.config.apikey = TestBase.admin_key
-    topic = f"test_topic_{time.time()!s}"
-    dataset_v1.add_topic(31, topic)
-    dataset_v1.delete_topic(31, topic)
+def test_v1_add_delete_topic_mocked(dataset_v1, test_apikey_v1, method, endpoint):
+    dataset_id = 31
+    topic = f"test_topic_{uuid.uuid4().hex}"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            b'<oml:data_topic xmlns:oml="http://openml.org/openml">\n'
+            b"  <oml:id>31</oml:id>\n"
+            b"</oml:data_topic>\n"
+        )
+
+        result = getattr(dataset_v1, method)(dataset_id, topic)
+
+        assert result == dataset_id
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + endpoint,
+            params={},
+            data={"data_id": dataset_id, "topic": topic, "api_key": test_apikey_v1},
+            headers=openml.config._HEADERS,
+            files=None,
+        )
 
 
 @pytest.mark.test_server
