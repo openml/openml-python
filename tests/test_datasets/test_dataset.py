@@ -4,10 +4,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from time import time
+from urllib.parse import parse_qs
 
 import numpy as np
 import pandas as pd
 import pytest
+from requests_mock import Mocker
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
@@ -305,44 +307,75 @@ def test_get_feature_with_ontology_data_id_11():
     assert len(dataset.features[3].ontologies) >= 1
 
 
-@pytest.mark.test_server
-def test_add_remove_ontology_to_dataset():
+def test_add_remove_ontology_to_dataset(requests_mock: Mocker, test_server_v1: str) -> None:
     did = 1
     feature_index = 1
-    ontology = "https://www.openml.org/unittest/" + str(time())
-    openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
-    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
+    ontology = "https://www.openml.org/unittest/ontology"
+    requests_mock.post(test_server_v1 + "data/feature/ontology/add", text="")
+    requests_mock.post(test_server_v1 + "data/feature/ontology/remove", text="")
+
+    assert openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
+    assert openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
+
+    assert requests_mock.call_count == 2
+    assert [request.url for request in requests_mock.request_history] == [
+        test_server_v1 + "data/feature/ontology/add",
+        test_server_v1 + "data/feature/ontology/remove",
+    ]
+    for request in requests_mock.request_history:
+        payload = parse_qs(request.text)
+        assert payload["data_id"] == [str(did)]
+        assert payload["index"] == [str(feature_index)]
+        assert payload["ontology"] == [ontology]
 
 
-@pytest.mark.test_server
-def test_add_same_ontology_multiple_features():
+def test_add_same_ontology_multiple_features(requests_mock: Mocker, test_server_v1: str) -> None:
     did = 1
-    ontology = "https://www.openml.org/unittest/" + str(time())
+    ontology = "https://www.openml.org/unittest/ontology"
+    requests_mock.post(test_server_v1 + "data/feature/ontology/add", text="")
 
     for i in range(3):
-        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
+        assert openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
+
+    assert requests_mock.call_count == 3
+    for i, request in enumerate(requests_mock.request_history):
+        payload = parse_qs(request.text)
+        assert payload["data_id"] == [str(did)]
+        assert payload["index"] == [str(i)]
+        assert payload["ontology"] == [ontology]
 
 
-@pytest.mark.test_server
-def test_add_illegal_long_ontology():
-    did = 1
-    ontology = "http://www.google.com/" + ("a" * 257)
-    try:
-        openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-        raise AssertionError()
-    except openml.exceptions.OpenMLServerException as e:
-        assert e.code == 1105  # noqa: PT017
+@pytest.mark.parametrize(
+    ("ontology", "code", "message"),
+    [
+        ("https://www.openml.org/" + "a" * 257, 1105, "Ontology URL is too long"),
+        ("not_a_url", 1106, "Invalid ontology URL"),
+    ],
+    ids=["too-long", "invalid-url"],
+)
+def test_add_illegal_ontology(
+    requests_mock: Mocker, test_server_v1: str, ontology: str, code: int, message: str
+) -> None:
+    requests_mock.post(
+        test_server_v1 + "data/feature/ontology/add",
+        status_code=412,
+        text=(
+            '<oml:error xmlns:oml="http://openml.org/openml">'
+            f"<oml:code>{code}</oml:code><oml:message>{message}</oml:message>"
+            "</oml:error>"
+        ),
+    )
 
+    # Validate how the client handles a server rejection; URL validation is server-side.
+    with pytest.raises(openml.exceptions.OpenMLServerException, match=message) as exc_info:
+        openml.datasets.functions.data_feature_add_ontology(1, 1, ontology)
 
-@pytest.mark.test_server
-def test_add_illegal_url_ontology():
-    did = 1
-    ontology = "not_a_url" + str(time())
-    try:
-        openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-        raise AssertionError()
-    except openml.exceptions.OpenMLServerException as e:
-        assert e.code == 1106  # noqa: PT017
+    assert exc_info.value.code == code
+    assert requests_mock.call_count == 1
+    payload = parse_qs(requests_mock.last_request.text)
+    assert payload["data_id"] == ["1"]
+    assert payload["index"] == ["1"]
+    assert payload["ontology"] == [ontology]
 
 
 @pytest.mark.production_server
