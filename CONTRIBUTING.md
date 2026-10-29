@@ -153,8 +153,8 @@ While existing tests may continue to connect to the production server, new tests
 #### Run `test_server` tests against local OpenML services
 
 It is possible to have tests connect to locally running services.
-The local-services configuration applies to tests marked `test_server` only. Tests marked `production_server` explicitly target production and are not redirected. 
-Please follow the instructions from the [`openml/services` repository](https://github.com/openml/services) on how to start local services. For the openml-python tests, the provided "rest-api" should be used. 
+The local-services configuration applies to tests marked `test_server` only. Tests marked `production_server` explicitly target production and are not redirected.
+Please follow the instructions from the [`openml/services` repository](https://github.com/openml/services) on how to start local services. For the openml-python tests, the provided "rest-api" should be used.
 
 Set `OPENML_USE_LOCAL_SERVICES` in the same terminal session in which you run the pytests.
 
