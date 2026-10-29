@@ -60,9 +60,9 @@ It is also possible to use the [openml-python Docker image](https://github.com/o
 
 These instructions use `uv`; if you choose another package manager, adapt the commands to your environment.
 
-1. **Install `uv`.** Follow the [official `uv` installation instructions](https://docs.astral.sh/uv/getting-started/installation/) for your operating system. The official guide is the source of truth for installing and updating `uv`.
+1. **Install `uv`.** Follow the [official `uv` installation instructions](https://docs.astral.sh/uv/getting-started/installation/) for your operating system.
 
-2. **Install Python 3.12.** The project metadata currently supports Python `>=3.10,<3.15`; the examples below use Python 3.12. Install it with:
+2. **Install Python 3.12.** The project currently supports Python `>=3.10,<3.15`; the examples below use Python 3.12. Install it with:
 
    ```bash
    uv python install 3.12
@@ -126,8 +126,8 @@ The test suite is an important part of contributing to `openml-python`, but **th
 
 Tests are marked according to the server they use:
 
-- `test_server` marks tests that normally require the OpenML test server. When the local OpenML services stack is running and `OPENML_USE_LOCAL_SERVICES=true` is set, these tests can use the local services instead.
-- `production_server` marks tests that interact with the production OpenML server. Setting `OPENML_USE_LOCAL_SERVICES=true` does **not** redirect these tests, so exclude them from normal local development runs.
+- `test_server` marks tests that normally require the OpenML test server (https://test.openml.org). When the local OpenML services stack is running and `OPENML_USE_LOCAL_SERVICES=true` is set, these tests can use the local services instead.
+- `production_server` marks tests that interact with the production OpenML server (https://www.openml.org). Setting `OPENML_USE_LOCAL_SERVICES=true` does **not** redirect these tests, so exclude them from normal local development runs.
 
 #### Run a focused test
 
@@ -148,10 +148,13 @@ python -m pytest tests -m "not production_server and not test_server"
 ```
 
 This is a useful starting point for local feedback, but it does not replace tests for functionality that depends on the API. Add or update tests for your change and run the relevant ones even when they need a server.
+While existing tests may continue to connect to the production server, new tests should avoid doing so unless explicitly approved by a maintainer. New tests may connect to the test server if there is a clear need for it, but it is best avoided otherwise.
 
 #### Run `test_server` tests against local OpenML services
 
-The local-services configuration applies to tests marked `test_server` only. Tests marked `production_server` explicitly target production and are not redirected. The local services stack must already be running; see the [`openml/services` repository](https://github.com/openml/services) for its setup instructions.
+It is possible to have tests connect to locally running services.
+The local-services configuration applies to tests marked `test_server` only. Tests marked `production_server` explicitly target production and are not redirected. 
+Please follow the instructions from the [`openml/services` repository](https://github.com/openml/services) on how to start local services. For the openml-python tests, the provided "rest-api" should be used. 
 
 Set `OPENML_USE_LOCAL_SERVICES` in the same terminal session in which you run the pytests.
 
