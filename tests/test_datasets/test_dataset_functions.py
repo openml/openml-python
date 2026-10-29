@@ -4,7 +4,6 @@ from __future__ import annotations
 import itertools
 import os
 import random
-import shutil
 import time
 import uuid
 from collections.abc import Iterable
@@ -22,16 +21,14 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
-from openml._api_calls import _download_minio_file
+from openml._api.clients.minio import MinIOClient
 from openml.datasets import edit_dataset, fork_dataset
 from openml.datasets.functions import (
     DATASETS_CACHE_DIR_NAME,
     _get_dataset_arff,
-    _get_dataset_description,
     _get_dataset_features_file,
     _get_dataset_parquet,
     _get_dataset_qualities_file,
-    _get_online_dataset_arff,
     _get_online_dataset_format,
     _topic_add_dataset,
     _topic_delete_dataset,
@@ -48,6 +45,11 @@ from openml.exceptions import (
 from openml.tasks import TaskType, create_task
 from openml.testing import TestBase, create_request_response
 from openml.utils import _create_cache_directory_for_id, _tag_entity
+
+
+def _get_online_dataset_arff(dataset_id: int) -> str:
+    dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
+    return _get_dataset_arff(dataset).read_text(encoding="utf8")
 
 
 class TestOpenMLDataset(TestBase):
@@ -105,6 +107,9 @@ class TestOpenMLDataset(TestBase):
     def _check_datasets(self, datasets):
         for did in datasets:
             self._check_dataset(datasets[did])
+
+    def _get_cache_filename(self, did):
+        return self.http_client.cache_path_from_url(f"data/{did}")
 
     @pytest.mark.test_server
     def test_tag_untag_dataset(self):
@@ -182,7 +187,7 @@ class TestOpenMLDataset(TestBase):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
         self.use_production_server()
         # /d/1 was deactivated
-        assert openml.datasets.functions._name_to_id("anneal") == 2
+        assert openml.datasets.functions._name_to_id("anneal", version=1) == 2
 
     @pytest.mark.production_server
     def test__name_to_id_with_multiple_active(self):
@@ -235,7 +240,7 @@ class TestOpenMLDataset(TestBase):
         dids = ["anneal", "kr-vs-kp"]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server
     def test_get_datasets_by_mixed(self):
@@ -243,21 +248,21 @@ class TestOpenMLDataset(TestBase):
         dids = ["anneal", 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        _assert_datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully(datasets)
 
     @pytest.mark.test_server
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset  # noqa: E721
         assert dataset.dataset_id == 1
-        _assert_datasets_retrieved_successfully([1])
+        _assert_datasets_retrieved_successfully([dataset])
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
@@ -335,86 +340,45 @@ class TestOpenMLDataset(TestBase):
         assert dataset.row_id_attribute == "Counter"
 
     @pytest.mark.test_server
-    def test__get_dataset_description(self):
-        description = _get_dataset_description(self.workdir, 2)
-        assert isinstance(description, dict)
-        description_xml_path = os.path.join(self.workdir, "description.xml")  # noqa: PTH118
-        assert os.path.exists(description_xml_path)  # noqa: PTH110
-
-    @pytest.mark.test_server
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        description = _get_dataset_description(self.workdir, 2)
-        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
+        dataset = openml.datasets.get_dataset(2)
+        arff_path = _get_dataset_arff(dataset)
         assert isinstance(arff_path, Path)
         assert arff_path.exists()
 
     def test__download_minio_file_object_does_not_exist(self):
+        minio = MinIOClient()
         self.assertRaisesRegex(  # noqa: PT027
             FileNotFoundError,
             r"Object at .* does not exist",
-            _download_minio_file,
+            minio.download_minio_file,
             source="http://data.openml.org/dataset20/i_do_not_exist.pq",
-            destination=self.workdir,
             exists_ok=True,
-        )
-
-    def test__download_minio_file_to_directory(self):
-        _download_minio_file(
-            source="http://data.openml.org/dataset20/dataset_20.pq",
-            destination=self.workdir,
-            exists_ok=True,
-        )
-        assert os.path.isfile(os.path.join(self.workdir, "dataset_20.pq")), (  # noqa: PTH113, PTH118
-            "_download_minio_file can save to a folder by copying the object name"
-        )
-
-    def test__download_minio_file_to_path(self):
-        file_destination = os.path.join(self.workdir, "custom.pq")  # noqa: PTH118
-        _download_minio_file(
-            source="http://data.openml.org/dataset20/dataset_20.pq",
-            destination=file_destination,
-            exists_ok=True,
-        )
-        assert os.path.isfile(file_destination), (  # noqa: PTH113
-            "_download_minio_file can save to a folder by copying the object name"
-        )
-
-    def test__download_minio_file_raises_FileExists_if_destination_in_use(self):
-        file_destination = Path(self.workdir, "custom.pq")
-        file_destination.touch()
-
-        self.assertRaises(  # noqa: PT027
-            FileExistsError,
-            _download_minio_file,
-            source="http://data.openml.org/dataset20/dataset_20.pq",
-            destination=str(file_destination),
-            exists_ok=False,
         )
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
-        file_destination = Path(self.workdir, "custom.pq")
-        _download_minio_file(
+        minio = MinIOClient()
+        file_destination = minio.download_minio_file(
             source="http://data.openml.org/dataset61/dataset_61.pq",
-            destination=file_destination,
             exists_ok=True,
         )
         assert os.path.isfile(file_destination), (  # noqa: PTH113
-            "_download_minio_file can download from subdirectories"
+            "download_minio_file can download from subdirectories"
         )
 
-    @mock.patch("openml._api_calls._download_minio_file")
+    @mock.patch.object(MinIOClient, "download_minio_file")
     @pytest.mark.test_server
     def test__get_dataset_parquet_is_cached(self, patch):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         patch.side_effect = RuntimeError(
-            "_download_parquet_url should not be called when loading from cache",
+            "download_parquet_url should not be called when loading from cache",
         )
         description = {
             "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
-        path = _get_dataset_parquet(description, cache_directory=None)
+        path = _get_dataset_parquet(description)
         assert isinstance(path, Path), "_get_dataset_parquet returns a path"
         assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
@@ -423,7 +387,7 @@ class TestOpenMLDataset(TestBase):
             "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
+        path = _get_dataset_parquet(description)
         assert path is None, "_get_dataset_parquet returns None if no file is found"
 
     def test__getarff_md5_issue(self):
@@ -437,8 +401,8 @@ class TestOpenMLDataset(TestBase):
 
         self.assertRaisesRegex(  # noqa: PT027
             OpenMLHashException,
-            "Checksum of downloaded file is unequal to the expected checksum abc when downloading "
-            "https://www.openml.org/data/download/61. Raised when downloading dataset 5.",
+            "Checksum of downloaded file is unequal to the expected checksum abc "
+            "when downloading https://www.openml.org/data/download/61.",
             _get_dataset_arff,
             description,
         )
@@ -447,62 +411,38 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server
     def test__get_dataset_features(self):
-        features_file = _get_dataset_features_file(self.workdir, 2)
+        features_file = _get_dataset_features_file(2)
         assert isinstance(features_file, Path)
-        features_xml_path = self.workdir / "features.xml"
-        assert features_xml_path.exists()
+        assert features_file.exists()
 
     @pytest.mark.test_server
     def test__get_dataset_qualities(self):
-        qualities = _get_dataset_qualities_file(self.workdir, 2)
+        qualities = _get_dataset_qualities_file(2)
         assert isinstance(qualities, Path)
-        qualities_xml_path = self.workdir / "qualities.xml"
-        assert qualities_xml_path.exists()
+        assert qualities.exists()
 
     @pytest.mark.test_server
     def test_get_dataset_force_refresh_cache(self):
-        did_cache_dir = _create_cache_directory_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            2,
-        )
         openml.datasets.get_dataset(2)
-        change_time = os.stat(did_cache_dir).st_mtime  # noqa: PTH116
+        did_cache_file = self._get_cache_filename(2)
+        change_time = os.stat(did_cache_file).st_mtime  # noqa: PTH116
 
         # Test default
         openml.datasets.get_dataset(2)
-        assert change_time == os.stat(did_cache_dir).st_mtime  # noqa: PTH116
+        assert change_time == os.stat(did_cache_file).st_mtime  # noqa: PTH116
 
         # Test refresh
         openml.datasets.get_dataset(2, force_refresh_cache=True)
-        assert change_time != os.stat(did_cache_dir).st_mtime  # noqa: PTH116
-
-        # Final clean up
-        openml.utils._remove_cache_dir_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+        assert change_time != os.stat(did_cache_file).st_mtime  # noqa: PTH116
 
     @pytest.mark.test_server
     def test_get_dataset_force_refresh_cache_clean_start(self):
-        did_cache_dir = _create_cache_directory_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            2,
-        )
-        # Clean up
-        openml.utils._remove_cache_dir_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+        with pytest.raises(FileNotFoundError):
+            self._get_cache_filename(2)
 
-        # Test clean start
         openml.datasets.get_dataset(2, force_refresh_cache=True)
-        assert os.path.exists(did_cache_dir)  # noqa: PTH110
 
-        # Final clean up
-        openml.utils._remove_cache_dir_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+        assert self._get_cache_filename(2).exists()
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
@@ -517,19 +457,18 @@ class TestOpenMLDataset(TestBase):
         )
         assert not os.path.exists(did_cache_dir)  # noqa: PTH110
 
-    # get_dataset_description is the only data guaranteed to be downloaded
-    @mock.patch("openml.datasets.functions._get_dataset_description")
-    @pytest.mark.test_server
-    def test_deletion_of_cache_dir_faulty_download(self, patch):
-        patch.side_effect = Exception("Boom!")
-        self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)  # noqa: PT027
-        datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")  # noqa: PTH118
-        assert len(list(Path(datasets_cache_dir).iterdir())) == 0
-
     @pytest.mark.test_server
     def test_publish_dataset(self):
         arff_file_path = (
-            self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+            self.static_cache_dir
+            / "org"
+            / "openml"
+            / "test"
+            / "data"
+            / "download"
+            / "1666876"
+            / "phpFsFYVN"
+            / "body.arff"
         )
         dataset = OpenMLDataset(
             "anneal",
@@ -564,6 +503,7 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
+    @pytest.mark.skip(reason="URL uploading is disabled on the server: OpenML#1333")
     @pytest.mark.test_server
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
@@ -1392,13 +1332,13 @@ class TestOpenMLDataset(TestBase):
         dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
-        cache_dir = openml.config.get_cache_directory()
-        cache_dir_for_id = os.path.join(cache_dir, "datasets", "128")  # noqa: PTH118
-        feather_file = os.path.join(cache_dir_for_id, "dataset.feather")  # noqa: PTH118
-        pickle_file = os.path.join(cache_dir_for_id, "dataset.feather.attributes.pkl.py3")  # noqa: PTH118
+        assert dataset.data_file is not None
+        arff_file = Path(dataset.data_file)
+        feather_file = arff_file.with_name("body.feather")
+        pickle_file = arff_file.with_name("body.feather.attributes.pkl.py3")
         data = pd.read_feather(feather_file)
-        assert os.path.isfile(feather_file), "Feather file is missing"  # noqa: PTH113
-        assert os.path.isfile(pickle_file), "Attributes pickle file is missing"  # noqa: PTH113
+        assert feather_file.is_file(), "Feather file is missing"
+        assert pickle_file.is_file(), "Attributes pickle file is missing"
         assert data.shape == (150, 5)
 
         # Check if get_data is able to retrieve feather data
@@ -1425,7 +1365,7 @@ class TestOpenMLDataset(TestBase):
         n_tries = 10
         # we need to wait for the edit to be reflected on the server
         for i in range(n_tries):
-            edited_dataset = openml.datasets.get_dataset(did)
+            edited_dataset = openml.datasets.get_dataset(did, force_refresh_cache=True)
             try:
                 assert edited_dataset.default_target_attribute == "shape", edited_dataset
                 assert edited_dataset.ignore_attribute == ["oil"], edited_dataset
@@ -1435,10 +1375,6 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
-
-                shutil.rmtree(
-                    os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),  # noqa: PTH118
-                )
 
     def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
@@ -1696,7 +1632,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         assert openml.datasets.delete_dataset(_dataset_id)
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_not_owned(
     mock_delete, test_files_directory, test_server_v1, test_apikey_v1
 ):
@@ -1715,11 +1651,12 @@ def test_delete_dataset_not_owned(
         openml.datasets.delete_dataset(40_000)
 
     dataset_url = test_server_v1 + "data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
@@ -1736,11 +1673,12 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_
         openml.datasets.delete_dataset(40_000)
 
     dataset_url = test_server_v1 + "data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
@@ -1754,11 +1692,12 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v
     assert success
 
     dataset_url = test_server_v1 + "data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
@@ -1775,7 +1714,8 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v
         openml.datasets.delete_dataset(9_999_999)
 
     dataset_url = test_server_v1 + "data/9999999"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert mock_delete.call_args.kwargs.get("method") == "DELETE"
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1852,34 +1792,44 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
 
 
 def _dataset_file_is_downloaded(did: int, file: str):
-    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data" / str(did)
     return (cache_directory / file).exists()
 
 
 def _dataset_description_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "description.xml")
+    return _dataset_file_is_downloaded(did, "body.xml")
 
 
 def _dataset_qualities_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "qualities.xml")
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data/qualities/"
+    return (cache_directory / str(did) / "body.xml").exists()
 
 
 def _dataset_features_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "features.xml")
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data/features/"
+    return (cache_directory / str(did) / "body.xml").exists()
 
 
-def _dataset_data_file_is_downloaded(did: int):
-    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
-    return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
+def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
+    if dataset._parquet_url is not None:
+        pq_directory = Path(openml.config.get_minio_download_path(dataset._parquet_url)).parent
+        if pq_directory.exists():
+            return any(f.suffix == ".pq" for f in pq_directory.iterdir())
+    arff_directory = (
+        Path(openml.config.get_cache_directory()) / "data/v1/download" / str(dataset.id)
+    )
+    if arff_directory.exists():
+        return any(f.suffix == ".arff" for f in arff_directory.iterdir())
+    return False
 
 
 def _assert_datasets_retrieved_successfully(
-    dids: Iterable[int],
+    datasets: Iterable[OpenMLDataset],
     with_qualities: bool = False,  # noqa: FBT002
     with_features: bool = False,  # noqa: FBT002
     with_data: bool = False,  # noqa: FBT002
 ):
-    """Checks that all files for the given dids have been downloaded.
+    """Checks that all files for the given datasets have been downloaded.
 
     This includes:
         - description
@@ -1887,16 +1837,16 @@ def _assert_datasets_retrieved_successfully(
         - features
         - absence of data arff if metadata_only, else it must be present too.
     """
-    for did in dids:
-        assert _dataset_description_is_downloaded(did)
+    for dataset in datasets:
+        assert _dataset_description_is_downloaded(dataset.id)
 
-        has_qualities = _dataset_qualities_is_downloaded(did)
+        has_qualities = _dataset_qualities_is_downloaded(dataset.id)
         assert has_qualities if with_qualities else not has_qualities
 
-        has_features = _dataset_features_is_downloaded(did)
+        has_features = _dataset_features_is_downloaded(dataset.id)
         assert has_features if with_features else not has_features
 
-        has_data = _dataset_data_file_is_downloaded(did)
+        has_data = _dataset_data_file_is_downloaded(dataset)
         assert has_data if with_data else not has_data
 
 
@@ -1924,12 +1874,13 @@ def test_get_dataset_lazy_behavior(
         download_data=with_data,
         download_qualities=with_qualities,
         download_features_meta_data=with_features,
+        force_refresh_cache=True,
     )
     assert type(dataset) == OpenMLDataset  # noqa: E721
     assert dataset.name == "anneal"
 
     _assert_datasets_retrieved_successfully(
-        [1],
+        [dataset],
         with_qualities=with_qualities,
         with_features=with_features,
         with_data=with_data,
@@ -1938,7 +1889,7 @@ def test_get_dataset_lazy_behavior(
     assert dataset.qualities, "Qualities should be downloaded on-demand if not during get_dataset"
     assert dataset.get_data(), "Data should be downloaded on-demand if not during get_dataset"
     _assert_datasets_retrieved_successfully(
-        [1], with_qualities=True, with_features=True, with_data=True
+        [dataset], with_qualities=True, with_features=True, with_data=True
     )
 
 
@@ -1955,9 +1906,7 @@ def test__get_dataset_parquet_not_cached():
         "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
         "oml:id": "20",
     }
-    path = _get_dataset_parquet(
-        description, cache_directory=Path(openml.config.get_cache_directory())
-    )
+    path = _get_dataset_parquet(description)
     assert isinstance(path, Path), "_get_dataset_parquet returns a path"
     assert path.is_file(), "_get_dataset_parquet returns path to real file"
 

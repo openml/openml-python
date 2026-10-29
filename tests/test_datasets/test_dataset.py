@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 from time import time
 
 import numpy as np
@@ -61,6 +60,9 @@ class OpenMLDatasetTest(TestBase):
         if self._iris is None:
             self._iris = openml.datasets.get_dataset(61, download_data=False)
         return self._iris
+
+    def _get_cache_filename(self, did):
+        return self.http_client.cache_path_from_url(f"data/{did}")
 
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
@@ -230,18 +232,14 @@ class OpenMLDatasetTest(TestBase):
         assert xy.shape == (150, 5)
 
     def test_lazy_loading_metadata(self):
-        # Initial Setup
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            2,
-        )
         _compare_dataset = openml.datasets.get_dataset(
             2,
             download_data=False,
             download_features_meta_data=True,
             download_qualities=True,
         )
-        change_time = os.stat(did_cache_dir).st_mtime  # noqa: PTH116
+        did_cache_file = self._get_cache_filename(2)
+        change_time = os.stat(did_cache_file).st_mtime  # noqa: PTH116
 
         # Test with cache
         _dataset = openml.datasets.get_dataset(
@@ -250,15 +248,12 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert change_time == os.stat(did_cache_dir).st_mtime  # noqa: PTH116
+        assert change_time == os.stat(did_cache_file).st_mtime  # noqa: PTH116
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
         # -- Test without cache
-        openml.utils._remove_cache_dir_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+        did_cache_file.unlink()
 
         _dataset = openml.datasets.get_dataset(
             2,
@@ -266,8 +261,9 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert [f.name for f in Path(did_cache_dir).iterdir()] == ["description.xml"]
-        assert change_time != os.stat(did_cache_dir).st_mtime  # noqa: PTH116
+
+        assert did_cache_file.exists()
+        assert change_time != os.stat(did_cache_file).st_mtime  # noqa: PTH116
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
@@ -412,7 +408,7 @@ def test__read_features(mocker, workdir, static_cache_dir):
     This test also does some simple checks to verify that the features are read correctly
     """
     filename_mock = mocker.patch("openml.datasets.dataset._get_features_pickle_file")
-    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+    pickle_mock = mocker.patch("openml._api.resources.dataset.pickle")
 
     filename_mock.return_value = os.path.join(workdir, "features.xml.pkl")  # noqa: PTH118
     pickle_mock.load.side_effect = FileNotFoundError
@@ -423,9 +419,13 @@ def test__read_features(mocker, workdir, static_cache_dir):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "features",
             "2",
-            "features.xml",
+            "body.xml",
         ),
     )
     assert isinstance(features, dict)
@@ -444,7 +444,7 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     This test also does some minor checks to ensure that the qualities are read correctly.
     """
     filename_mock = mocker.patch("openml.datasets.dataset._get_qualities_pickle_file")
-    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+    pickle_mock = mocker.patch("openml._api.resources.dataset.pickle")
 
     filename_mock.return_value = os.path.join(workdir, "qualities.xml.pkl")  # noqa: PTH118
     pickle_mock.load.side_effect = FileNotFoundError
@@ -455,26 +455,16 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "qualities",
             "2",
-            "qualities.xml",
+            "body.xml",
         ),
     )
     assert isinstance(qualities, dict)
     assert len(qualities) == 106
     assert pickle_mock.load.call_count == 0
     assert pickle_mock.dump.call_count == 1
-
-
-def test__check_qualities():
-    qualities = [{"oml:name": "a", "oml:value": "0.5"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] == 0.5
-
-    qualities = [{"oml:name": "a", "oml:value": "null"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
-
-    qualities = [{"oml:name": "a", "oml:value": None}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
