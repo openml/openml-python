@@ -246,6 +246,11 @@ def assert_static_test_cache_correct(root_dir: Path) -> None:
         assert p.exists(), f"Expected path {p} exists"
 
 
+@pytest.fixture(scope="session")
+def long_version_new(request):
+    return request.config.getoption("--long")
+
+
 @pytest.fixture(scope="class")
 def long_version(request):
     request.cls.long_version = request.config.getoption("--long")

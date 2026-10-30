@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import unittest
 from unittest import mock
 
 import pytest
@@ -40,12 +39,8 @@ class TestTask(TestBase):
 
     def test__get_cached_task_not_cached(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        self.assertRaisesRegex(  # noqa: PT027
-            OpenMLCacheException,
-            "Task file for tid 2 not cached",
-            openml.tasks.functions._get_cached_task,
-            2,
-        )
+        with pytest.raises(OpenMLCacheException, match="Task file for tid 2 not cached"):
+            openml.tasks.functions._get_cached_task(2)
 
     @pytest.mark.test_server
     def test__get_estimation_procedure_list(self):
@@ -54,8 +49,8 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
+    # 2026-10-20: Removed skip marker, test just works (#1544)
     @pytest.mark.production_server
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
         self.use_production_server()
         # as shown by #383, clustering tasks can give list/dict casting problems
@@ -141,8 +136,8 @@ class TestTask(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.tasks.get_task(1882)
 
-    @unittest.skip(
-        "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
+    @pytest.mark.skip(
+        reason="Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
     @pytest.mark.production_server
     def test__get_task_live(self):
