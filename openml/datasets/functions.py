@@ -742,6 +742,8 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
 
     data_format: Literal["arff", "sparse_arff"]
     if isinstance(data, (list, np.ndarray)):
+        if len(data) == 0:
+            raise ValueError("'data' must contain at least one row, but it is empty.")
         if isinstance(data[0], (list, np.ndarray)):
             data_format = "arff"
         elif isinstance(data[0], dict):

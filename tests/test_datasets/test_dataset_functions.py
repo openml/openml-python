@@ -877,6 +877,10 @@ class TestOpenMLDataset(TestBase):
         param["data"] = data[0]
         self.assertRaises(ValueError, create_dataset, **param)  # noqa: PT027
 
+        param["data"] = np.empty((0, 2))
+        with pytest.raises(ValueError, match="at least one row"):
+            create_dataset(**param)
+
     @pytest.mark.test_server
     def test_get_online_dataset_arff(self):
         dataset_id = 128  # iris -- one of the few datasets without parquet file
