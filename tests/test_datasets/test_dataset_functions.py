@@ -564,6 +564,7 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
+    @pytest.mark.skip(reason="URL upload disabled since PHP API v1.3.2")
     @pytest.mark.test_server
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
