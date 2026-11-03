@@ -229,20 +229,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
             _c_root_dir / "api" / "v1" / "xml" / "data",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "features",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "-1",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "-1" / "body.xml",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "-1",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "-1" / "body.xml",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "-1",
-            _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "-1" / "body.xml",
-            _c_root_dir
-            / "labs"
-            / "beta"
-            / "Projects"
-            / "autoweka"
-            / "datasets"
-            / "dexter.zip"
-            / "body.arff",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "2",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "2" / "body.xml",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "qualities" / "2",
