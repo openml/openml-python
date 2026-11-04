@@ -128,6 +128,7 @@ def test_get_structure():
 
 
 def test_tagging():
+    # Not possible as a marker since autouse fixtures change the configuration
     flows = openml.flows.list_flows(size=1)
     flow_id = flows["id"].iloc[0]
     flow = openml.flows.get_flow(flow_id)
@@ -136,7 +137,17 @@ def test_tagging():
     tag = f"test_tag_TestFlow_{unique_indicator}"
     flows = openml.flows.list_flows(tag=tag)
     assert len(flows) == 0
-    flow.push_tag(tag)
+    try:
+        flow.push_tag(tag)
+    except openml.exceptions.OpenMLServerException as e:
+        # pytest.mark.xfail doesn't work because the autouse fixtures change server config
+        reason = "There is an issue with Elasticsearch on the test server since Oct 2026."
+        test_server = openml.config.get_server_base_url() == "https://test.openml.org"
+        elastic_search_error = "Elastic Search" in e.message
+        if test_server and elastic_search_error:
+            pytest.xfail(reason)
+        raise
+
     flows = openml.flows.list_flows(tag=tag)
     assert len(flows) == 1
     assert flow_id in flows["id"].values
