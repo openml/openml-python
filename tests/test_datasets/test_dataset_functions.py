@@ -4,6 +4,7 @@ from __future__ import annotations
 import itertools
 import os
 import random
+import tempfile
 import time
 import uuid
 from collections.abc import Iterable
@@ -368,19 +369,28 @@ class TestOpenMLDataset(TestBase):
         )
 
     @mock.patch.object(MinIOClient, "download_minio_file")
-    @pytest.mark.test_server
     def test__get_dataset_parquet_is_cached(self, patch):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        patch.side_effect = RuntimeError(
-            "download_parquet_url should not be called when loading from cache",
-        )
-        description = {
-            "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
-            "oml:id": "30",
-        }
-        path = _get_dataset_parquet(description)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
+        with tempfile.TemporaryDirectory() as tmp_path:
+            tmp_file_path = (
+                Path(tmp_path) / "org" / "openml" / "data" / "minio" / "dataset30" / "dataset_30.pq"
+            )
+            tmp_file_path.parent.mkdir(parents=True)
+            with tmp_file_path.open(mode="w") as fh:
+                fh.write("test")
+
+            openml.config.set_root_cache_directory(tmp_path)
+            patch.side_effect = RuntimeError(
+                "download_parquet_url should not be called when loading from cache",
+            )
+
+            description = {
+                "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
+                "oml:id": "30",
+            }
+            path = _get_dataset_parquet(description)
+            assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+            assert path == tmp_file_path
+            assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {

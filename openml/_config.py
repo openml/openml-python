@@ -492,16 +492,17 @@ class OpenMLConfigManager:
         """Get the current configuration as a dictionary."""
         return self._config.__dict__.copy()
 
-    def get_cache_directory(self) -> str:
+    def get_cache_directory(self, server_url: str | None = None) -> str:
         """Get the cache directory for the current server."""
-        url_suffix = urlparse(self._config.server).netloc
+        server_url = server_url or self._config.server
+        url_suffix = urlparse(server_url).netloc
         url_parts = url_suffix.replace(":", "_").split(".")[::-1]
         reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
         return os.path.join(self._root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
     def get_minio_download_path(self, url: str) -> str:
         parsed_url = urlparse(url)
-        return os.path.join(self.get_cache_directory(), "minio", parsed_url.path.lstrip("/"))  #  noqa: PTH118
+        return os.path.join(self.get_cache_directory(url), "minio", parsed_url.path.lstrip("/"))  #  noqa: PTH118
 
     def set_root_cache_directory(self, root_cache_directory: str | Path) -> None:
         """Set the root cache directory."""
