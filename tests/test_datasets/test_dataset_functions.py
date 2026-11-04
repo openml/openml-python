@@ -503,7 +503,7 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
-    @pytest.mark.skip(reason="URL uploading is disabled on the server: OpenML#1333")
+    @pytest.mark.skip(reason="URL upload disabled since PHP API v1.3.2")
     @pytest.mark.test_server
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
@@ -534,19 +534,25 @@ class TestOpenMLDataset(TestBase):
         not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
         reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
     )
-    @pytest.mark.flaky
     @pytest.mark.test_server
     def test_data_status(self):
+        arff_file_path = (
+            self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+        )
         dataset = OpenMLDataset(
-            f"{self._get_sentinel()}-UploadTestWithURL",
+            "anneal",
             "test",
-            "ARFF",
+            data_format="arff",
             version=1,
-            url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+            licence="public",
+            default_target_attribute="class",
+            data_file=arff_file_path,
         )
         dataset.publish()
-        TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
+        TestBase._mark_entity_for_removal("data", dataset.dataset_id)
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
+        )
         did = dataset.id
 
         # admin key for test server (only admins can activate datasets.

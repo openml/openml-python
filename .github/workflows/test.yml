@@ -122,14 +122,7 @@ jobs:
       run: |
         chmod -R a+rw ./data
         chmod -R a+rw ./logs
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
-
-        echo "Waiting for PHP API to boot..."
-        timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
-
-        echo "Final Verification: Gateway Connectivity..."
-        curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
-
+        docker compose --profile "client-ci" up --quiet-pull --wait
         docker container ls
 
     - name: Show installed dependencies
@@ -197,7 +190,7 @@ jobs:
       if: always() && steps.clone-services.outcome == 'success'
       working-directory: ./services
       run: |
-        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        docker compose --profile "client-ci" down -v
         cd ..
         sudo rm -rf services
 
