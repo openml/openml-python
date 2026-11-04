@@ -149,6 +149,7 @@ class TestTask(TestBase):
     @pytest.mark.test_server
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
+        dataset = openml.datasets.get_dataset(task.dataset_id)
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(  # noqa: PTH110
             os.path.join(openml.config.get_cache_directory(), "tasks", "1", "task.xml")  # noqa: PTH118
@@ -157,7 +158,7 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")  # noqa: PTH118
         )
         assert os.path.exists(  # noqa: PTH110
-            os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")  # noqa: PTH118
+            openml.config.get_minio_download_path(dataset._parquet_url)
         )
 
     @pytest.mark.test_server
