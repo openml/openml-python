@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from .task import (
         OpenMLTask,
     )
-TASKS_CACHE_DIR_NAME = "tasks"
 
 
 def _get_estimation_procedure_list() -> list[dict[str, Any]]:
