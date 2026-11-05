@@ -32,17 +32,11 @@ class TaskV1API(ResourceV1API, TaskAPI):
         ----------
         task_id : int
             The OpenML task id of the task to download.
-        get_dataset_kwargs :
-            Args and kwargs can be used pass optional parameters to
-            :meth:`openml.datasets.get_dataset`.
 
         Returns
         -------
         task: OpenMLTask
         """
-        if not isinstance(task_id, int):
-            raise TypeError(f"Task id should be integer, is {type(task_id)}")
-
         response = self._http.get(f"task/{task_id}", enable_cache=True)
         return self._create_task_from_xml(response.text)
 
@@ -119,17 +113,17 @@ class TaskV1API(ResourceV1API, TaskAPI):
         tasks_dict = xmltodict.parse(xml_string, force_list=("oml:task", "oml:input"))
         # Minimalistic check if the XML is useful
         if "oml:tasks" not in tasks_dict:
-            raise ValueError(f'Error in return XML, does not contain "oml:runs": {tasks_dict}')
+            raise ValueError(f'Error in return XML, does not contain "oml:tasks": {tasks_dict}')
 
         if "@xmlns:oml" not in tasks_dict["oml:tasks"]:
             raise ValueError(
-                f'Error in return XML, does not contain "oml:runs"/@xmlns:oml: {tasks_dict}'
+                f'Error in return XML, does not contain "oml:tasks"/@xmlns:oml: {tasks_dict}'
             )
 
         if tasks_dict["oml:tasks"]["@xmlns:oml"] != "http://openml.org/openml":
             raise ValueError(
-                "Error in return XML, value of  "
-                '"oml:runs"/@xmlns:oml is not '
+                "Error in return XML, value of "
+                '"oml:tasks"/@xmlns:oml is not '
                 f'"http://openml.org/openml": {tasks_dict!s}',
             )
 
