@@ -22,107 +22,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def _create_task_from_xml(xml: str) -> OpenMLTask:
-    """Create a task given a xml string.
-
-    Parameters
-    ----------
-    xml : string
-        Task xml representation.
-
-    Returns
-    -------
-    OpenMLTask
-    """
-    dic = xmltodict.parse(xml)["oml:task"]
-    estimation_parameters = {}
-    inputs = {}
-    # Due to the unordered structure we obtain, we first have to extract
-    # the possible keys of oml:input; dic["oml:input"] is a list of
-    # OrderedDicts
-
-    # Check if there is a list of inputs
-    if isinstance(dic["oml:input"], list):
-        for input_ in dic["oml:input"]:
-            name = input_["@name"]
-            inputs[name] = input_
-    # Single input case
-    elif isinstance(dic["oml:input"], dict):
-        name = dic["oml:input"]["@name"]
-        inputs[name] = dic["oml:input"]
-
-    evaluation_measures = None
-    if "evaluation_measures" in inputs:
-        evaluation_measures = inputs["evaluation_measures"]["oml:evaluation_measures"][
-            "oml:evaluation_measure"
-        ]
-
-    task_type = TaskType(int(dic["oml:task_type_id"]))
-    common_kwargs = {
-        "task_id": dic["oml:task_id"],
-        "task_type": dic["oml:task_type"],
-        "task_type_id": task_type,
-        "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
-        "evaluation_measure": evaluation_measures,
-    }
-    # TODO: add OpenMLClusteringTask?
-    if task_type in (
-        TaskType.SUPERVISED_CLASSIFICATION,
-        TaskType.SUPERVISED_REGRESSION,
-        TaskType.LEARNING_CURVE,
-    ):
-        # Convert some more parameters
-        for parameter in inputs["estimation_procedure"]["oml:estimation_procedure"][
-            "oml:parameter"
-        ]:
-            name = parameter["@name"]
-            text = parameter.get("#text", "")
-            estimation_parameters[name] = text
-
-        common_kwargs["estimation_procedure_type"] = inputs["estimation_procedure"][
-            "oml:estimation_procedure"
-        ]["oml:type"]
-        common_kwargs["estimation_procedure_id"] = int(
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:id"]
-        )
-
-        common_kwargs["estimation_parameters"] = estimation_parameters
-        common_kwargs["target_name"] = inputs["source_data"]["oml:data_set"]["oml:target_feature"]
-        common_kwargs["data_splits_url"] = inputs["estimation_procedure"][
-            "oml:estimation_procedure"
-        ]["oml:data_splits_url"]
-
-    cls = {
-        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskType.CLUSTERING: OpenMLClusteringTask,
-        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type)
-    if cls is None:
-        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
-    return cls(**common_kwargs)  # type: ignore
-
-
-def _build_url(
-    limit: int, offset: int, task_type: TaskType | int | None, kwargs: dict[str, Any]
-) -> str:
-    api_call = "task/list"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if task_type is not None:
-        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
-        api_call += f"/type/{tvalue}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                if operator == "task_id":
-                    value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
-                api_call += f"/{operator}/{value}"
-    return api_call
-
-
 class TaskV1API(ResourceV1API, TaskAPI):
     def get(self, task_id: int) -> OpenMLTask:
         """Download OpenML task for a given task ID.
@@ -145,7 +44,7 @@ class TaskV1API(ResourceV1API, TaskAPI):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
         response = self._http.get(f"task/{task_id}", enable_cache=True)
-        return _create_task_from_xml(response.text)
+        return self._create_task_from_xml(response.text)
 
     def download_split(self, url: str, *, refresh_cache: bool = False) -> Path:
         """Download a task's split file and return its path in the cache.
@@ -192,7 +91,7 @@ class TaskV1API(ResourceV1API, TaskAPI):
         -------
         dataframe
         """
-        api_call = _build_url(limit, offset, task_type, kwargs)
+        api_call = self._build_url(limit, offset, task_type, kwargs)
         return self._parse_list_xml(api_call=api_call)
 
     def _parse_list_xml(self, api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
@@ -297,50 +196,108 @@ class TaskV1API(ResourceV1API, TaskAPI):
 
         return pd.DataFrame.from_dict(tasks, orient="index")
 
+    @staticmethod
+    def _create_task_from_xml(xml: str) -> OpenMLTask:
+        """Create a task given a xml string.
 
-def _create_task_from_json(task_json: dict) -> OpenMLTask:
-    task_type_id = TaskType(int(task_json["task_type_id"]))
+        Parameters
+        ----------
+        xml : string
+            Task xml representation.
 
-    inputs = {i["name"]: i for i in task_json.get("input", [])}
+        Returns
+        -------
+        OpenMLTask
+        """
+        dic = xmltodict.parse(xml)["oml:task"]
+        estimation_parameters = {}
+        inputs = {}
+        # Due to the unordered structure we obtain, we first have to extract
+        # the possible keys of oml:input; dic["oml:input"] is a list of
+        # OrderedDicts
 
-    source = inputs["source_data"]["data_set"]
-    evaluation_measures = inputs.get("evaluation_measures", {}).get("evaluation_measures", {})
+        # Check if there is a list of inputs
+        if isinstance(dic["oml:input"], list):
+            for input_ in dic["oml:input"]:
+                name = input_["@name"]
+                inputs[name] = input_
+        # Single input case
+        elif isinstance(dic["oml:input"], dict):
+            name = dic["oml:input"]["@name"]
+            inputs[name] = dic["oml:input"]
 
-    common_kwargs = {
-        "task_id": int(task_json["id"]),
-        "task_type": task_json["task_type"],
-        "task_type_id": task_type_id,
-        "data_set_id": int(source["data_set_id"]),
-        "evaluation_measure": evaluation_measures.get("evaluation_measure") or None,
-    }
+        evaluation_measures = None
+        if "evaluation_measures" in inputs:
+            evaluation_measures = inputs["evaluation_measures"]["oml:evaluation_measures"][
+                "oml:evaluation_measure"
+            ]
 
-    if task_type_id in (
-        TaskType.SUPERVISED_CLASSIFICATION,
-        TaskType.SUPERVISED_REGRESSION,
-        TaskType.LEARNING_CURVE,
-    ):
-        est = inputs.get("estimation_procedure", {}).get("estimation_procedure")
+        task_type = TaskType(int(dic["oml:task_type_id"]))
+        common_kwargs = {
+            "task_id": dic["oml:task_id"],
+            "task_type": dic["oml:task_type"],
+            "task_type_id": task_type,
+            "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
+            "evaluation_measure": evaluation_measures,
+        }
+        # TODO: add OpenMLClusteringTask?
+        if task_type in (
+            TaskType.SUPERVISED_CLASSIFICATION,
+            TaskType.SUPERVISED_REGRESSION,
+            TaskType.LEARNING_CURVE,
+        ):
+            # Convert some more parameters
+            for parameter in inputs["estimation_procedure"]["oml:estimation_procedure"][
+                "oml:parameter"
+            ]:
+                name = parameter["@name"]
+                text = parameter.get("#text", "")
+                estimation_parameters[name] = text
 
-        if est:
-            common_kwargs["estimation_procedure_id"] = int(est["id"])
-            common_kwargs["estimation_procedure_type"] = est["type"]
-            common_kwargs["estimation_parameters"] = {
-                p["name"]: "" if p.get("value") in (None, []) else str(p["value"])
-                for p in est.get("parameter", [])
-            }
-            common_kwargs["data_splits_url"] = est["data_splits_url"]
+            common_kwargs["estimation_procedure_type"] = inputs["estimation_procedure"][
+                "oml:estimation_procedure"
+            ]["oml:type"]
+            common_kwargs["estimation_procedure_id"] = int(
+                inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:id"]
+            )
 
-        common_kwargs["target_name"] = source.get("target_feature")
+            common_kwargs["estimation_parameters"] = estimation_parameters
+            common_kwargs["target_name"] = inputs["source_data"]["oml:data_set"][
+                "oml:target_feature"
+            ]
+            common_kwargs["data_splits_url"] = inputs["estimation_procedure"][
+                "oml:estimation_procedure"
+            ]["oml:data_splits_url"]
 
-    cls = {
-        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskType.CLUSTERING: OpenMLClusteringTask,
-        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type_id)
-    if cls is None:
-        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
-    return cls(**common_kwargs)  # type: ignore
+        cls = {
+            TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+            TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+            TaskType.CLUSTERING: OpenMLClusteringTask,
+            TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
+        }.get(task_type)
+        if cls is None:
+            raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
+        return cls(**common_kwargs)  # type: ignore
+
+    @staticmethod
+    def _build_url(
+        limit: int, offset: int, task_type: TaskType | int | None, kwargs: dict[str, Any]
+    ) -> str:
+        api_call = "task/list"
+        if limit is not None:
+            api_call += f"/limit/{limit}"
+        if offset is not None:
+            api_call += f"/offset/{offset}"
+        if task_type is not None:
+            tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
+            api_call += f"/type/{tvalue}"
+        if kwargs is not None:
+            for operator, value in kwargs.items():
+                if value is not None:
+                    if operator == "task_id":
+                        value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
+                    api_call += f"/{operator}/{value}"
+        return api_call
 
 
 class TaskV2API(ResourceV2API, TaskAPI):
@@ -359,7 +316,7 @@ class TaskV2API(ResourceV2API, TaskAPI):
         task: OpenMLTask
         """
         response = self._http.get(f"tasks/{task_id}", enable_cache=True)
-        return _create_task_from_json(response.json())
+        return self._create_task_from_json(response.json())
 
     def list(
         self,
@@ -386,3 +343,48 @@ class TaskV2API(ResourceV2API, TaskAPI):
         """
         self._http.get(url, enable_cache=True, refresh_cache=refresh_cache)
         return self._http.cache_path_from_url(url)
+
+    @staticmethod
+    def _create_task_from_json(task_json: dict) -> OpenMLTask:
+        task_type_id = TaskType(int(task_json["task_type_id"]))
+
+        inputs = {i["name"]: i for i in task_json.get("input", [])}
+
+        source = inputs["source_data"]["data_set"]
+        evaluation_measures = inputs.get("evaluation_measures", {}).get("evaluation_measures", {})
+
+        common_kwargs = {
+            "task_id": int(task_json["id"]),
+            "task_type": task_json["task_type"],
+            "task_type_id": task_type_id,
+            "data_set_id": int(source["data_set_id"]),
+            "evaluation_measure": evaluation_measures.get("evaluation_measure") or None,
+        }
+
+        if task_type_id in (
+            TaskType.SUPERVISED_CLASSIFICATION,
+            TaskType.SUPERVISED_REGRESSION,
+            TaskType.LEARNING_CURVE,
+        ):
+            est = inputs.get("estimation_procedure", {}).get("estimation_procedure")
+
+            if est:
+                common_kwargs["estimation_procedure_id"] = int(est["id"])
+                common_kwargs["estimation_procedure_type"] = est["type"]
+                common_kwargs["estimation_parameters"] = {
+                    p["name"]: "" if p.get("value") in (None, []) else str(p["value"])
+                    for p in est.get("parameter", [])
+                }
+                common_kwargs["data_splits_url"] = est["data_splits_url"]
+
+            common_kwargs["target_name"] = source.get("target_feature")
+
+        cls = {
+            TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
+            TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
+            TaskType.CLUSTERING: OpenMLClusteringTask,
+            TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
+        }.get(task_type_id)
+        if cls is None:
+            raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
+        return cls(**common_kwargs)  # type: ignore
