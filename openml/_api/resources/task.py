@@ -304,13 +304,14 @@ def _create_task_from_json(task_json: dict) -> OpenMLTask:
     inputs = {i["name"]: i for i in task_json.get("input", [])}
 
     source = inputs["source_data"]["data_set"]
+    evaluation_measures = inputs.get("evaluation_measures", {}).get("evaluation_measures", {})
 
     common_kwargs = {
         "task_id": int(task_json["id"]),
         "task_type": task_json["task_type"],
         "task_type_id": task_type_id,
         "data_set_id": int(source["data_set_id"]),
-        "evaluation_measure": None,
+        "evaluation_measure": evaluation_measures.get("evaluation_measure") or None,
     }
 
     if task_type_id in (
@@ -324,8 +325,10 @@ def _create_task_from_json(task_json: dict) -> OpenMLTask:
             common_kwargs["estimation_procedure_id"] = int(est["id"])
             common_kwargs["estimation_procedure_type"] = est["type"]
             common_kwargs["estimation_parameters"] = {
-                p["name"]: p.get("value") for p in est.get("parameter", [])
+                p["name"]: "" if p.get("value") in (None, []) else str(p["value"])
+                for p in est.get("parameter", [])
             }
+            common_kwargs["data_splits_url"] = est["data_splits_url"]
 
         common_kwargs["target_name"] = source.get("target_feature")
 
@@ -334,8 +337,9 @@ def _create_task_from_json(task_json: dict) -> OpenMLTask:
         TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
         TaskType.CLUSTERING: OpenMLClusteringTask,
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }[task_type_id]
-
+    }.get(task_type_id)
+    if cls is None:
+        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
     return cls(**common_kwargs)  # type: ignore
 
 
