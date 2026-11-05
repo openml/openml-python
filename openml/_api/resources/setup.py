@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import builtins
 from collections import OrderedDict
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 import xmltodict
@@ -12,6 +10,9 @@ from openml.setups.setup import OpenMLParameter, OpenMLSetup
 from .base import ResourceV1API, ResourceV2API, SetupAPI
 
 if TYPE_CHECKING:
+    import builtins
+    from collections.abc import Iterable
+
     from openml.flows.flow import OpenMLFlow
 
 

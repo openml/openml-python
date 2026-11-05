@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import unittest
 from unittest import mock
 
 import pytest
@@ -14,7 +13,7 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-from openml.tasks import TaskType, task
+from openml.tasks import TaskType
 from openml.testing import TestBase, create_request_response
 
 
@@ -27,15 +26,15 @@ class TestTask(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test__get_estimation_procedure_list(self):
         estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
         assert isinstance(estimation_procedures, list)
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production_server()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
+    # 2026-10-20: Removed skip marker, test just works (#1544)
+    @pytest.mark.production_server
     def test_list_clustering_task(self):
         self.use_production_server()
         # as shown by #383, clustering tasks can give list/dict casting problems
@@ -43,7 +42,7 @@ class TestTask(TestBase):
         # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
-        assert type(task) == dict
+        assert type(task) == dict  # noqa: E721
         assert len(task) >= 2
         assert "did" in task
         assert isinstance(task["did"], int)
@@ -51,7 +50,7 @@ class TestTask(TestBase):
         assert isinstance(task["status"], str)
         assert task["status"] in ["in_preparation", "active", "deactivated"]
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_by_type(self):
         num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
@@ -61,18 +60,18 @@ class TestTask(TestBase):
             assert ttid == task["ttid"]
             self._check_task(task)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_length(self):
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) > 100
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_empty(self):
         tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
         assert tasks.empty
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_by_tag(self):
         # Server starts with 99 active tasks with the tag, and one 'in_preparation',
         # so depending on the processing of the last dataset, there may be 99 or 100 matches.
@@ -82,27 +81,27 @@ class TestTask(TestBase):
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
         assert len(tasks) >= 900
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_paginate(self):
         size = 10
-        max = 100
+        max = 100  # noqa: A001
         for i in range(0, max, size):
             tasks = openml.tasks.list_tasks(offset=i, size=size)
             assert size >= len(tasks)
             for task in tasks.to_dict(orient="index").values():
                 self._check_task(task)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_list_tasks_per_type_paginate(self):
         size = 40
-        max = 100
+        max = 100  # noqa: A001
         task_types = [
             TaskType.SUPERVISED_CLASSIFICATION,
             TaskType.SUPERVISED_REGRESSION,
@@ -116,88 +115,85 @@ class TestTask(TestBase):
                     assert j == task["ttid"]
                     self._check_task(task)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test__get_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+        with mock.patch("requests.sessions.Session.request") as mock_request:
             openml.tasks.get_task(1882)
             mock_request.assert_not_called()
 
-    @unittest.skip(
-        "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
+    @pytest.mark.skip(
+        reason="Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test__get_task_live(self):
         self.use_production_server()
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_get_task(self):
-        openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
+        dataset = openml.datasets.get_dataset(task.dataset_id)
+        assert isinstance(task, OpenMLTask)
+        assert os.path.exists(  # noqa: PTH110
+            openml.config.get_minio_download_path(dataset._parquet_url)
+        )
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
 
         assert isinstance(task, OpenMLTask)
-        assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "task.xml")
-        )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
-        assert not os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "tasks", "2", "body.arff"
-            )
-        )
         # Since the download_data=False is propagated to get_dataset
-        assert not os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "datasets", "2", "body.arff"
-            )
+        assert not os.path.exists(  # noqa: PTH110
+            os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")  # noqa: PTH118
         )
 
-        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
-            task.download_split()
-            mock_request.assert_not_called()        
-            
-        assert os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "task", "2", "body.arff"
+        task.download_split()
+        assert os.path.exists(  # noqa: PTH110
+            os.path.join(  # noqa: PTH118
+                openml.config.get_cache_directory(),
+                "api_splits",
+                "get",
+                "2",
+                "Task_2_splits.arff",
+                "body.arff",
             )
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_removal_upon_download_failure(self, get_dataset):
-        class WeirdException(Exception):
+        class WeirdException(Exception):  # noqa: N818
             pass
 
-        def assert_and_raise(*args, **kwargs):
+        def assert_and_raise(*args, **kwargs):  # noqa: ARG001
             # Make sure that the file was created!
-            assert os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")
+            assert os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")  # noqa: PTH109, PTH118
             raise WeirdException()
 
         get_dataset.side_effect = assert_and_raise
-        try:
+        try:  # noqa: SIM105
             openml.tasks.get_task(1)  # anneal; crossvalidation
         except WeirdException:
             pass
         # Now the file should no longer exist
-        assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
+        assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))  # noqa: PTH109, PTH110, PTH118
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+        with mock.patch("requests.sessions.Session.request") as mock_request:
             task = openml.tasks.get_task(1)
             mock_request.assert_not_called()
 
         assert isinstance(task, OpenMLTask)
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_task_different_types(self):
         self.use_production_server()
         # Regression task
@@ -207,15 +203,19 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
-
-        assert type(split) == OpenMLSplit
-        assert os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "task", "1", "body.arff"
+        assert type(split) == OpenMLSplit  # noqa: E721
+        assert os.path.exists(  # noqa: PTH110
+            os.path.join(  # noqa: PTH118
+                openml.config.get_cache_directory(),
+                "api_splits",
+                "get",
+                "1",
+                "Task_1_splits.arff",
+                "body.arff",
             )
         )
 
@@ -225,9 +225,9 @@ class TestTask(TestBase):
             "tasks",
             1,
         )
-        assert os.path.exists(tid_cache_dir)
+        assert os.path.exists(tid_cache_dir)  # noqa: PTH110
         openml.utils._remove_cache_dir_for_id("tasks", tid_cache_dir)
-        assert not os.path.exists(tid_cache_dir)
+        assert not os.path.exists(tid_cache_dir)  # noqa: PTH110
 
 
 @mock.patch.object(requests.Session, "request")
@@ -239,7 +239,7 @@ def test_delete_task_not_owned(mock_request, test_files_directory, test_server_v
     )
     with pytest.raises(
         OpenMLNotAuthorizedError,
-        match="The task can not be deleted because it was not uploaded by you.",
+        match=r"The task can not be deleted because it was not uploaded by you.",
     ):
         openml.tasks.delete_task(1)
 

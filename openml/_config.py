@@ -10,15 +10,16 @@ import os
 import platform
 import shutil
 import warnings
-from collections.abc import Iterator
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass, field, fields, replace
 from io import StringIO
 from pathlib import Path
-from typing import Any, ClassVar, Literal, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
 from urllib.parse import urlparse
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 from openml.enums import APIVersion, ServerMode
 
 from .__version__ import __version__
@@ -69,7 +70,7 @@ _SERVERS_REGISTRY: dict[ServerMode, dict[APIVersion, dict[str, str | None]]] = {
 
 
 def _get_servers(mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
-    if mode not in ServerMode:
+    if mode not in ServerMode._value2member_map_:
         raise ValueError(f'invalid mode="{mode}" allowed modes: {", ".join(list(ServerMode))}')
     return deepcopy(_SERVERS_REGISTRY[mode])
 
@@ -288,13 +289,16 @@ class OpenMLConfigManager:
         api_version: APIVersion,
         fallback_api_version: APIVersion | None = None,
     ) -> None:
-        if api_version not in APIVersion:
+        if api_version not in APIVersion._value2member_map_:
             raise ValueError(
                 f'invalid api_version="{api_version}" '
                 f"allowed versions: {', '.join(list(APIVersion))}"
             )
 
-        if fallback_api_version is not None and fallback_api_version not in APIVersion:
+        if (
+            fallback_api_version is not None
+            and fallback_api_version not in APIVersion._value2member_map_
+        ):
             raise ValueError(
                 f'invalid fallback_api_version="{fallback_api_version}" '
                 f"allowed versions: {', '.join(list(APIVersion))}"
@@ -488,12 +492,17 @@ class OpenMLConfigManager:
         """Get the current configuration as a dictionary."""
         return self._config.__dict__.copy()
 
-    def get_cache_directory(self) -> str:
+    def get_cache_directory(self, server_url: str | None = None) -> str:
         """Get the cache directory for the current server."""
-        url_suffix = urlparse(self._config.server).netloc
+        server_url = server_url or self._config.server
+        url_suffix = urlparse(server_url).netloc
         url_parts = url_suffix.replace(":", "_").split(".")[::-1]
         reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
         return os.path.join(self._root_cache_directory, reversed_url_suffix)  # noqa: PTH118
+
+    def get_minio_download_path(self, url: str) -> str:
+        parsed_url = urlparse(url)
+        return os.path.join(self.get_cache_directory(url), "minio", parsed_url.path.lstrip("/"))  #  noqa: PTH118
 
     def set_root_cache_directory(self, root_cache_directory: str | Path) -> None:
         """Set the root cache directory."""

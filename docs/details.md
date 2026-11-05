@@ -1,21 +1,21 @@
 # Advanced User Guide
 
 This document highlights some of the more advanced features of
-`openml-python`. 
+`openml-python`.
 
 ## Configuration
 
-The configuration file resides in a directory `.config/openml` in the
+The configuration file resides in a directory `~/.config/openml` in the
 home directory of the user and is called config (More specifically, it
-resides in the [configuration directory specified by the XDGB Base
+resides in the [configuration directory specified by the XDG Base
 Directory
 Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)).
 It consists of `key = value` pairs which are separated by newlines. The
 following keys are defined:
 
 - apikey: required to access the server.
-- server: the server to connect to (default: `http://www.openml.org`).
-          For connection to the test server, set this to `test.openml.org`.
+- server: the server to connect to (default: `https://www.openml.org`).
+          For connection to the test server, set this to `https://test.openml.org`.
 - cachedir: the root folder where the cache file directories should be created.
     If not given, will default to `~/.openml/cache`
 - avoid_duplicate_runs: if set to `True` (default), when certain functions
@@ -34,7 +34,7 @@ following keys are defined:
                 trying to reconnect for a longer time, quickly increasing
                 the time between retries.
 
-- connection_n_retries: number of times to retry a request if they fail. 
+- connection_n_retries: number of times to retry a request if they fail.
 Default depends on retry_policy (5 for `human`, 50 for `robot`)
 - verbosity: the level of output:
       -   0: normal output
@@ -43,7 +43,7 @@ Default depends on retry_policy (5 for `human`, 50 for `robot`)
 
 This file is easily configurable by the `openml` command line interface.
 To see where the file is stored, and what its values are, use openml
-configure none. 
+configure none.
 
 ## Docker
 
@@ -73,4 +73,3 @@ list of **tasks**.
 
 A further explanation is given in the [OpenML user
 guide](https://docs.openml.org/concepts/).
-
