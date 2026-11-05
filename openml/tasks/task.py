@@ -10,10 +10,9 @@ from typing_extensions import TypedDict
 
 import arff
 
-import openml._api_calls
+import openml
 from openml import datasets
 from openml.base import OpenMLBase
-from openml.utils import _create_cache_directory_for_id
 
 from .split import OpenMLSplit
 
@@ -187,31 +186,15 @@ class OpenMLTask(OpenMLBase):
         """Download the OpenML split for a given task."""
         # TODO(eddiebergman): Can this every be `None`?
         assert self.task_id is not None
-        cache_dir = _create_cache_directory_for_id("tasks", self.task_id)
-        cached_split_file = cache_dir / "body.arff"
+        split_url = str(self.estimation_procedure["data_splits_url"])
+        split_file = openml._backend.task.download_split(split_url)
 
         try:
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-            logger.debug("Loaded file from cache: %s", str(cached_split_file))
-        except (OSError, arff.BadDataFormat):
-            logger.info("Failed to load file from cache: %s", str(cached_split_file))
-            if cached_split_file.exists():
-                logger.debug("Cleaning up old file")
-                cached_split_file.unlink()
-            # Next, download and cache the associated split file
-            split_url = self.estimation_procedure["data_splits_url"]
-            openml._api_calls._download_text_file(
-                source=str(split_url),
-                output_path=str(cached_split_file),
-            )
-            if cached_split_file.exists():
-                logger.info("New file created of size %d", cached_split_file.stat().st_size)
-            else:
-                logger.info("Failed to create new file")
-
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-
-        return split
+            return OpenMLSplit._from_arff_file(split_file)
+        except arff.BadDataFormat:
+            logger.info("Failed to parse cached split file: %s", str(split_file))
+            split_file = openml._backend.task.download_split(split_url, refresh_cache=True)
+            return OpenMLSplit._from_arff_file(split_file)
 
     def get_split_dimensions(self) -> tuple[int, int, int]:
         """Get the (repeats, folds, samples) of the split for a given task."""

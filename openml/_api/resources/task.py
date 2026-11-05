@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import xmltodict
@@ -17,6 +17,9 @@ from openml.tasks.task import (
 )
 
 from .base import ResourceV1API, ResourceV2API, TaskAPI
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _create_task_from_xml(xml: str) -> OpenMLTask:
@@ -143,6 +146,23 @@ class TaskV1API(ResourceV1API, TaskAPI):
 
         response = self._http.get(f"task/{task_id}", enable_cache=True)
         return _create_task_from_xml(response.text)
+
+    def download_split(self, url: str, *, refresh_cache: bool = False) -> Path:
+        """Download a task's split file and return its path in the cache.
+
+        Parameters
+        ----------
+        url : str
+            URL of the split file.
+        refresh_cache : bool, optional
+            Whether to replace the file if it is already cached.
+
+        Returns
+        -------
+        Path
+        """
+        self._http.get(url, enable_cache=True, refresh_cache=refresh_cache)
+        return self._http.cache_path_from_url(url)
 
     def supports_download_splits(self) -> bool:
         return True
@@ -348,6 +368,23 @@ class TaskV2API(ResourceV2API, TaskAPI):
         **kwargs: Any,  # noqa: ARG002
     ) -> pd.DataFrame:
         raise self._not_supported(method="list")
+
+    def download_split(self, url: str, *, refresh_cache: bool = False) -> Path:
+        """Download a task's split file and return its path in the cache.
+
+        Parameters
+        ----------
+        url : str
+            URL of the split file.
+        refresh_cache : bool, optional
+            Whether to replace the file if it is already cached.
+
+        Returns
+        -------
+        Path
+        """
+        self._http.get(url, enable_cache=True, refresh_cache=refresh_cache)
+        return self._http.cache_path_from_url(url)
 
     def supports_download_splits(self) -> bool:
         return False
