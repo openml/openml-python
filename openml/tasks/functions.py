@@ -90,6 +90,7 @@ def list_tasks(  # noqa: PLR0913,PLR0917
     listing_call = partial(
         openml._backend.task.list,
         task_type=task_type,
+        estimation_procedures=_get_estimation_procedure_list(),
         tag=tag,
         data_tag=data_tag,
         status=status,

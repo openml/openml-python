@@ -11,6 +11,7 @@ import openml
 from openml._api import TaskV1API, TaskV2API
 from openml.exceptions import OpenMLNotSupportedError
 from openml.tasks import OpenMLClassificationTask, OpenMLSplit, TaskType
+from openml.tasks.functions import _get_estimation_procedure_list
 
 CLASSIFICATION_TASK_ID = 1
 REGRESSION_TASK_ID = 613
@@ -47,11 +48,17 @@ def test_v1_get(task_v1):
 
 @pytest.mark.test_server
 def test_v1_list(task_v1):
-    tasks_df = task_v1.list(limit=5, offset=0, task_type=TaskType.SUPERVISED_REGRESSION)
+    tasks_df = task_v1.list(
+        limit=5,
+        offset=0,
+        task_type=TaskType.SUPERVISED_REGRESSION,
+        estimation_procedures=_get_estimation_procedure_list(),
+    )
     assert isinstance(tasks_df, pd.DataFrame)
     assert len(tasks_df) == 5
     assert (tasks_df["ttid"] == TaskType.SUPERVISED_REGRESSION).all()
-    assert tasks_df["estimation_procedure"].notna().all()
+    names = {procedure["name"] for procedure in _get_estimation_procedure_list()}
+    assert set(tasks_df["estimation_procedure"]) <= names
 
 
 @pytest.mark.test_server
@@ -80,7 +87,7 @@ def test_v2_get(task_v2):
 
 def test_v2_list(task_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        task_v2.list(limit=5, offset=0)
+        task_v2.list(limit=5, offset=0, estimation_procedures=[])
 
 
 @pytest.mark.test_server

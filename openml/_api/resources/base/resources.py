@@ -172,6 +172,8 @@ class TaskAPI(ResourceAPI):
         limit: int,
         offset: int,
         task_type: TaskType | int | None = None,
+        *,
+        estimation_procedures: builtins.list[dict[str, Any]],
         **kwargs: Any,
     ) -> pd.DataFrame:
         """

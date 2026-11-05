@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import xmltodict
 
-from openml.tasks.functions import _get_estimation_procedure_list
 from openml.tasks.task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
@@ -19,6 +18,7 @@ from openml.tasks.task import (
 from .base import ResourceV1API, ResourceV2API, TaskAPI
 
 if TYPE_CHECKING:
+    import builtins
     from pathlib import Path
 
 
@@ -62,6 +62,8 @@ class TaskV1API(ResourceV1API, TaskAPI):
         limit: int,
         offset: int,
         task_type: TaskType | int | None = None,
+        *,
+        estimation_procedures: builtins.list[dict[str, Any]],
         **kwargs: Any,
     ) -> pd.DataFrame:
         """
@@ -76,6 +78,9 @@ class TaskV1API(ResourceV1API, TaskAPI):
         offset: int
         task_type : TaskType, optional
             Refers to the type of task.
+        estimation_procedures : list of dict
+            All estimation procedures on OpenML, used to resolve the procedure
+            ids returned by the listing into names.
         kwargs: dict, optional
             Legal filter operators: tag, task_id (list), data_tag, status, limit,
             offset, data_id, data_name, number_instances, number_features,
@@ -86,15 +91,21 @@ class TaskV1API(ResourceV1API, TaskAPI):
         dataframe
         """
         api_call = self._build_url(limit, offset, task_type, kwargs)
-        return self._parse_list_xml(api_call=api_call)
+        return self._parse_list_xml(api_call, estimation_procedures)
 
-    def _parse_list_xml(self, api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
+    def _parse_list_xml(  # noqa: C901, PLR0912
+        self,
+        api_call: str,
+        estimation_procedures: builtins.list[dict[str, Any]],
+    ) -> pd.DataFrame:
         """Returns a Pandas DataFrame with information about OpenML tasks.
 
         Parameters
         ----------
         api_call : str
             The API call specifying which tasks to return.
+        estimation_procedures : list of dict
+            All estimation procedures on OpenML.
 
         Returns
         -------
@@ -130,8 +141,7 @@ class TaskV1API(ResourceV1API, TaskAPI):
         assert isinstance(tasks_dict["oml:tasks"]["oml:task"], list), type(tasks_dict["oml:tasks"])
 
         tasks = {}
-        procs = _get_estimation_procedure_list()
-        proc_dict = {x["id"]: x for x in procs}
+        proc_dict = {x["id"]: x for x in estimation_procedures}
 
         for task_ in tasks_dict["oml:tasks"]["oml:task"]:
             tid = None
@@ -317,6 +327,8 @@ class TaskV2API(ResourceV2API, TaskAPI):
         limit: int,  # noqa: ARG002
         offset: int,  # noqa: ARG002
         task_type: TaskType | int | None = None,  # noqa: ARG002
+        *,
+        estimation_procedures: builtins.list[dict[str, Any]],  # noqa: ARG002
         **kwargs: Any,  # noqa: ARG002
     ) -> pd.DataFrame:
         raise self._not_supported(method="list")
