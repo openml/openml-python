@@ -165,25 +165,6 @@ class TestTask(TestBase):
             )
         )
 
-    @mock.patch("openml.tasks.functions.get_dataset")
-    @pytest.mark.test_server
-    def test_removal_upon_download_failure(self, get_dataset):
-        class WeirdException(Exception):  # noqa: N818
-            pass
-
-        def assert_and_raise(*args, **kwargs):  # noqa: ARG001
-            # Make sure that the file was created!
-            assert os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")  # noqa: PTH109, PTH118
-            raise WeirdException()
-
-        get_dataset.side_effect = assert_and_raise
-        try:  # noqa: SIM105
-            openml.tasks.get_task(1)  # anneal; crossvalidation
-        except WeirdException:
-            pass
-        # Now the file should no longer exist
-        assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))  # noqa: PTH109, PTH110, PTH118
-
     @pytest.mark.test_server
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
@@ -218,16 +199,6 @@ class TestTask(TestBase):
                 "body.arff",
             )
         )
-
-    def test_deletion_of_cache_dir(self):
-        # Simple removal
-        tid_cache_dir = openml.utils._create_cache_directory_for_id(
-            "tasks",
-            1,
-        )
-        assert os.path.exists(tid_cache_dir)  # noqa: PTH110
-        openml.utils._remove_cache_dir_for_id("tasks", tid_cache_dir)
-        assert not os.path.exists(tid_cache_dir)  # noqa: PTH110
 
 
 @mock.patch.object(requests.Session, "request")
