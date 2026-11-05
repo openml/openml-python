@@ -165,11 +165,6 @@ class TaskAPI(ResourceAPI):
         """Download a task's split file and return its path in the cache."""
         ...
 
-    @abstractmethod
-    def supports_download_splits(self) -> bool:
-        """Return whether the task API implementation supports split downloads."""
-        ...
-
     # Task listing (V1 only)
     @abstractmethod
     def list(

@@ -164,9 +164,6 @@ class TaskV1API(ResourceV1API, TaskAPI):
         self._http.get(url, enable_cache=True, refresh_cache=refresh_cache)
         return self._http.cache_path_from_url(url)
 
-    def supports_download_splits(self) -> bool:
-        return True
-
     def list(
         self,
         limit: int,
@@ -385,6 +382,3 @@ class TaskV2API(ResourceV2API, TaskAPI):
         """
         self._http.get(url, enable_cache=True, refresh_cache=refresh_cache)
         return self._http.cache_path_from_url(url)
-
-    def supports_download_splits(self) -> bool:
-        return False
