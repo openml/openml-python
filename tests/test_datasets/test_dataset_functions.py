@@ -547,10 +547,18 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.test_server
     def test_data_status(self):
         arff_file_path = (
-            self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+            self.static_cache_dir
+            / "org"
+            / "openml"
+            / "test"
+            / "data"
+            / "download"
+            / "1666876"
+            / "phpFsFYVN"
+            / "body.arff"
         )
         dataset = OpenMLDataset(
-            "anneal",
+            f"TEST-{time.time()!s}-UploadTestWithFile",
             "test",
             data_format="arff",
             version=1,
@@ -558,6 +566,7 @@ class TestOpenMLDataset(TestBase):
             default_target_attribute="class",
             data_file=arff_file_path,
         )
+        dataset.publish()
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
