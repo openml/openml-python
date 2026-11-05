@@ -558,7 +558,7 @@ class TestOpenMLDataset(TestBase):
             / "body.arff"
         )
         dataset = OpenMLDataset(
-            f"TEST-{time.time()!s}-UploadTestWithURL",
+            f"TEST-{time.time()!s}-UploadTestWithFile",
             "test",
             data_format="arff",
             version=1,

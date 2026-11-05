@@ -140,7 +140,7 @@ def test_v1_status_update(dataset_v1, static_cache_dir):
         / "body.arff"
     )
     new_dataset = OpenMLDataset(
-        f"TEST-{time.time()!s}-UploadTestWithURL",
+        f"TEST-{time.time()!s}-UploadTestWithFile",
         "test",
         data_format="arff",
         version=1,
