@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -15,6 +16,17 @@ from openml.exceptions import (
 )
 from openml.tasks import TaskType
 from openml.testing import TestBase, create_request_response
+
+
+def _cached_split_path(task_id: int) -> Path:
+    return Path(
+        openml.config.get_cache_directory(),
+        "api_splits",
+        "get",
+        str(task_id),
+        f"Task_{task_id}_splits.arff",
+        "body.arff",
+    )
 
 
 class TestTask(TestBase):
@@ -153,22 +165,17 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")  # noqa: PTH118
         )
 
+        assert not _cached_split_path(2).exists()
         task.download_split()
-        assert os.path.exists(  # noqa: PTH110
-            os.path.join(  # noqa: PTH118
-                openml.config.get_cache_directory(),
-                "api_splits",
-                "get",
-                "2",
-                "Task_2_splits.arff",
-                "body.arff",
-            )
-        )
+        assert _cached_split_path(2).exists()
 
     @pytest.mark.test_server
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        with mock.patch("requests.sessions.Session.request") as mock_request:
+        with (
+            mock.patch("openml.tasks.functions.get_dataset"),
+            mock.patch("requests.sessions.Session.request") as mock_request,
+        ):
             task = openml.tasks.get_task(1)
             mock_request.assert_not_called()
 
@@ -189,16 +196,32 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
         assert type(split) == OpenMLSplit  # noqa: E721
-        assert os.path.exists(  # noqa: PTH110
-            os.path.join(  # noqa: PTH118
-                openml.config.get_cache_directory(),
-                "api_splits",
-                "get",
-                "1",
-                "Task_1_splits.arff",
-                "body.arff",
-            )
+        assert _cached_split_path(1).exists()
+
+    @pytest.mark.test_server
+    def test_download_split_replaces_corrupted_file(self):
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
+        expected = task.download_split()
+
+        split_file = _cached_split_path(1)
+        split_file.with_suffix(".pkl.py3").unlink()
+        split_file.write_text(
+            "@relation corrupted\n"
+            "@attribute type {TRAIN,TEST}\n"
+            "@attribute rowid INTEGER\n"
+            "@attribute repeat INTEGER\n"
+            "@attribute fold INTEGER\n"
+            "@data\n"
+            "TRAIN,1\n"
         )
+
+        assert task.download_split() == expected
+        assert "corrupted" not in split_file.read_text()
+
+    @pytest.mark.test_server
+    def test_get_task_with_download_splits(self):
+        openml.tasks.get_task(1, download_splits=True)
+        assert _cached_split_path(1).exists()
 
 
 @mock.patch.object(requests.Session, "request")
