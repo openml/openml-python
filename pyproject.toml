@@ -356,6 +356,7 @@ module = [
   "tests.test_api.test_evaluation_measure",
   "tests.test_api.test_flow",
   "tests.test_api.test_http",
+  "tests.test_api.test_minio",
   "tests.test_api.test_run",
   "tests.test_api.test_setup",
   "tests.test_api.test_study",

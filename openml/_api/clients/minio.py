@@ -13,6 +13,46 @@ from urllib3 import ProxyManager
 import openml
 from openml.utils import ProgressBar
 
+_MOUNTS = frozenset({"minio", "s3"})
+
+
+def _parse_s3_url(
+    url: str,
+) -> tuple[str, str, str]:
+    """Split object storage URL into endpoint, bucket, and key.
+
+    Handle prefixes before bucket names.
+
+    Parameters
+    ----------
+    url : str
+        URL of an object in an S3 bucket, for example:
+        ``http://localhost:8000/s3/datasets/0000/0061/dataset_61.pq``
+
+    Returns
+    -------
+    tuple[str, str, str]
+        Endpoint URL, bucket name, object key.
+    """
+    # Parse the URL into sections
+    parsed_url = urllib.parse.urlparse(url)
+    parts = [part for part in parsed_url.path.split("/") if part]
+    if len(parts) < 2:  # Bucket and key minimum
+        raise ValueError(f"Object storage URL must contain a bucket and object key: {url!r}")
+
+    # Handle the endpoint
+    endpoint = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    if parts[0] in _MOUNTS:  # URL has mount in first index
+        endpoint += f"/{parts.pop(0)}"
+
+    # Handle the bucket and object key
+    bucket = parts[0]
+    key = "/".join(parts[1:])
+    if not key:
+        raise ValueError(f"Object storage URL must contain an object key: {url!r}.")
+
+    return endpoint, bucket, key
+
 
 class MinIOClient:
     """
