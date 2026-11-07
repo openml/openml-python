@@ -5,10 +5,17 @@ import shutil
 import urllib
 import zipfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+import boto3
 import minio
 import requests
+from botocore import UNSIGNED
+from botocore.config import Config
 from urllib3 import ProxyManager
+
+if TYPE_CHECKING:
+    from botocore.client import BaseClient
 
 import openml
 from openml.utils import ProgressBar
@@ -17,28 +24,35 @@ _MOUNTS = frozenset({"minio", "s3"})
 
 
 def _parse_s3_url(
-    url: str,
+    source: str,
 ) -> tuple[str, str, str]:
-    """Split object storage URL into endpoint, bucket, and key.
+    """Split an object storage URL into endpoint, bucket, and key.
 
-    Handle prefixes before bucket names.
+    The optional mount prefix (``/s3`` or ``/minio``) is kept on the
+    endpoint URL so path-style S3 requests still go through the reverse
+    proxy. Production URLs have no mount prefix.
 
     Parameters
     ----------
-    url : str
-        URL of an object in an S3 bucket, for example:
+    source : str
+        URL to a file in an S3 bucket, for example:
         ``http://localhost:8000/s3/datasets/0000/0061/dataset_61.pq``
 
     Returns
     -------
     tuple[str, str, str]
         Endpoint URL, bucket name, object key.
+
+    Raises
+    ------
+    ValueError
+        If the URL does not contain both a bucket and an object key.
     """
     # Parse the URL into sections
-    parsed_url = urllib.parse.urlparse(url)
+    parsed_url = urllib.parse.urlparse(source)
     parts = [part for part in parsed_url.path.split("/") if part]
     if len(parts) < 2:  # Bucket and key minimum
-        raise ValueError(f"Object storage URL must contain a bucket and object key: {url!r}")
+        raise ValueError(f"Object storage URL must contain a bucket and object key: {source!r}")
 
     # Handle the endpoint
     endpoint = f"{parsed_url.scheme}://{parsed_url.netloc}"
@@ -49,9 +63,43 @@ def _parse_s3_url(
     bucket = parts[0]
     key = "/".join(parts[1:])
     if not key:
-        raise ValueError(f"Object storage URL must contain an object key: {url!r}.")
+        raise ValueError(f"Object storage URL must contain an object key: {source!r}.")
 
     return endpoint, bucket, key
+
+
+def _make_s3_client(
+    endpoint_url: str,
+    proxy: str | None = None,
+) -> BaseClient:
+    """Create an anonymous S3 client for a public object-storage endpoint.
+
+    Parameters
+    ----------
+    endpoint_url : str
+        Endpoint URL, including any reverse-proxy mount prefix.
+    proxy : str or None, optional (default=None)
+        Proxy URL used for both HTTP and HTTPS requests. ``None`` means
+        a direct connection.
+
+    Returns
+    -------
+    botocore.client.BaseClient
+        Configured S3 client.
+    """
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+    config = Config(
+        signature_version=UNSIGNED,  # Public bucket
+        s3={"addressing_style": "path"},  # URL = endpoint/bucket/key for example
+        proxies=proxies,  # Optional HTTP proxy
+    )
+
+    return boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        region_name="eu-central-1",
+        config=config,
+    )
 
 
 class MinIOClient:
