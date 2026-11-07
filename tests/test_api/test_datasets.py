@@ -126,14 +126,27 @@ def test_v1_get_qualities(dataset_v1):
     reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
 )
 @pytest.mark.test_server
-def test_v1_status_update(dataset_v1):
+def test_v1_status_update(dataset_v1, static_cache_dir):
     openml.config.apikey = TestBase.admin_key
+    arff_file_path = (
+        static_cache_dir
+        / "org"
+        / "openml"
+        / "test"
+        / "data"
+        / "download"
+        / "1666876"
+        / "phpFsFYVN"
+        / "body.arff"
+    )
     new_dataset = OpenMLDataset(
-        f"TEST-{time.time()!s}-UploadTestWithURL",
+        f"TEST-{time.time()!s}-UploadTestWithFile",
         "test",
-        "ARFF",
+        data_format="arff",
         version=1,
-        url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+        licence="public",
+        default_target_attribute="class",
+        data_file=arff_file_path,
     )
     new_dataset.publish()
     _status_update_check(dataset_v1, new_dataset.dataset_id, "deactivated")
