@@ -9,7 +9,6 @@ import sklearn.tree
 
 import openml
 
-
 # %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
@@ -48,7 +47,7 @@ print(flow_id)
 # %% [markdown]
 # ## 2. Obtaining a flow given its name
 # The schema of a flow is given in XSD (
-# [here](https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd)).  # noqa E501
+# [here](https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd)).
 # Only two fields are required, a unique name, and an external version. While it should be pretty
 # obvious why we need a name, the need for the additional external version information might not
 # be immediately clear. However, this information is very important as it allows to have multiple

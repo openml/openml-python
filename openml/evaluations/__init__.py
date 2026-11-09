@@ -5,7 +5,7 @@ from .functions import list_evaluation_measures, list_evaluations, list_evaluati
 
 __all__ = [
     "OpenMLEvaluation",
-    "list_evaluations",
     "list_evaluation_measures",
+    "list_evaluations",
     "list_evaluations_setups",
 ]

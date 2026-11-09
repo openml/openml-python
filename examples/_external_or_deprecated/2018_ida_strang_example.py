@@ -17,8 +17,8 @@ Publication
 # License: BSD 3-Clause
 
 import matplotlib.pyplot as plt
+
 import openml
-import pandas as pd
 
 ##############################################################################
 # A basic step for each data-mining or machine learning task is to determine
@@ -86,10 +86,9 @@ plt.show()
 def determine_class(val_lin, val_nonlin):
     if val_lin < val_nonlin:
         return class_values[0]
-    elif val_nonlin < val_lin:
+    if val_nonlin < val_lin:
         return class_values[1]
-    else:
-        return class_values[2]
+    return class_values[2]
 
 
 evaluations["class"] = evaluations.apply(

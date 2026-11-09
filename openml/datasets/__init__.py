@@ -17,17 +17,17 @@ from .functions import (
 )
 
 __all__ = [
+    "OpenMLDataFeature",
+    "OpenMLDataset",
     "attributes_arff_from_df",
     "check_datasets_active",
     "create_dataset",
+    "delete_dataset",
+    "edit_dataset",
+    "fork_dataset",
     "get_dataset",
     "get_datasets",
     "list_datasets",
-    "OpenMLDataset",
-    "OpenMLDataFeature",
-    "status_update",
     "list_qualities",
-    "edit_dataset",
-    "fork_dataset",
-    "delete_dataset",
+    "status_update",
 ]

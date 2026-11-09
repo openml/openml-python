@@ -14,20 +14,21 @@ from .test_task import OpenMLTaskTest
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
     __test__ = True
 
-    def setUp(self, n_levels: int = 1):
+    def setUp(self, n_levels: int = 1):  # noqa: ARG002
         super().setUp()
         self.task_id = 146714
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
-    @pytest.mark.production()
+    @pytest.mark.production_server
     def test_get_dataset(self):
         # no clustering tasks on test server
         self.use_production_server()
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
-    @pytest.mark.production()
+    @pytest.mark.production_server
+    @pytest.mark.test_server
     def test_download_task(self):
         # no clustering tasks on test server
         self.use_production_server()
@@ -36,6 +37,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         assert task.task_type_id == TaskType.CLUSTERING
         assert task.dataset_id == 36
 
+    @pytest.mark.test_server
     def test_upload_task(self):
         compatible_datasets = self._get_compatible_rand_dataset()
         for i in range(100):
@@ -57,11 +59,10 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
             except OpenMLServerException as e:
                 # Error code for 'task already exists'
                 # Should be 533 according to the docs
-                # (# https://www.openml.org/api_docs#!/task/post_task)
+                # (https://www.openml.org/api_docs#!/task/post_task)
                 if e.code == 614:
                     continue
-                else:
-                    raise e
+                raise e
         else:
             raise ValueError(
                 f"Could not create a valid task for task type ID {self.task_type}",

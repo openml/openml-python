@@ -22,7 +22,7 @@ class OpenMLServerException(OpenMLServerError):  # noqa: N818
     """
 
     # Code needs to be optional to allow the exception to be picklable:
-    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
+    # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable
     def __init__(self, message: str, code: int | None = None, url: str | None = None):
         self.message = message
         self.code = code
@@ -63,5 +63,32 @@ class OpenMLNotAuthorizedError(OpenMLServerError):
     """Indicates an authenticated user is not authorized to execute the requested action."""
 
 
+class OpenMLAuthenticationError(OpenMLServerError):
+    """Exception raised when API authentication fails.
+
+    This typically occurs when:
+    - No API key is configured
+    - The API key is invalid or expired
+    - The API key format is incorrect
+
+    This is different from authorization (OpenMLNotAuthorizedError), which occurs
+    when a valid API key lacks permissions for the requested operation.
+    """
+
+    def __init__(self, message: str):
+        help_text = (
+            "\n\nTo fix this:\n"
+            "1. Get your API key from https://www.openml.org/\n"
+            "   (you'll need to register for a free account if you don't have one)\n"
+            "2. Configure your API key by following the authentication guide:\n"
+            "   https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+        )
+        super().__init__(message + help_text)
+
+
 class ObjectNotPublishedError(PyOpenMLError):
     """Indicates an object has not been published yet."""
+
+
+class OpenMLNotSupportedError(PyOpenMLError):
+    """Raised when an API operation is not supported for a resource/version."""
