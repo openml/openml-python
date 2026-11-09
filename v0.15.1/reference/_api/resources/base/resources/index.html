@@ -2189,6 +2189,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#openml._api.resources.base.resources.TaskAPI.download_split" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;download_split
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openml._api.resources.base.resources.TaskAPI.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openml._api.resources.base.resources.TaskAPI.list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#openml._api.resources.base.resources.TaskAPI.publish" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9281,6 +9314,200 @@ depends on the resource type.</p>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    -----</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    Concrete subclasses must implement this method.</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    """</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.base.resources.TaskAPI.download_split" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">download_split</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#openml._api.resources.base.resources.TaskAPI.download_split" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">download_split</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh_cache</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pathlib.Path">Path</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Download a task's split file and return its path in the cache.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/base/resources.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-163">163</a></span>
+<span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">refresh_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="w">    </span><span class="sd">"""Download a task's split file and return its path in the cache."""</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a>    <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.base.resources.TaskAPI.get" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#openml._api.resources.base.resources.TaskAPI.get" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            OpenMLTask (openml.tasks.task.OpenMLTask)" href="../../../../tasks/task/#openml.tasks.task.OpenMLTask">OpenMLTask</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>API v1:
+    GET /task/{task_id}</p>
+<p>API v2:
+    GET /tasks/{task_id}</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/base/resources.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-149">149</a></span>
+<span class="normal"><a href="#__codelineno-0-150">150</a></span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span>
+<span class="normal"><a href="#__codelineno-0-152">152</a></span>
+<span class="normal"><a href="#__codelineno-0-153">153</a></span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span>
+<span class="normal"><a href="#__codelineno-0-161">161</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLTask</span><span class="p">:</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    API v1:</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        GET /task/{task_id}</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    API v2:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        GET /tasks/{task_id}</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    """</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a>    <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.base.resources.TaskAPI.list" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#openml._api.resources.base.resources.TaskAPI.list" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">list</span><span class="p">(</span><span class="n">limit</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">task_type</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TaskType (openml.tasks.task.TaskType)" href="../../../../tasks/task/#openml.tasks.task.TaskType">TaskType</a></span> <span class="o">|</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">estimation_procedures</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pandas.DataFrame">DataFrame</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>List tasks with filters.</p>
+<p>API v1:
+    GET /task/list</p>
+<p>API v2:
+    Not available.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="pandas.DataFrame">DataFrame</span></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/base/resources.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
+<span class="normal"><a href="#__codelineno-0-170">170</a></span>
+<span class="normal"><a href="#__codelineno-0-171">171</a></span>
+<span class="normal"><a href="#__codelineno-0-172">172</a></span>
+<span class="normal"><a href="#__codelineno-0-173">173</a></span>
+<span class="normal"><a href="#__codelineno-0-174">174</a></span>
+<span class="normal"><a href="#__codelineno-0-175">175</a></span>
+<span class="normal"><a href="#__codelineno-0-176">176</a></span>
+<span class="normal"><a href="#__codelineno-0-177">177</a></span>
+<span class="normal"><a href="#__codelineno-0-178">178</a></span>
+<span class="normal"><a href="#__codelineno-0-179">179</a></span>
+<span class="normal"><a href="#__codelineno-0-180">180</a></span>
+<span class="normal"><a href="#__codelineno-0-181">181</a></span>
+<span class="normal"><a href="#__codelineno-0-182">182</a></span>
+<span class="normal"><a href="#__codelineno-0-183">183</a></span>
+<span class="normal"><a href="#__codelineno-0-184">184</a></span>
+<span class="normal"><a href="#__codelineno-0-185">185</a></span>
+<span class="normal"><a href="#__codelineno-0-186">186</a></span>
+<span class="normal"><a href="#__codelineno-0-187">187</a></span>
+<span class="normal"><a href="#__codelineno-0-188">188</a></span>
+<span class="normal"><a href="#__codelineno-0-189">189</a></span>
+<span class="normal"><a href="#__codelineno-0-190">190</a></span>
+<span class="normal"><a href="#__codelineno-0-191">191</a></span>
+<span class="normal"><a href="#__codelineno-0-192">192</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="nd">@abstractmethod</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a>    <span class="n">estimation_procedures</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    List tasks with filters.</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    API v1:</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        GET /task/list</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    API v2:</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        Not available.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    pandas.DataFrame</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">    """</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="o">...</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
