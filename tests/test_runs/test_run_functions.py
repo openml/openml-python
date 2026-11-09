@@ -350,7 +350,9 @@ class TestRun(TestBase):
             assert run.trace.run_id == run.run_id
             assert run.trace.trace_iterations is not None
             for trace_iteration in run.trace.trace_iterations.values():
-                assert (trace_iteration.setup_string is not None) != (trace_iteration.parameters is not None)
+                assert (trace_iteration.setup_string is not None) != (
+                    trace_iteration.parameters is not None
+                )
 
             run.trace.trace_to_arff()
             assert isinstance(run.trace, dict)
@@ -405,11 +407,11 @@ class TestRun(TestBase):
         # so that the two objects can actually be compared):
         # downloaded_run_trace = downloaded._generate_trace_arff_dict()
         # self.assertEqual(run_trace, downloaded_run_trace)
-        
+
         downloaded_run_trace = downloaded.trace
         assert downloaded_run_trace is not None
         assert run.trace is not None
-        self.assertEqual(run.trace, downloaded_run_trace)
+        assert run.trace == downloaded_run_trace
 
         return run
 
