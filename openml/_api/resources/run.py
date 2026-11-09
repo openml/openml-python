@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
@@ -12,6 +11,8 @@ from openml._api.resources.base import ResourceV1API, ResourceV2API, RunAPI
 from openml.tasks.task import TaskType
 
 if TYPE_CHECKING:
+    import builtins
+
     from openml.runs.run import OpenMLRun
 
 

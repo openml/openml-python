@@ -196,7 +196,7 @@ def _prepare_run_environment(flow: OpenMLFlow) -> tuple[list[str], list[str]]:
     return tags, run_environment
 
 
-def _create_run_from_results(  # noqa: PLR0913
+def _create_run_from_results(  # noqa: PLR0913,PLR0917
     task: OpenMLTask,
     flow: OpenMLFlow,
     flow_id: int | None,
@@ -281,7 +281,7 @@ def _create_run_from_results(  # noqa: PLR0913
 
 # TODO(eddiebergman): Could potentially overload this but
 # it seems very big to do so
-def run_model_on_task(  # noqa: PLR0913
+def run_model_on_task(  # noqa: PLR0913,PLR0917
     model: Any,
     task: int | str | OpenMLTask,
     avoid_duplicate_runs: bool | None = None,
@@ -409,7 +409,7 @@ def run_model_on_task(  # noqa: PLR0913
     return run
 
 
-def run_flow_on_task(  # noqa: PLR0913
+def run_flow_on_task(  # noqa: PLR0913,PLR0917
     flow: OpenMLFlow,
     task: OpenMLTask,
     avoid_duplicate_runs: bool | None = None,
@@ -876,7 +876,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     )
 
 
-def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
+def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913,PLR0917
     extension: Extension,
     fold_no: int,
     model: Any,
@@ -1205,7 +1205,7 @@ def _create_run_from_xml(  # noqa: PLR0915, PLR0912, C901
     )
 
 
-def list_runs(  # noqa: PLR0913
+def list_runs(  # noqa: PLR0913,PLR0917
     offset: int | None = None,
     size: int | None = None,
     id: list | None = None,  # noqa: A002
@@ -1283,7 +1283,7 @@ def list_runs(  # noqa: PLR0913
     return pd.concat(batches)
 
 
-def format_prediction(  # noqa: PLR0913
+def format_prediction(  # noqa: PLR0913,PLR0917
     task: OpenMLSupervisedTask,
     repeat: int,
     fold: int,

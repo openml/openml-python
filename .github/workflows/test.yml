@@ -7,14 +7,12 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - "v*.*.*"
 
   pull_request:
     branches:
       - main
-      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -77,12 +75,12 @@ jobs:
             code-cov: true
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 2
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -115,7 +113,9 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       id: clone-services
       run: |
-        git clone --depth 1 https://github.com/openml/services.git
+        # 2026-11-05: Services switched to SeaweedFS and the MinIO client cannot handle the new URLs.
+        # We use the old stack until we have migrated away from the MinIO client
+        git clone --revision dd8b98a9e0450bf487f973e1711c8b00dc022294 --depth 1 https://github.com/openml/services.git
 
     - name: Start Docker Services
       id: start-services
@@ -124,14 +124,7 @@ jobs:
       run: |
         chmod -R a+rw ./data
         chmod -R a+rw ./logs
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
-
-        echo "Waiting for PHP API to boot..."
-        timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
-
-        echo "Final Verification: Gateway Connectivity..."
-        curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
-
+        docker compose --profile "client-ci" up --quiet-pull --wait
         docker container ls
 
     - name: Show installed dependencies
@@ -182,10 +175,11 @@ jobs:
 
     - name: Upload coverage
       if: matrix.code-cov && always()
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v7
       with:
         files: coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
+        cleanup: true
         fail_ci_if_error: true
         verbose: true
 
@@ -198,7 +192,7 @@ jobs:
       if: always() && steps.clone-services.outcome == 'success'
       working-directory: ./services
       run: |
-        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        docker compose --profile "client-ci" down -v
         cd ..
         sudo rm -rf services
 
@@ -213,30 +207,3 @@ jobs:
             echo "Not all generated files have been deleted!"
             exit 1
         fi
-
-  dummy_windows_py_sk024:
-    name: (windows-latest, Py, sk0.24.*, sk-only:false)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy job."
-          echo "Always succeeds."
-
-  dummy_windows_py_sk023:
-    name: (ubuntu-latest, Py3.8, sk0.23.1, sk-only:false)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy job."
-          echo "Always succeeds."
-
-  dummy_docker:
-    name: docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dummy step
-        run: |
-          echo "This is a temporary dummy docker job."
-          echo "Always succeeds."

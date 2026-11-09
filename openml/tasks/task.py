@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import warnings
 from abc import ABC
-from collections.abc import Sequence
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
@@ -19,6 +18,8 @@ from openml.utils import _create_cache_directory_for_id
 from .split import OpenMLSplit
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import numpy as np
     import pandas as pd
 
@@ -75,7 +76,7 @@ class OpenMLTask(OpenMLBase):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_id: int | None,
         task_type_id: TaskType,
@@ -271,7 +272,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -379,7 +380,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         task_type_id: TaskType,
         task_type: str,

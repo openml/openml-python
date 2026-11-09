@@ -6,7 +6,7 @@ import re
 import shutil
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Iterable, Mapping, Sequence, Sized
+from collections.abc import Callable, Mapping, Sized
 from functools import wraps
 from pathlib import Path
 from typing import (
@@ -29,6 +29,8 @@ import openml.exceptions
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence, Sized
+
     from openml.base import OpenMLBase
 
     P = ParamSpec("P")
