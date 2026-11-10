@@ -12,7 +12,7 @@
 # For certain functionality, such as uploading tasks or datasets, users have to
 # sign up. Only accessing the data on OpenML does not require an account!
 #
-# If you don’t have an account yet, sign up now.
+# If you don't have an account yet, sign up now.
 # You will receive an API key, which will authenticate you to the server
 # and allow you to download and upload datasets, tasks, runs and flows.
 #

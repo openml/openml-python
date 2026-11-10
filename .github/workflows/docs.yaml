@@ -5,14 +5,12 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - "v*.*.*"
 
   pull_request:
     branches:
       - main
-      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -22,13 +20,13 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.8
+          python-version: "3.10"
       - name: Install dependencies
         run: |
           pip install -e .[docs,examples]
@@ -40,7 +38,7 @@ jobs:
           CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAGES_BRANCH: gh-pages
-        if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
+        if: contains(github.ref, 'main') && github.event_name == 'push'
         run: |
           git config user.name doc-bot
           git config user.email doc-bot@openml.com

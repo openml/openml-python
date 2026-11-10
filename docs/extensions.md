@@ -27,11 +27,11 @@ to upload it. However, in order to simplify the process of uploading
 flows and runs from a specific library, an additional interface can be
 built. The OpenML-Python team does not have the capacity to develop and
 maintain such interfaces on its own. For this reason, we have built an
-extension interface to allows others to contribute back. Building a
-suitable extension for therefore requires an understanding of the
+extension interface to allow others to contribute back. Building a
+suitable extension therefore requires an understanding of the
 current OpenML-Python support.
 
-[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn 
+[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn
 extension works with OpenML-Python.
 
 #### API
@@ -52,7 +52,7 @@ must be called to allow OpenML-Python to interface the new extension.
 
 The following methods should get implemented. Although the documentation
 in the extension interface should always be leading, here
-we list some additional information and best practices. 
+we list some additional information and best practices.
 Note that most methods are relatively simple
 and can be implemented in several lines of code.
 
@@ -65,8 +65,8 @@ and can be implemented in several lines of code.
         Typically, the flow-dependency field is used to check whether
         the specific library is present, and no unknown libraries are
         present there.
-    -   `can_handle_model`: Similar as
-        `can_handle_flow`:, except that in
+    -   `can_handle_model`: Similar to
+        `can_handle_flow`, except that in
         this case a Python object is given. As such, in many cases, this
         method can be implemented by checking whether this adheres to a
         certain base class.
@@ -135,10 +135,10 @@ and can be implemented in several lines of code.
 ### Hosting the library
 
 Each extension created should be a stand-alone repository, compatible
-with the [OpenML-Python repository](https://github.com/openml/openml-python). 
+with the [OpenML-Python repository](https://github.com/openml/openml-python).
 The extension repository should work off-the-shelf with *OpenML-Python* installed.
 
-Create a public Github repo with the following directory structure:
+Create a public GitHub repo with the following directory structure:
 
     | [repo name]
     |    |-- [extension name]
@@ -149,7 +149,7 @@ Create a public Github repo with the following directory structure:
 ### Recommended
 
 -   Test cases to keep the extension up to date with the
-    Openml-Python upstream changes.
+    OpenML-Python upstream changes.
 -   Documentation of the extension API, especially if any new
     functionality added to OpenML-Python\'s extension design.
 -   Examples to show how the new extension interfaces and works with

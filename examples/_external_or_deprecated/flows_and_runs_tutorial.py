@@ -3,8 +3,7 @@
 # This tutorial covers how to train/run a model and how to upload the results.
 
 # %%
-import openml
-from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
+from sklearn import compose, ensemble, impute, neighbors, pipeline, preprocessing, tree
 
 import openml
 

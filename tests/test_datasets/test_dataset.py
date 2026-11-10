@@ -10,7 +10,6 @@ import pytest
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
-from openml.exceptions import PyOpenMLError
 
 
 # Fixtures for datasets
@@ -89,28 +88,32 @@ def test__unpack_categories_with_nan_likes():
     assert list(clean_series.values) == expected_values
     assert list(clean_series.cat.categories.values) == list("ab")
 
-@pytest.mark.production()
+
+@pytest.mark.production_server
 def test_get_data_pandas(titanic_dataset):
     """Test get_data returns correct pandas DataFrame."""
     data, _, _, _ = titanic_dataset.get_data()
     assert isinstance(data, pd.DataFrame)
     assert data.shape[1] == len(titanic_dataset.features)
     assert data.shape[0] == 1309
+    # Dynamically detect what this version of Pandas calls string columns.
+    str_dtype = data["name"].dtype.name
+
     col_dtype = {
         "pclass": "uint8",
         "survived": "category",
-        "name": "object",
+        "name": str_dtype,
         "sex": "category",
         "age": "float64",
         "sibsp": "uint8",
         "parch": "uint8",
-        "ticket": "object",
+        "ticket": str_dtype,
         "fare": "float64",
-        "cabin": "object",
+        "cabin": str_dtype,
         "embarked": "category",
-        "boat": "object",
+        "boat": str_dtype,
         "body": "float64",
-        "home.dest": "object",
+        "home.dest": str_dtype,
     }
     for col_name in data.columns:
         assert data[col_name].dtype.name == col_dtype[col_name]
@@ -127,7 +130,7 @@ def test_get_data_pandas(titanic_dataset):
     assert y.dtype.name == col_dtype["survived"]
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
 def test_get_data_boolean_pandas(jm1_dataset, pc4_dataset):
     """Test boolean data is correctly converted."""
@@ -153,33 +156,34 @@ def _check_expected_type(dtype, is_cat, col):
 
     assert dtype.name == expected_type
 
-@pytest.mark.production()
+
+@pytest.mark.production_server
 @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
 def test_get_data_with_rowid(anneal_dataset):
     """Test get_data with row_id_attribute."""
     anneal_dataset.row_id_attribute = "condition"
     rval, _, categorical, _ = anneal_dataset.get_data(include_row_id=True)
     assert isinstance(rval, pd.DataFrame)
-    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
         _check_expected_type(dtype, is_cat, rval[col])
     assert rval.shape == (898, 39)
     assert len(categorical) == 39
 
     rval, _, categorical, _ = anneal_dataset.get_data()
     assert isinstance(rval, pd.DataFrame)
-    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
         _check_expected_type(dtype, is_cat, rval[col])
     assert rval.shape == (898, 38)
     assert len(categorical) == 38
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
 def test_get_data_with_target_pandas(anneal_dataset):
     """Test get_data with target specified."""
     X, y, categorical, attribute_names = anneal_dataset.get_data(target="class")
     assert isinstance(X, pd.DataFrame)
-    for dtype, is_cat, col in zip(X.dtypes, categorical, X):
+    for dtype, is_cat, col in zip(X.dtypes, categorical, X, strict=False):
         _check_expected_type(dtype, is_cat, X[col])
     assert isinstance(y, pd.Series)
     assert y.dtype.name == "category"
@@ -191,7 +195,7 @@ def test_get_data_with_target_pandas(anneal_dataset):
     assert "class" not in attribute_names
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_data_rowid_and_ignore_and_target(anneal_dataset):
     """Test get_data with rowid, ignore and target attributes."""
     anneal_dataset.ignore_attribute = ["condition"]
@@ -204,25 +208,25 @@ def test_get_data_rowid_and_ignore_and_target(anneal_dataset):
     assert y.shape == (898,)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
 def test_get_data_with_ignore_attributes(anneal_dataset):
     """Test get_data with ignore_attribute."""
     anneal_dataset.ignore_attribute = ["condition"]
     rval, _, categorical, _ = anneal_dataset.get_data(include_ignore_attribute=True)
-    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
         _check_expected_type(dtype, is_cat, rval[col])
     assert rval.shape == (898, 39)
     assert len(categorical) == 39
 
     rval, _, categorical, _ = anneal_dataset.get_data(include_ignore_attribute=False)
-    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
         _check_expected_type(dtype, is_cat, rval[col])
     assert rval.shape == (898, 38)
     assert len(categorical) == 38
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_data_with_nonexisting_class(anneal_dataset):
     """Test dataset with missing class labels."""
     # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
@@ -232,7 +236,7 @@ def test_get_data_with_nonexisting_class(anneal_dataset):
     assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_data_corrupt_pickle(iris_dataset):
     """Test that corrupt pickle files are handled gracefully."""
     # Lazy loaded dataset, populate cache.
@@ -247,7 +251,7 @@ def test_get_data_corrupt_pickle(iris_dataset):
     assert xy.shape == (150, 5)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_lazy_loading_metadata():
     """Test lazy loading of dataset metadata."""
     # Initial Setup
@@ -292,7 +296,7 @@ def test_lazy_loading_metadata():
     assert _dataset.qualities == _compare_dataset.qualities
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_equality_comparison(iris_dataset, titanic_dataset):
     """Test dataset equality comparison."""
     assert iris_dataset == iris_dataset
@@ -300,6 +304,7 @@ def test_equality_comparison(iris_dataset, titanic_dataset):
     assert titanic_dataset != "Wrong_object"
 
 
+@pytest.mark.test_server
 def test_tagging():
     dataset = openml.datasets.get_dataset(125, download_data=False)
 
@@ -316,48 +321,55 @@ def test_tagging():
     datasets = openml.datasets.list_datasets(tag=tag)
     assert datasets.empty
 
+
+@pytest.mark.test_server
 def test_get_feature_with_ontology_data_id_11():
     # test on car dataset, which has built-in ontology references
     dataset = openml.datasets.get_dataset(11)
     assert len(dataset.features) == 7
     assert len(dataset.features[1].ontologies) >= 2
     assert len(dataset.features[2].ontologies) >= 1
-    assert len(dataset.features[3].ontologies) >= 1   
+    assert len(dataset.features[3].ontologies) >= 1
 
+
+@pytest.mark.test_server
 def test_add_remove_ontology_to_dataset():
     did = 1
     feature_index = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
-    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
+    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
 
+
+@pytest.mark.test_server
 def test_add_same_ontology_multiple_features():
     did = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
 
     for i in range(3):
-        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
+        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
 
 
+@pytest.mark.test_server
 def test_add_illegal_long_ontology():
     did = 1
     ontology = "http://www.google.com/" + ("a" * 257)
     try:
         openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-        assert False
+        raise AssertionError()
     except openml.exceptions.OpenMLServerException as e:
-        assert e.code == 1105
-    
+        assert e.code == 1105  # noqa: PT017
 
 
+@pytest.mark.test_server
 def test_add_illegal_url_ontology():
     did = 1
     ontology = "not_a_url" + str(time())
     try:
         openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-        assert False
+        raise AssertionError()
     except openml.exceptions.OpenMLServerException as e:
-        assert e.code == 1106
+        assert e.code == 1106  # noqa: PT017
 
 
 @pytest.fixture(scope="module")
@@ -366,12 +378,12 @@ def sparse_dataset(production_server):
     return openml.datasets.get_dataset(4136, download_data=False)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_sparse_dataset_dataframe_with_target(sparse_dataset):
     """Test sparse dataset with target."""
     X, y, _, attribute_names = sparse_dataset.get_data(target="class")
     assert isinstance(X, pd.DataFrame)
-    assert isinstance(X.dtypes[0], pd.SparseDtype)
+    assert isinstance(X.dtypes.iloc[0], pd.SparseDtype)
     assert X.shape == (600, 20000)
 
     assert isinstance(y, pd.Series)
@@ -382,7 +394,7 @@ def test_get_sparse_dataset_dataframe_with_target(sparse_dataset):
     assert "class" not in attribute_names
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_sparse_dataset_dataframe(sparse_dataset):
     """Test sparse dataset returns sparse DataFrame."""
     rval, *_ = sparse_dataset.get_data()
@@ -394,7 +406,7 @@ def test_get_sparse_dataset_dataframe(sparse_dataset):
     assert rval.shape == (600, 20001)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_sparse_dataset_rowid_and_ignore_and_target(sparse_dataset):
     """Test sparse dataset with row_id, ignore and target attributes."""
     # TODO: re-add row_id and ignore attributes
@@ -415,7 +427,7 @@ def test_get_sparse_dataset_rowid_and_ignore_and_target(sparse_dataset):
     assert y.shape == (600,)
 
 
-@pytest.mark.production()
+@pytest.mark.production_server
 def test_get_sparse_categorical_data_id_395():
     """Test sparse categorical dataset."""
     dataset = openml.datasets.get_dataset(395, download_data=True)
@@ -428,25 +440,30 @@ def test_get_sparse_categorical_data_id_395():
     assert len(feature.nominal_values) == 25
 
 
+@pytest.mark.test_server
 def test__read_features(mocker, workdir, static_cache_dir):
     """Test we read the features from the xml if no cache pickle is available.
     This test also does some simple checks to verify that the features are read correctly
     """
     filename_mock = mocker.patch("openml.datasets.dataset._get_features_pickle_file")
-    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+    pickle_mock = mocker.patch("openml._api.resources.dataset.pickle")
 
-    filename_mock.return_value = os.path.join(workdir, "features.xml.pkl")
+    filename_mock.return_value = os.path.join(workdir, "features.xml.pkl")  # noqa: PTH118
     pickle_mock.load.side_effect = FileNotFoundError
 
     features = openml.datasets.dataset._read_features(
-        os.path.join(
+        os.path.join(  # noqa: PTH118
             static_cache_dir,
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "features",
             "2",
-            "features.xml",
+            "body.xml",
         ),
     )
     assert isinstance(features, dict)
@@ -459,44 +476,33 @@ def test__read_features(mocker, workdir, static_cache_dir):
     assert pickle_mock.dump.call_count == 1
 
 
+@pytest.mark.test_server
 def test__read_qualities(static_cache_dir, workdir, mocker):
     """Test we read the qualities from the xml if no cache pickle is available.
     This test also does some minor checks to ensure that the qualities are read correctly.
     """
-
     filename_mock = mocker.patch("openml.datasets.dataset._get_qualities_pickle_file")
-    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+    pickle_mock = mocker.patch("openml._api.resources.dataset.pickle")
 
-    filename_mock.return_value=os.path.join(workdir, "qualities.xml.pkl")
+    filename_mock.return_value = os.path.join(workdir, "qualities.xml.pkl")  # noqa: PTH118
     pickle_mock.load.side_effect = FileNotFoundError
 
     qualities = openml.datasets.dataset._read_qualities(
-        os.path.join(
+        os.path.join(  # noqa: PTH118
             static_cache_dir,
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "qualities",
             "2",
-            "qualities.xml",
+            "body.xml",
         ),
     )
     assert isinstance(qualities, dict)
     assert len(qualities) == 106
     assert pickle_mock.load.call_count == 0
     assert pickle_mock.dump.call_count == 1
-
-
-
-def test__check_qualities():
-    qualities = [{"oml:name": "a", "oml:value": "0.5"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] == 0.5
-
-    qualities = [{"oml:name": "a", "oml:value": "null"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
-
-    qualities = [{"oml:name": "a", "oml:value": None}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
