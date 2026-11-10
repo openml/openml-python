@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
+import shutil
 from time import time
 
 import numpy as np
 import pandas as pd
 import pytest
+import requests
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
@@ -14,10 +17,11 @@ from openml.datasets import OpenMLDataFeature, OpenMLDataset
 
 # Fixtures for datasets
 @pytest.fixture(scope="module")
-def production_server():
+def production_server(static_cache_dir):
     """Configure to use production server."""
     original_server = openml.config.server
     openml.config.server = "https://www.openml.org/api/v1/xml"
+    openml.config.set_root_cache_directory(static_cache_dir)
     yield
     openml.config.server = original_server
 
@@ -251,49 +255,55 @@ def test_get_data_corrupt_pickle(iris_dataset):
     assert xy.shape == (150, 5)
 
 
-@pytest.mark.production_server
-def test_lazy_loading_metadata():
+@pytest.mark.test_server
+def test_lazy_loading_metadata(mocker):
     """Test lazy loading of dataset metadata."""
-    # Initial Setup
-    did_cache_dir = openml.utils._create_cache_directory_for_id(
-        openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-        2,
-    )
+    # The test automatically executes with a temporary cache directory,
+    # that means files should be downloaded:
+    spy = mocker.spy(requests.sessions.Session, "request")
     _compare_dataset = openml.datasets.get_dataset(
         2,
         download_data=False,
         download_features_meta_data=True,
         download_qualities=True,
     )
-    change_time = os.stat(did_cache_dir).st_mtime
+    eager_download_call_count = spy.call_count
+    assert eager_download_call_count > 0, (
+        "Eager download should make network call if cache is empty."
+    )
 
-    # Test with cache
     _dataset = openml.datasets.get_dataset(
         2,
         download_data=False,
         download_features_meta_data=False,
         download_qualities=False,
     )
-    assert change_time == os.stat(did_cache_dir).st_mtime
+
+    assert spy.call_count == eager_download_call_count, (
+        "Lazy instantiation with description in cache shouldn't make network call."
+    )
     assert _dataset.features == _compare_dataset.features
     assert _dataset.qualities == _compare_dataset.qualities
+    assert spy.call_count == eager_download_call_count, (
+        "Lazy loading with files in cache shouldn't make network calls."
+    )
 
     # -- Test without cache
-    openml.utils._remove_cache_dir_for_id(
-        openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-        did_cache_dir,
-    )
-
+    shutil.rmtree(openml.config.get_cache_directory())
     _dataset = openml.datasets.get_dataset(
         2,
         download_data=False,
         download_features_meta_data=False,
         download_qualities=False,
     )
-    assert ["description.xml"] == os.listdir(did_cache_dir)
-    assert change_time != os.stat(did_cache_dir).st_mtime
+
     assert _dataset.features == _compare_dataset.features
     assert _dataset.qualities == _compare_dataset.qualities
+    lazy_download_call_count = spy.call_count - eager_download_call_count
+    assert lazy_download_call_count == eager_download_call_count, (
+        "Lazy fetching of files should result in the same number of calls "
+        "if all attributes have been accessed."
+    )
 
 
 @pytest.mark.production_server
