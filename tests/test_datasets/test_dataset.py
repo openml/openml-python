@@ -14,6 +14,9 @@ import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
 
 
+SPARSE_DATASET_ID = 4136
+
+
 # Fixtures for datasets
 @pytest.fixture(scope="module")
 def production_server(static_cache_dir):
@@ -229,14 +232,25 @@ def test_get_data_with_ignore_attributes(anneal_dataset):
     assert len(categorical) == 38
 
 
-@pytest.mark.production_server
-def test_get_data_corrupt_pickle(iris_dataset):
-    """Test that corrupt pickle files are handled gracefully."""
-    # Lazy loaded dataset, populate cache.
+@pytest.mark.test_server
+def test_get_data_corrupt_pickle():
+    """Test that corrupt pickle files are handled gracefully.
+
+    The pickle file is stored for fast-load convenience only, but the
+    primary file is the parquet (or aff) file. If a pickle file is corrupted
+    the file should be loaded from the parquet (or arff) file instead.
+
+    This feature will be removed when arff support is removed (#1027).
+    """
+    iris_dataset = openml.datasets.get_dataset(128, download_data=True)
+    # Only on first load would the pickle file actually be created.
     iris_dataset.get_data()
-    # Corrupt pickle file, overwrite as empty.
+    assert os.stat(iris_dataset.data_pickle_file).st_size > 0
+
     with open(iris_dataset.data_pickle_file, "w") as fh:
         fh.write("")
+    assert os.stat(iris_dataset.data_pickle_file).st_size == 0
+
     # Despite the corrupt file, the data should be loaded from the ARFF file.
     # A warning message is written to the python logger.
     xy, _, _, _ = iris_dataset.get_data()
@@ -371,15 +385,10 @@ def test_add_illegal_url_ontology():
         assert e.code == 1106  # noqa: PT017
 
 
-@pytest.fixture(scope="module")
-def sparse_dataset(production_server):
-    """Sparse dataset for testing."""
-    return openml.datasets.get_dataset(4136, download_data=False)
-
-
 @pytest.mark.production_server
-def test_get_sparse_dataset_dataframe_with_target(sparse_dataset):
+def test_get_sparse_dataset_dataframe_with_target():
     """Test sparse dataset with target."""
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
     X, y, _, attribute_names = sparse_dataset.get_data(target="class")
     assert isinstance(X, pd.DataFrame)
     assert isinstance(X.dtypes.iloc[0], pd.SparseDtype)
@@ -394,7 +403,8 @@ def test_get_sparse_dataset_dataframe_with_target(sparse_dataset):
 
 
 @pytest.mark.production_server
-def test_get_sparse_dataset_dataframe(sparse_dataset):
+def test_get_sparse_dataset_dataframe():
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
     """Test sparse dataset returns sparse DataFrame."""
     rval, *_ = sparse_dataset.get_data()
     assert isinstance(rval, pd.DataFrame)
@@ -406,8 +416,9 @@ def test_get_sparse_dataset_dataframe(sparse_dataset):
 
 
 @pytest.mark.production_server
-def test_get_sparse_dataset_rowid_and_ignore_and_target(sparse_dataset):
+def test_get_sparse_dataset_rowid_and_ignore_and_target():
     """Test sparse dataset with row_id, ignore and target attributes."""
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
     # TODO: re-add row_id and ignore attributes
     sparse_dataset.ignore_attribute = ["V256"]
     sparse_dataset.row_id_attribute = ["V512"]
