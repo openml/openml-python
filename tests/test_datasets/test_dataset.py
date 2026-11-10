@@ -16,47 +16,6 @@ from openml.datasets import OpenMLDataFeature, OpenMLDataset
 SPARSE_DATASET_ID = 4136
 
 
-# Fixtures for datasets
-@pytest.fixture(scope="module")
-def production_server(static_cache_dir):
-    """Configure to use production server."""
-    original_server = openml.config.server
-    openml.config.server = "https://www.openml.org/api/v1/xml"
-    openml.config.set_root_cache_directory(static_cache_dir)
-    yield
-    openml.config.server = original_server
-
-
-@pytest.fixture(scope="module")
-def anneal_dataset(production_server):
-    """Load dataset id 2 - contains missing values, categorical features etc."""
-    return openml.datasets.get_dataset(2, download_data=False)
-
-
-@pytest.fixture(scope="module")
-def titanic_dataset(production_server):
-    """Titanic dataset - has missing values, categories, and string."""
-    return openml.datasets.get_dataset(40945, download_data=False)
-
-
-@pytest.fixture(scope="module")
-def pc4_dataset(production_server):
-    """PC4 dataset - has some boolean features."""
-    return openml.datasets.get_dataset(1049, download_data=False)
-
-
-@pytest.fixture(scope="module")
-def jm1_dataset(production_server):
-    """JM1 dataset - has some boolean features."""
-    return openml.datasets.get_dataset(1053, download_data=False)
-
-
-@pytest.fixture(scope="module")
-def iris_dataset(production_server):
-    """Iris dataset."""
-    return openml.datasets.get_dataset(61, download_data=False)
-
-
 def test_repr():
     """Test dataset repr doesn't crash."""
     # create a bare-bones dataset as would be returned by
@@ -95,8 +54,9 @@ def test__unpack_categories_with_nan_likes():
 
 
 @pytest.mark.production_server
-def test_get_data_pandas(titanic_dataset):
+def test_get_data_pandas():
     """Test get_data returns correct pandas DataFrame."""
+    titanic_dataset = openml.datasetes.get_dataset(40945)
     data, _, _, _ = titanic_dataset.get_data()
     assert isinstance(data, pd.DataFrame)
     assert data.shape[1] == len(titanic_dataset.features)
@@ -136,15 +96,16 @@ def test_get_data_pandas(titanic_dataset):
 
 
 @pytest.mark.production_server
-@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-def test_get_data_boolean_pandas(jm1_dataset, pc4_dataset):
+def test_get_data_boolean_pandas():
     """Test boolean data is correctly converted."""
     # test to check that we are converting properly True and False even
     # with some inconsistency when dumping the data on openml
+    jm1_dataset = openml.datasets.get_dataset(1053)
     data, _, _, _ = jm1_dataset.get_data()
     assert data["defects"].dtype.name == "category"
     assert set(data["defects"].cat.categories) == {True, False}
 
+    pc4_dataset = openml.datasets.get_dataset(1049)
     data, _, _, _ = pc4_dataset.get_data()
     assert data["c"].dtype.name == "category"
     assert set(data["c"].cat.categories) == {True, False}
@@ -162,10 +123,12 @@ def _check_expected_type(dtype, is_cat, col):
     assert dtype.name == expected_type
 
 
-@pytest.mark.production_server
-@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-def test_get_data_with_rowid(anneal_dataset):
+@pytest.mark.test_server
+def test_get_data_with_rowid():
     """Test get_data with row_id_attribute."""
+    if "localhost" in openml.config.server:
+        pytest.skip(reason="This test doesn't currently work with local services.")
+    anneal_dataset = openml.datasets.get_dataset(138)
     anneal_dataset.row_id_attribute = "condition"
     rval, _, categorical, _ = anneal_dataset.get_data(include_row_id=True)
     assert isinstance(rval, pd.DataFrame)
@@ -182,10 +145,12 @@ def test_get_data_with_rowid(anneal_dataset):
     assert len(categorical) == 38
 
 
-@pytest.mark.production_server
-@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-def test_get_data_with_target_pandas(anneal_dataset):
+@pytest.mark.test_server
+def test_get_data_with_target_pandas():
     """Test get_data with target specified."""
+    if "localhost" in openml.config.server:
+        pytest.skip(reason="This test doesn't currently work with local services.")
+    anneal_dataset = openml.datasets.get_dataset(138)
     X, y, categorical, attribute_names = anneal_dataset.get_data(target="class")
     assert isinstance(X, pd.DataFrame)
     for dtype, is_cat, col in zip(X.dtypes, categorical, X, strict=False):
@@ -200,9 +165,12 @@ def test_get_data_with_target_pandas(anneal_dataset):
     assert "class" not in attribute_names
 
 
-@pytest.mark.production_server
-def test_get_data_rowid_and_ignore_and_target(anneal_dataset):
+@pytest.mark.test_server
+def test_get_data_rowid_and_ignore_and_target():
     """Test get_data with rowid, ignore and target attributes."""
+    if "localhost" in openml.config.server:
+        pytest.skip(reason="This test doesn't currently work with local services.")
+    anneal_dataset = openml.datasets.get_dataset(138)
     anneal_dataset.ignore_attribute = ["condition"]
     anneal_dataset.row_id_attribute = ["hardness"]
     X, y, categorical, _names = anneal_dataset.get_data(target="class")
@@ -213,10 +181,12 @@ def test_get_data_rowid_and_ignore_and_target(anneal_dataset):
     assert y.shape == (898,)
 
 
-@pytest.mark.production_server
-@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-def test_get_data_with_ignore_attributes(anneal_dataset):
+@pytest.mark.test_server
+def test_get_data_with_ignore_attributes():
     """Test get_data with ignore_attribute."""
+    if "localhost" in openml.config.server:
+        pytest.skip(reason="This test doesn't currently work with local services.")
+    anneal_dataset = openml.datasets.get_dataset(138)
     anneal_dataset.ignore_attribute = ["condition"]
     rval, _, categorical, _ = anneal_dataset.get_data(include_ignore_attribute=True)
     for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
