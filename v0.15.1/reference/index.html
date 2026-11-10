@@ -17814,8 +17814,7 @@ even if the requested run is already cached.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-995"> 995</a></span>
-<span class="normal"><a href="#__codelineno-0-996"> 996</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-996"> 996</a></span>
 <span class="normal"><a href="#__codelineno-0-997"> 997</a></span>
 <span class="normal"><a href="#__codelineno-0-998"> 998</a></span>
 <span class="normal"><a href="#__codelineno-0-999"> 999</a></span>
@@ -17834,27 +17833,28 @@ even if the requested run is already cached.</p>
 <span class="normal"><a href="#__codelineno-0-1012">1012</a></span>
 <span class="normal"><a href="#__codelineno-0-1013">1013</a></span>
 <span class="normal"><a href="#__codelineno-0-1014">1014</a></span>
-<span class="normal"><a href="#__codelineno-0-1015">1015</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-995" name="__codelineno-0-995"></a><span class="nd">@openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_safe_if_oslo_installed</span>
-<a id="__codelineno-0-996" name="__codelineno-0-996"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLRun</span><span class="p">:</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-997" name="__codelineno-0-997"></a><span class="w">    </span><span class="sd">"""Gets run corresponding to run_id.</span>
-<a id="__codelineno-0-998" name="__codelineno-0-998"></a>
-<a id="__codelineno-0-999" name="__codelineno-0-999"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a><span class="sd">    run_id : int</span>
-<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a>
-<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a><span class="sd">    ignore_cache : bool</span>
-<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a><span class="sd">        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml</span>
-<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a><span class="sd">        even if the requested run is already cached.</span>
-<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a>
-<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a><span class="sd">    run : OpenMLRun</span>
-<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a><span class="sd">        Run corresponding to ID, fetched from the server.</span>
-<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a><span class="sd">    """</span>
-<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a>        <span class="n">run_id</span><span class="p">,</span>
-<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a>        <span class="n">reset_cache</span><span class="o">=</span><span class="n">ignore_cache</span><span class="p">,</span>
-<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-1015">1015</a></span>
+<span class="normal"><a href="#__codelineno-0-1016">1016</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-996" name="__codelineno-0-996"></a><span class="nd">@openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_safe_if_oslo_installed</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLRun</span><span class="p">:</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-998" name="__codelineno-0-998"></a><span class="w">    </span><span class="sd">"""Gets run corresponding to run_id.</span>
+<a id="__codelineno-0-999" name="__codelineno-0-999"></a>
+<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a><span class="sd">    run_id : int</span>
+<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a>
+<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a><span class="sd">    ignore_cache : bool</span>
+<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a><span class="sd">        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml</span>
+<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a><span class="sd">        even if the requested run is already cached.</span>
+<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a>
+<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a><span class="sd">    run : OpenMLRun</span>
+<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a><span class="sd">        Run corresponding to ID, fetched from the server.</span>
+<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a><span class="sd">    """</span>
+<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a>        <span class="n">run_id</span><span class="p">,</span>
+<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a>        <span class="n">reset_cache</span><span class="o">=</span><span class="n">ignore_cache</span><span class="p">,</span>
+<a id="__codelineno-0-1016" name="__codelineno-0-1016"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -19089,8 +19089,7 @@ prediction file).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1208">1208</a></span>
-<span class="normal"><a href="#__codelineno-0-1209">1209</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1209">1209</a></span>
 <span class="normal"><a href="#__codelineno-0-1210">1210</a></span>
 <span class="normal"><a href="#__codelineno-0-1211">1211</a></span>
 <span class="normal"><a href="#__codelineno-0-1212">1212</a></span>
@@ -19164,82 +19163,83 @@ prediction file).</p>
 <span class="normal"><a href="#__codelineno-0-1280">1280</a></span>
 <span class="normal"><a href="#__codelineno-0-1281">1281</a></span>
 <span class="normal"><a href="#__codelineno-0-1282">1282</a></span>
-<span class="normal"><a href="#__codelineno-0-1283">1283</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1208" name="__codelineno-0-1208"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
-<a id="__codelineno-0-1209" name="__codelineno-0-1209"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1210" name="__codelineno-0-1210"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1211" name="__codelineno-0-1211"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: A002</span>
-<a id="__codelineno-0-1212" name="__codelineno-0-1212"></a>    <span class="n">task</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1213" name="__codelineno-0-1213"></a>    <span class="n">setup</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1214" name="__codelineno-0-1214"></a>    <span class="n">flow</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1215" name="__codelineno-0-1215"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1216" name="__codelineno-0-1216"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1217" name="__codelineno-0-1217"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1218" name="__codelineno-0-1218"></a>    <span class="n">display_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-1219" name="__codelineno-0-1219"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1220" name="__codelineno-0-1220"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-1221" name="__codelineno-0-1221"></a><span class="w">    </span><span class="sd">"""</span>
-<a id="__codelineno-0-1222" name="__codelineno-0-1222"></a><span class="sd">    List all runs matching all of the given filters.</span>
-<a id="__codelineno-0-1223" name="__codelineno-0-1223"></a><span class="sd">    (Supports large amount of results)</span>
-<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a>
-<a id="__codelineno-0-1225" name="__codelineno-0-1225"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">    offset : int, optional</span>
-<a id="__codelineno-0-1228" name="__codelineno-0-1228"></a><span class="sd">        the number of runs to skip, starting from the first</span>
-<a id="__codelineno-0-1229" name="__codelineno-0-1229"></a><span class="sd">    size : int, optional</span>
-<a id="__codelineno-0-1230" name="__codelineno-0-1230"></a><span class="sd">        the maximum number of runs to show</span>
-<a id="__codelineno-0-1231" name="__codelineno-0-1231"></a>
-<a id="__codelineno-0-1232" name="__codelineno-0-1232"></a><span class="sd">    id : list, optional</span>
-<a id="__codelineno-0-1233" name="__codelineno-0-1233"></a>
-<a id="__codelineno-0-1234" name="__codelineno-0-1234"></a><span class="sd">    task : list, optional</span>
-<a id="__codelineno-0-1235" name="__codelineno-0-1235"></a>
-<a id="__codelineno-0-1236" name="__codelineno-0-1236"></a><span class="sd">    setup: list, optional</span>
-<a id="__codelineno-0-1237" name="__codelineno-0-1237"></a>
-<a id="__codelineno-0-1238" name="__codelineno-0-1238"></a><span class="sd">    flow : list, optional</span>
-<a id="__codelineno-0-1239" name="__codelineno-0-1239"></a>
-<a id="__codelineno-0-1240" name="__codelineno-0-1240"></a><span class="sd">    uploader : list, optional</span>
-<a id="__codelineno-0-1241" name="__codelineno-0-1241"></a>
-<a id="__codelineno-0-1242" name="__codelineno-0-1242"></a><span class="sd">    tag : str, optional</span>
-<a id="__codelineno-0-1243" name="__codelineno-0-1243"></a>
-<a id="__codelineno-0-1244" name="__codelineno-0-1244"></a><span class="sd">    study : int, optional</span>
-<a id="__codelineno-0-1245" name="__codelineno-0-1245"></a>
-<a id="__codelineno-0-1246" name="__codelineno-0-1246"></a><span class="sd">    display_errors : bool, optional (default=None)</span>
-<a id="__codelineno-0-1247" name="__codelineno-0-1247"></a><span class="sd">        Whether to list runs which have an error (for example a missing</span>
-<a id="__codelineno-0-1248" name="__codelineno-0-1248"></a><span class="sd">        prediction file).</span>
-<a id="__codelineno-0-1249" name="__codelineno-0-1249"></a>
-<a id="__codelineno-0-1250" name="__codelineno-0-1250"></a><span class="sd">    task_type : str, optional</span>
-<a id="__codelineno-0-1251" name="__codelineno-0-1251"></a>
-<a id="__codelineno-0-1252" name="__codelineno-0-1252"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-1253" name="__codelineno-0-1253"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-1254" name="__codelineno-0-1254"></a><span class="sd">    dataframe</span>
-<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">    """</span>
-<a id="__codelineno-0-1256" name="__codelineno-0-1256"></a>    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1257" name="__codelineno-0-1257"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"id must be of type list."</span><span class="p">)</span>
-<a id="__codelineno-0-1258" name="__codelineno-0-1258"></a>    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1259" name="__codelineno-0-1259"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"task must be of type list."</span><span class="p">)</span>
-<a id="__codelineno-0-1260" name="__codelineno-0-1260"></a>    <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1261" name="__codelineno-0-1261"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"setup must be of type list."</span><span class="p">)</span>
-<a id="__codelineno-0-1262" name="__codelineno-0-1262"></a>    <span class="k">if</span> <span class="n">flow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1263" name="__codelineno-0-1263"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"flow must be of type list."</span><span class="p">)</span>
-<a id="__codelineno-0-1264" name="__codelineno-0-1264"></a>    <span class="k">if</span> <span class="n">uploader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uploader</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1265" name="__codelineno-0-1265"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"uploader must be of type list."</span><span class="p">)</span>
-<a id="__codelineno-0-1266" name="__codelineno-0-1266"></a>
-<a id="__codelineno-0-1267" name="__codelineno-0-1267"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
-<a id="__codelineno-0-1268" name="__codelineno-0-1268"></a>        <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">list</span><span class="p">,</span>
-<a id="__codelineno-0-1269" name="__codelineno-0-1269"></a>        <span class="n">ids</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
-<a id="__codelineno-0-1270" name="__codelineno-0-1270"></a>        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-<a id="__codelineno-0-1271" name="__codelineno-0-1271"></a>        <span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span>
-<a id="__codelineno-0-1272" name="__codelineno-0-1272"></a>        <span class="n">flow</span><span class="o">=</span><span class="n">flow</span><span class="p">,</span>
-<a id="__codelineno-0-1273" name="__codelineno-0-1273"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
-<a id="__codelineno-0-1274" name="__codelineno-0-1274"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
-<a id="__codelineno-0-1275" name="__codelineno-0-1275"></a>        <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="p">,</span>
-<a id="__codelineno-0-1276" name="__codelineno-0-1276"></a>        <span class="n">display_errors</span><span class="o">=</span><span class="n">display_errors</span><span class="p">,</span>
-<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>    <span class="p">)</span>
-<a id="__codelineno-0-1279" name="__codelineno-0-1279"></a>    <span class="n">batches</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_list_all</span><span class="p">(</span><span class="n">listing_call</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
-<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a>
-<a id="__codelineno-0-1283" name="__codelineno-0-1283"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-1283">1283</a></span>
+<span class="normal"><a href="#__codelineno-0-1284">1284</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1209" name="__codelineno-0-1209"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
+<a id="__codelineno-0-1210" name="__codelineno-0-1210"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1211" name="__codelineno-0-1211"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1212" name="__codelineno-0-1212"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: A002</span>
+<a id="__codelineno-0-1213" name="__codelineno-0-1213"></a>    <span class="n">task</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1214" name="__codelineno-0-1214"></a>    <span class="n">setup</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1215" name="__codelineno-0-1215"></a>    <span class="n">flow</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1216" name="__codelineno-0-1216"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1217" name="__codelineno-0-1217"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1218" name="__codelineno-0-1218"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1219" name="__codelineno-0-1219"></a>    <span class="n">display_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-1220" name="__codelineno-0-1220"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1221" name="__codelineno-0-1221"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-1222" name="__codelineno-0-1222"></a><span class="w">    </span><span class="sd">"""</span>
+<a id="__codelineno-0-1223" name="__codelineno-0-1223"></a><span class="sd">    List all runs matching all of the given filters.</span>
+<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="sd">    (Supports large amount of results)</span>
+<a id="__codelineno-0-1225" name="__codelineno-0-1225"></a>
+<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-1228" name="__codelineno-0-1228"></a><span class="sd">    offset : int, optional</span>
+<a id="__codelineno-0-1229" name="__codelineno-0-1229"></a><span class="sd">        the number of runs to skip, starting from the first</span>
+<a id="__codelineno-0-1230" name="__codelineno-0-1230"></a><span class="sd">    size : int, optional</span>
+<a id="__codelineno-0-1231" name="__codelineno-0-1231"></a><span class="sd">        the maximum number of runs to show</span>
+<a id="__codelineno-0-1232" name="__codelineno-0-1232"></a>
+<a id="__codelineno-0-1233" name="__codelineno-0-1233"></a><span class="sd">    id : list, optional</span>
+<a id="__codelineno-0-1234" name="__codelineno-0-1234"></a>
+<a id="__codelineno-0-1235" name="__codelineno-0-1235"></a><span class="sd">    task : list, optional</span>
+<a id="__codelineno-0-1236" name="__codelineno-0-1236"></a>
+<a id="__codelineno-0-1237" name="__codelineno-0-1237"></a><span class="sd">    setup: list, optional</span>
+<a id="__codelineno-0-1238" name="__codelineno-0-1238"></a>
+<a id="__codelineno-0-1239" name="__codelineno-0-1239"></a><span class="sd">    flow : list, optional</span>
+<a id="__codelineno-0-1240" name="__codelineno-0-1240"></a>
+<a id="__codelineno-0-1241" name="__codelineno-0-1241"></a><span class="sd">    uploader : list, optional</span>
+<a id="__codelineno-0-1242" name="__codelineno-0-1242"></a>
+<a id="__codelineno-0-1243" name="__codelineno-0-1243"></a><span class="sd">    tag : str, optional</span>
+<a id="__codelineno-0-1244" name="__codelineno-0-1244"></a>
+<a id="__codelineno-0-1245" name="__codelineno-0-1245"></a><span class="sd">    study : int, optional</span>
+<a id="__codelineno-0-1246" name="__codelineno-0-1246"></a>
+<a id="__codelineno-0-1247" name="__codelineno-0-1247"></a><span class="sd">    display_errors : bool, optional (default=None)</span>
+<a id="__codelineno-0-1248" name="__codelineno-0-1248"></a><span class="sd">        Whether to list runs which have an error (for example a missing</span>
+<a id="__codelineno-0-1249" name="__codelineno-0-1249"></a><span class="sd">        prediction file).</span>
+<a id="__codelineno-0-1250" name="__codelineno-0-1250"></a>
+<a id="__codelineno-0-1251" name="__codelineno-0-1251"></a><span class="sd">    task_type : str, optional</span>
+<a id="__codelineno-0-1252" name="__codelineno-0-1252"></a>
+<a id="__codelineno-0-1253" name="__codelineno-0-1253"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-1254" name="__codelineno-0-1254"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">    dataframe</span>
+<a id="__codelineno-0-1256" name="__codelineno-0-1256"></a><span class="sd">    """</span>
+<a id="__codelineno-0-1257" name="__codelineno-0-1257"></a>    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1258" name="__codelineno-0-1258"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"id must be of type list."</span><span class="p">)</span>
+<a id="__codelineno-0-1259" name="__codelineno-0-1259"></a>    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1260" name="__codelineno-0-1260"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"task must be of type list."</span><span class="p">)</span>
+<a id="__codelineno-0-1261" name="__codelineno-0-1261"></a>    <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1262" name="__codelineno-0-1262"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"setup must be of type list."</span><span class="p">)</span>
+<a id="__codelineno-0-1263" name="__codelineno-0-1263"></a>    <span class="k">if</span> <span class="n">flow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1264" name="__codelineno-0-1264"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"flow must be of type list."</span><span class="p">)</span>
+<a id="__codelineno-0-1265" name="__codelineno-0-1265"></a>    <span class="k">if</span> <span class="n">uploader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uploader</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1266" name="__codelineno-0-1266"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"uploader must be of type list."</span><span class="p">)</span>
+<a id="__codelineno-0-1267" name="__codelineno-0-1267"></a>
+<a id="__codelineno-0-1268" name="__codelineno-0-1268"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+<a id="__codelineno-0-1269" name="__codelineno-0-1269"></a>        <span class="n">openml</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">list</span><span class="p">,</span>
+<a id="__codelineno-0-1270" name="__codelineno-0-1270"></a>        <span class="n">ids</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+<a id="__codelineno-0-1271" name="__codelineno-0-1271"></a>        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+<a id="__codelineno-0-1272" name="__codelineno-0-1272"></a>        <span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span>
+<a id="__codelineno-0-1273" name="__codelineno-0-1273"></a>        <span class="n">flow</span><span class="o">=</span><span class="n">flow</span><span class="p">,</span>
+<a id="__codelineno-0-1274" name="__codelineno-0-1274"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
+<a id="__codelineno-0-1275" name="__codelineno-0-1275"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
+<a id="__codelineno-0-1276" name="__codelineno-0-1276"></a>        <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="p">,</span>
+<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a>        <span class="n">display_errors</span><span class="o">=</span><span class="n">display_errors</span><span class="p">,</span>
+<a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-1279" name="__codelineno-0-1279"></a>    <span class="p">)</span>
+<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a>    <span class="n">batches</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_list_all</span><span class="p">(</span><span class="n">listing_call</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-1283" name="__codelineno-0-1283"></a>
+<a id="__codelineno-0-1284" name="__codelineno-0-1284"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
