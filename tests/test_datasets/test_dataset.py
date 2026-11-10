@@ -13,7 +13,6 @@ import requests
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
 
-
 SPARSE_DATASET_ID = 4136
 
 
@@ -309,12 +308,15 @@ def test_lazy_loading_metadata(mocker):
     )
 
 
-@pytest.mark.production_server
-def test_equality_comparison(iris_dataset, titanic_dataset):
+@pytest.mark.test_server
+def test_equality_comparison():
     """Test dataset equality comparison."""
-    assert iris_dataset == iris_dataset
-    assert iris_dataset != titanic_dataset
-    assert titanic_dataset != "Wrong_object"
+    dataset_a = openml.datasets.get_dataset(1)
+    dataset_b = openml.datasets.get_dataset(2)
+
+    assert dataset_a == dataset_a
+    assert dataset_a != dataset_b
+    assert dataset_a != "not any dataset"
 
 
 @pytest.mark.test_server
