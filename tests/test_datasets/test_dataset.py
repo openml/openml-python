@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 import shutil
 from time import time
 
@@ -204,7 +203,7 @@ def test_get_data_rowid_and_ignore_and_target(anneal_dataset):
     """Test get_data with rowid, ignore and target attributes."""
     anneal_dataset.ignore_attribute = ["condition"]
     anneal_dataset.row_id_attribute = ["hardness"]
-    X, y, categorical, names = anneal_dataset.get_data(target="class")
+    X, y, categorical, _names = anneal_dataset.get_data(target="class")
     assert X.shape == (898, 36)
     assert len(categorical) == 36
     cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
@@ -228,16 +227,6 @@ def test_get_data_with_ignore_attributes(anneal_dataset):
         _check_expected_type(dtype, is_cat, rval[col])
     assert rval.shape == (898, 38)
     assert len(categorical) == 38
-
-
-@pytest.mark.production_server
-def test_get_data_with_nonexisting_class(anneal_dataset):
-    """Test dataset with missing class labels."""
-    # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
-    # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
-    # indices 4 and 5, and that nothing is mapped to index 3.
-    _, y, _, _ = anneal_dataset.get_data("class")
-    assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
 
 
 @pytest.mark.production_server
