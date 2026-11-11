@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import shutil
 from time import time
 
@@ -211,11 +212,11 @@ def test_get_data_corrupt_pickle():
     iris_dataset = openml.datasets.get_dataset(128, download_data=True)
     # Only on first load would the pickle file actually be created.
     iris_dataset.get_data()
-    assert os.stat(iris_dataset.data_pickle_file).st_size > 0
+    iris_data_file = Path(iris_dataset.data_pickle_file)
+    assert iris_data_file.stat().st_size > 0
 
-    with open(iris_dataset.data_pickle_file, "w") as fh:
-        fh.write("")
-    assert os.stat(iris_dataset.data_pickle_file).st_size == 0
+    iris_data_file.write_bytes(b"")
+    assert iris_data_file.stat().st_size == 0
 
     # Despite the corrupt file, the data should be loaded from the ARFF file.
     # A warning message is written to the python logger.
