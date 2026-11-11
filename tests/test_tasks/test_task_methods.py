@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from time import time
+from unittest import mock
 
 import pytest
 
@@ -36,8 +37,10 @@ class OpenMLTaskMethodsTest(TestBase):
     @pytest.mark.test_server
     def test_get_train_and_test_split_indices(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        task = openml.tasks.get_task(1882)
-        train_indices, test_indices = task.get_train_test_split_indices(0, 0)
+        with mock.patch("requests.sessions.Session.request") as mock_request:
+            task = openml.tasks.get_task(1882)
+            train_indices, test_indices = task.get_train_test_split_indices(0, 0)
+            mock_request.assert_not_called()
         assert train_indices[0] == 16
         assert train_indices[-1] == 395
         assert test_indices[0] == 412
