@@ -350,6 +350,7 @@ module = [
   "examples.Advanced.create_upload_tutorial",
 
   # Files that need to be fixed after removing the entire tests directory from skipping mypy checks
+  "tests.test_api.test_datasets",
   "tests.test_api.test_estimation_procedure",
   "tests.test_api.test_evaluation",
   "tests.test_api.test_evaluation_measure",
@@ -358,6 +359,7 @@ module = [
   "tests.test_api.test_run",
   "tests.test_api.test_setup",
   "tests.test_api.test_study",
+  "tests.test_api.test_task",
   "tests.test_api.test_versions",
   "tests.conftest",
   "tests.test_datasets.test_dataset",

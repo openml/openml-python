@@ -10,10 +10,9 @@ from typing_extensions import TypedDict
 
 import arff
 
-import openml._api_calls
+import openml
 from openml import datasets
 from openml.base import OpenMLBase
-from openml.utils import _create_cache_directory_for_id
 
 from .split import OpenMLSplit
 
@@ -187,31 +186,15 @@ class OpenMLTask(OpenMLBase):
         """Download the OpenML split for a given task."""
         # TODO(eddiebergman): Can this every be `None`?
         assert self.task_id is not None
-        cache_dir = _create_cache_directory_for_id("tasks", self.task_id)
-        cached_split_file = cache_dir / "datasplits.arff"
+        split_url = str(self.estimation_procedure["data_splits_url"])
+        split_file = openml._backend.task.download_split(split_url)
 
         try:
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-            logger.debug("Loaded file from cache: %s", str(cached_split_file))
-        except (OSError, arff.BadDataFormat):
-            logger.info("Failed to load file from cache: %s", str(cached_split_file))
-            if cached_split_file.exists():
-                logger.debug("Cleaning up old file")
-                cached_split_file.unlink()
-            # Next, download and cache the associated split file
-            split_url = self.estimation_procedure["data_splits_url"]
-            openml._api_calls._download_text_file(
-                source=str(split_url),
-                output_path=str(cached_split_file),
-            )
-            if cached_split_file.exists():
-                logger.info("New file created of size %d", cached_split_file.stat().st_size)
-            else:
-                logger.info("Failed to create new file")
-
-            split = OpenMLSplit._from_arff_file(cached_split_file)
-
-        return split
+            return OpenMLSplit._from_arff_file(split_file)
+        except arff.BadDataFormat:
+            logger.info("Failed to parse cached split file: %s", str(split_file))
+            split_file = openml._backend.task.download_split(split_url, refresh_cache=True)
+            return OpenMLSplit._from_arff_file(split_file)
 
     def get_split_dimensions(self) -> tuple[int, int, int]:
         """Get the (repeats, folds, samples) of the split for a given task."""
@@ -241,6 +224,48 @@ class OpenMLTask(OpenMLBase):
     def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.task_id = int(xml_response["oml:upload_task"]["oml:id"])
+
+    def publish(self) -> OpenMLTask:
+        """Publish this task to OpenML server.
+
+        Returns
+        -------
+        self : OpenMLTask
+        """
+        file_elements = self._get_file_elements()
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+        task_id = openml._backend.task.publish(path="task", files=file_elements)
+        self.task_id = task_id
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this task with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the task.
+        """
+        if self.task_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to tag it."
+            )
+        openml._backend.task.tag(self.task_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this task on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the task.
+        """
+        if self.task_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to untag it."
+            )
+        openml._backend.task.untag(self.task_id, tag)
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):
