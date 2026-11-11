@@ -96,10 +96,14 @@ def test_get_data_pandas():
 
 
 @pytest.mark.production_server
-def test_get_data_boolean_pandas():
-    """Test boolean data is correctly converted."""
-    # test to check that we are converting properly True and False even
-    # with some inconsistency when dumping the data on openml
+def test_get_data_boolean_pandas(monkeypatch):
+    """Test boolean data is converted to categorical when loading from arff."""
+    # At some point we decided to convert bool-ey features to
+    # categories, because from the ARFF file we technically can't
+    # specify which is which (#1106, #1157).
+    # This seems mostly historical after conversion to parquet,
+    # which does load as boolean.
+    monkeypatch.setenv(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "true")
     jm1_dataset = openml.datasets.get_dataset(1053)
     data, _, _, _ = jm1_dataset.get_data()
     assert data["defects"].dtype.name == "category"
@@ -127,6 +131,7 @@ def test_get_data_with_rowid(static_cache_dir):
     """Test get_data with row_id_attribute."""
     openml.config.set_root_cache_directory(static_cache_dir)
     anneal_dataset = openml.datasets.get_dataset(2)
+
     anneal_dataset.row_id_attribute = "condition"
     rval, _, categorical, _ = anneal_dataset.get_data(include_row_id=True)
     assert isinstance(rval, pd.DataFrame)
@@ -246,8 +251,9 @@ def test_lazy_loading_metadata(mocker):
     assert spy.call_count == eager_download_call_count, (
         "Lazy instantiation with description in cache shouldn't make network call."
     )
+
     assert _dataset.features == _compare_dataset.features
-    assert _dataset.qualities == _compare_dataset.qualities
+    assert _dataset.qualities == pytest.approx(_compare_dataset.qualities, nan_ok=True)
     assert spy.call_count == eager_download_call_count, (
         "Lazy loading with files in cache shouldn't make network calls."
     )
@@ -262,7 +268,7 @@ def test_lazy_loading_metadata(mocker):
     )
 
     assert _dataset.features == _compare_dataset.features
-    assert _dataset.qualities == _compare_dataset.qualities
+    assert _dataset.qualities == pytest.approx(_compare_dataset.qualities, nan_ok=True)
     lazy_download_call_count = spy.call_count - eager_download_call_count
     assert lazy_download_call_count == eager_download_call_count, (
         "Lazy fetching of files should result in the same number of calls "
