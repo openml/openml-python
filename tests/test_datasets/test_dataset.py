@@ -56,7 +56,7 @@ def test__unpack_categories_with_nan_likes():
 @pytest.mark.production_server
 def test_get_data_pandas():
     """Test get_data returns correct pandas DataFrame."""
-    titanic_dataset = openml.datasetes.get_dataset(40945)
+    titanic_dataset = openml.datasets.get_dataset(40945)
     data, _, _, _ = titanic_dataset.get_data()
     assert isinstance(data, pd.DataFrame)
     assert data.shape[1] == len(titanic_dataset.features)
@@ -123,12 +123,10 @@ def _check_expected_type(dtype, is_cat, col):
     assert dtype.name == expected_type
 
 
-@pytest.mark.test_server
-def test_get_data_with_rowid():
+def test_get_data_with_rowid(static_cache_dir):
     """Test get_data with row_id_attribute."""
-    if "localhost" in openml.config.server:
-        pytest.skip(reason="This test doesn't currently work with local services.")
-    anneal_dataset = openml.datasets.get_dataset(138)
+    openml.config.set_root_cache_directory(static_cache_dir)
+    anneal_dataset = openml.datasets.get_dataset(2)
     anneal_dataset.row_id_attribute = "condition"
     rval, _, categorical, _ = anneal_dataset.get_data(include_row_id=True)
     assert isinstance(rval, pd.DataFrame)
@@ -145,12 +143,10 @@ def test_get_data_with_rowid():
     assert len(categorical) == 38
 
 
-@pytest.mark.test_server
-def test_get_data_with_target_pandas():
+def test_get_data_with_target_pandas(static_cache_dir):
     """Test get_data with target specified."""
-    if "localhost" in openml.config.server:
-        pytest.skip(reason="This test doesn't currently work with local services.")
-    anneal_dataset = openml.datasets.get_dataset(138)
+    openml.config.set_root_cache_directory(static_cache_dir)
+    anneal_dataset = openml.datasets.get_dataset(2)
     X, y, categorical, attribute_names = anneal_dataset.get_data(target="class")
     assert isinstance(X, pd.DataFrame)
     for dtype, is_cat, col in zip(X.dtypes, categorical, X, strict=False):
@@ -165,12 +161,10 @@ def test_get_data_with_target_pandas():
     assert "class" not in attribute_names
 
 
-@pytest.mark.test_server
-def test_get_data_rowid_and_ignore_and_target():
+def test_get_data_rowid_and_ignore_and_target(static_cache_dir):
     """Test get_data with rowid, ignore and target attributes."""
-    if "localhost" in openml.config.server:
-        pytest.skip(reason="This test doesn't currently work with local services.")
-    anneal_dataset = openml.datasets.get_dataset(138)
+    openml.config.set_root_cache_directory(static_cache_dir)
+    anneal_dataset = openml.datasets.get_dataset(2)
     anneal_dataset.ignore_attribute = ["condition"]
     anneal_dataset.row_id_attribute = ["hardness"]
     X, y, categorical, _names = anneal_dataset.get_data(target="class")
@@ -181,12 +175,10 @@ def test_get_data_rowid_and_ignore_and_target():
     assert y.shape == (898,)
 
 
-@pytest.mark.test_server
-def test_get_data_with_ignore_attributes():
+def test_get_data_with_ignore_attributes(static_cache_dir):
     """Test get_data with ignore_attribute."""
-    if "localhost" in openml.config.server:
-        pytest.skip(reason="This test doesn't currently work with local services.")
-    anneal_dataset = openml.datasets.get_dataset(138)
+    openml.config.set_root_cache_directory(static_cache_dir)
+    anneal_dataset = openml.datasets.get_dataset(2)
     anneal_dataset.ignore_attribute = ["condition"]
     rval, _, categorical, _ = anneal_dataset.get_data(include_ignore_attribute=True)
     for dtype, is_cat, col in zip(rval.dtypes, categorical, rval, strict=False):
