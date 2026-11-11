@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 import shutil
+from pathlib import Path
 from time import time
 
 import numpy as np
@@ -281,9 +281,10 @@ def test_lazy_loading_metadata(mocker):
 def test_equality_comparison():
     """Test dataset equality comparison."""
     dataset_a = openml.datasets.get_dataset(1)
+    dataset_a2 = openml.datasets.get_dataset(1)
     dataset_b = openml.datasets.get_dataset(2)
 
-    assert dataset_a == dataset_a
+    assert dataset_a == dataset_a2
     assert dataset_a != dataset_b
     assert dataset_a != "not any dataset"
 
