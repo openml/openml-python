@@ -28,9 +28,11 @@ class OpenMLSplitTest(TestBase):
             / "org"
             / "openml"
             / "test"
-            / "tasks"
+            / "api_splits"
+            / "get"
             / "1882"
-            / "datasplits.arff"
+            / "Task_1882_splits.arff"
+            / "body.arff"
         )
         # Use a unique temp directory for each test to avoid race conditions
         # when running tests in parallel (see issue #1641)
