@@ -113,7 +113,9 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       id: clone-services
       run: |
-        git clone --depth 1 https://github.com/openml/services.git
+        # 2026-11-05: Services switched to SeaweedFS and the MinIO client cannot handle the new URLs.
+        # We use the old stack until we have migrated away from the MinIO client
+        git clone --revision dd8b98a9e0450bf487f973e1711c8b00dc022294 --depth 1 https://github.com/openml/services.git
 
     - name: Start Docker Services
       id: start-services
@@ -122,14 +124,7 @@ jobs:
       run: |
         chmod -R a+rw ./data
         chmod -R a+rw ./logs
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
-
-        echo "Waiting for PHP API to boot..."
-        timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
-
-        echo "Final Verification: Gateway Connectivity..."
-        curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
-
+        docker compose --profile "client-ci" up --quiet-pull --wait
         docker container ls
 
     - name: Show installed dependencies
@@ -197,7 +192,7 @@ jobs:
       if: always() && steps.clone-services.outcome == 'success'
       working-directory: ./services
       run: |
-        docker compose --profile rest-api --profile minio --profile evaluation-engine down -v
+        docker compose --profile "client-ci" down -v
         cd ..
         sudo rm -rf services
 
