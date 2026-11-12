@@ -202,17 +202,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    res_paths.append(_c_root_dir / "tasks")
-
-    for _id in ["1", "3", "1882"]:
-        tmp_p = _c_root_dir / "tasks" / _id
-        res_paths.extend(
-            [
-                tmp_p / "datasplits.arff",
-                tmp_p / "task.xml",
-            ]
-        )
-
     res_paths.extend(
         [
             _c_root_dir / "api" / "v1" / "xml" / "setup",
@@ -236,6 +225,17 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
             _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "2",
             _c_root_dir / "api" / "v1" / "xml" / "data" / "features" / "2" / "body.xml",
             _c_root_dir / "data" / "download" / "1666876" / "phpFsFYVN" / "body.arff",
+        ]
+    )
+
+    res_paths.extend(
+        [
+            _c_root_dir / "api_splits" / "get" / "1882" / "Task_1882_splits.arff" / "body.arff",
+            _c_root_dir / "api_splits" / "get" / "3" / "Task_3_splits.arff" / "body.arff",
+            _c_root_dir / "api_splits" / "get" / "1" / "Task_1_splits.arff" / "body.arff",
+            _c_root_dir / "api" / "v1" / "xml" / "task" / "1882" / "body.xml",
+            _c_root_dir / "api" / "v1" / "xml" / "task" / "3" / "body.xml",
+            _c_root_dir / "api" / "v1" / "xml" / "task" / "1" / "body.xml",
         ]
     )
 
@@ -333,7 +333,7 @@ def with_test_cache(test_files_directory, request):
         shutil.rmtree(tmp_cache)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def static_cache_dir():
     return Path(__file__).parent / "files"
 
