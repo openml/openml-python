@@ -22,7 +22,7 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
-from openml._api.clients.minio import MinIOClient
+from openml._api.clients.s3 import S3Client
 from openml.datasets import edit_dataset, fork_dataset
 from openml.datasets.functions import (
     DATASETS_CACHE_DIR_NAME,
@@ -348,31 +348,31 @@ class TestOpenMLDataset(TestBase):
         assert isinstance(arff_path, Path)
         assert arff_path.exists()
 
-    def test__download_minio_file_object_does_not_exist(self):
-        minio = MinIOClient()
+    def test__download_s3_file_object_does_not_exist(self):
+        s3_client = S3Client()
         self.assertRaisesRegex(  # noqa: PT027
             FileNotFoundError,
             r"Object at .* does not exist",
-            minio.download_minio_file,
-            source="http://data.openml.org/dataset20/i_do_not_exist.pq",
+            s3_client.download_file,
+            source="https://data.openml.org/dataset20/i_do_not_exist.pq",
             exists_ok=True,
         )
 
-    def test__download_minio_file_works_with_bucket_subdirectory(self):
-        minio = MinIOClient()
-        file_destination = minio.download_minio_file(
-            source="http://data.openml.org/dataset61/dataset_61.pq",
+    def test__download_s3_file_works_with_bucket_subdirectory(self):
+        s3_client = S3Client()
+        file_destination = s3_client.download_file(
+            source="https://data.openml.org/dataset61/dataset_61.pq",
             exists_ok=True,
         )
         assert os.path.isfile(file_destination), (  # noqa: PTH113
-            "download_minio_file can download from subdirectories"
+            "download_file can download from subdirectories"
         )
 
-    @mock.patch.object(MinIOClient, "download_minio_file")
+    @mock.patch.object(S3Client, "download_file")
     def test__get_dataset_parquet_is_cached(self, patch):
         with tempfile.TemporaryDirectory() as tmp_path:
             tmp_file_path = (
-                Path(tmp_path) / "org" / "openml" / "data" / "minio" / "dataset30" / "dataset_30.pq"
+                Path(tmp_path) / "org" / "openml" / "data" / "s3" / "dataset30" / "dataset_30.pq"
             )
             tmp_file_path.parent.mkdir(parents=True)
             with tmp_file_path.open(mode="w") as fh:
@@ -384,7 +384,7 @@ class TestOpenMLDataset(TestBase):
             )
 
             description = {
-                "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
+                "oml:parquet_url": "https://data.openml.org/dataset30/dataset_30.pq",
                 "oml:id": "30",
             }
             path = _get_dataset_parquet(description)
@@ -394,7 +394,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "https://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description)
@@ -1837,7 +1837,7 @@ def _dataset_features_is_downloaded(did: int):
 
 def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
     if dataset._parquet_url is not None:
-        pq_directory = Path(openml.config.get_minio_download_path(dataset._parquet_url)).parent
+        pq_directory = Path(openml.config.get_download_path(dataset._parquet_url)).parent
         if pq_directory.exists():
             return any(f.suffix == ".pq" for f in pq_directory.iterdir())
     arff_directory = (
@@ -1928,7 +1928,7 @@ def test_get_dataset_with_invalid_id() -> None:
 
 def test__get_dataset_parquet_not_cached():
     description = {
-        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:parquet_url": "https://data.openml.org/dataset20/dataset_20.pq",
         "oml:id": "20",
     }
     path = _get_dataset_parquet(description)

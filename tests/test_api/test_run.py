@@ -13,13 +13,13 @@ from openml.runs.run import OpenMLRun
 
 
 @pytest.fixture
-def run_v1(http_client_v1, minio_client) -> RunV1API:
-    return RunV1API(http=http_client_v1, minio=minio_client)
+def run_v1(http_client_v1, s3_client) -> RunV1API:
+    return RunV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def run_v2(http_client_v2, minio_client) -> RunV2API:
-    return RunV2API(http=http_client_v2, minio=minio_client)
+def run_v2(http_client_v2, s3_client) -> RunV2API:
+    return RunV2API(http=http_client_v2, s3=s3_client)
 
 
 def _assert_run_shape(run: OpenMLRun) -> None:

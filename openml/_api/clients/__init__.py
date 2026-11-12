@@ -1,8 +1,8 @@
 from .http import HTTPCache, HTTPClient
-from .minio import MinIOClient
+from .s3 import S3Client
 
 __all__ = [
     "HTTPCache",
     "HTTPClient",
-    "MinIOClient",
+    "S3Client",
 ]

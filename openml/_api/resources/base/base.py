@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import Any
 
-    from openml._api.clients import HTTPClient, MinIOClient
+    from openml._api.clients import HTTPClient, S3Client
     from openml.enums import APIVersion, ResourceType
 
 
@@ -31,8 +31,8 @@ class ResourceAPI(ABC):
     ----------
     http : HTTPClient
         Configured HTTP client used for communication with the OpenML API.
-    minio : MinIOClient
-        Configured MinIO client used for object storage operations.
+    s3 : S3Client
+        Configured S3 client used for object storage operations.
 
     Attributes
     ----------
@@ -42,16 +42,16 @@ class ResourceAPI(ABC):
         Type of OpenML resource handled by the implementation.
     _http : HTTPClient
         Internal HTTP client instance.
-    _minio : MinIOClient or None
-        Internal MinIO client instance, if provided.
+    _s3 : S3Client or None
+        Internal S3 client instance, if provided.
     """
 
     api_version: APIVersion
     resource_type: ResourceType
 
-    def __init__(self, http: HTTPClient, minio: MinIOClient):
+    def __init__(self, http: HTTPClient, s3: S3Client):
         self._http = http
-        self._minio = minio
+        self._s3 = s3
 
     @abstractmethod
     def delete(self, resource_id: int) -> bool:

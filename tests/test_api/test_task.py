@@ -20,13 +20,13 @@ DATASTREAM_TASK_ID = 967
 
 
 @pytest.fixture
-def task_v1(http_client_v1, minio_client) -> TaskV1API:
-    return TaskV1API(http=http_client_v1, minio=minio_client)
+def task_v1(http_client_v1, s3_client) -> TaskV1API:
+    return TaskV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def task_v2(http_client_v2, minio_client) -> TaskV2API:
-    return TaskV2API(http=http_client_v2, minio=minio_client)
+def task_v2(http_client_v2, s3_client) -> TaskV2API:
+    return TaskV2API(http=http_client_v2, s3=s3_client)
 
 
 def _assert_task_1(task):

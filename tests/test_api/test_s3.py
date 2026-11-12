@@ -3,15 +3,15 @@ from __future__ import annotations
 import pytest
 from botocore import UNSIGNED
 
-from openml._api.clients.minio import _make_s3_client, _parse_s3_url
+from openml._api.clients.s3 import S3Client
 
 _ENDPOINT = "http://localhost:8000/s3"
 
 
 def test_make_s3_client(mocker) -> None:
-    boto_client = mocker.patch("openml._api.clients.minio.boto3.client")
+    boto_client = mocker.patch("openml._api.clients.s3.boto3.client")
 
-    _make_s3_client(_ENDPOINT)
+    S3Client._make_s3_client(_ENDPOINT)
 
     kwargs = boto_client.call_args.kwargs
     assert kwargs["endpoint_url"] == _ENDPOINT
@@ -28,9 +28,9 @@ def test_make_s3_client(mocker) -> None:
     ],
 )
 def test_make_s3_client_with_proxy(mocker, proxy: str) -> None:
-    boto_client = mocker.patch("openml._api.clients.minio.boto3.client")
+    boto_client = mocker.patch("openml._api.clients.s3.boto3.client")
 
-    _make_s3_client(_ENDPOINT, proxy=proxy)
+    S3Client._make_s3_client(_ENDPOINT, proxy=proxy)
 
     assert boto_client.call_args.kwargs["config"].proxies == {
         "http": proxy,
@@ -59,7 +59,7 @@ def test_make_s3_client_with_proxy(mocker, proxy: str) -> None:
     ],
 )
 def test_parse_s3_url(url: str, expected: tuple[str, str, str]) -> None:
-    assert _parse_s3_url(url) == expected
+    assert S3Client._parse_s3_url(url) == expected
 
 
 @pytest.mark.parametrize(
@@ -71,4 +71,4 @@ def test_parse_s3_url(url: str, expected: tuple[str, str, str]) -> None:
 )
 def test_parse_s3_url_rejects_incomplete(url: str) -> None:
     with pytest.raises(ValueError, match="object key"):
-        _parse_s3_url(url)
+        S3Client._parse_s3_url(url)
