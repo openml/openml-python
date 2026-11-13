@@ -333,7 +333,7 @@ def with_test_cache(test_files_directory, request):
         shutil.rmtree(tmp_cache)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def static_cache_dir():
     return Path(__file__).parent / "files"
 
