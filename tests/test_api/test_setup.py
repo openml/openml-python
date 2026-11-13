@@ -24,13 +24,13 @@ def get_sentinel():
 
 
 @pytest.fixture
-def setup_v1(http_client_v1, minio_client) -> SetupV1API:
-    return SetupV1API(http=http_client_v1, minio=minio_client)
+def setup_v1(http_client_v1, s3_client) -> SetupV1API:
+    return SetupV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def setup_v2(http_client_v2, minio_client) -> SetupV2API:
-    return SetupV2API(http=http_client_v2, minio=minio_client)
+def setup_v2(http_client_v2, s3_client) -> SetupV2API:
+    return SetupV2API(http=http_client_v2, s3=s3_client)
 
 
 @pytest.mark.test_server

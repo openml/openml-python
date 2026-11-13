@@ -9,13 +9,13 @@ from openml.exceptions import OpenMLNotSupportedError
 
 
 @pytest.fixture
-def evaluation_v1(http_client_v1, minio_client) -> EvaluationV1API:
-    return EvaluationV1API(http=http_client_v1, minio=minio_client)
+def evaluation_v1(http_client_v1, s3_client) -> EvaluationV1API:
+    return EvaluationV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def evaluation_v2(http_client_v2, minio_client) -> EvaluationV2API:
-    return EvaluationV2API(http=http_client_v2, minio=minio_client)
+def evaluation_v2(http_client_v2, s3_client) -> EvaluationV2API:
+    return EvaluationV2API(http=http_client_v2, s3=s3_client)
 
 
 @pytest.mark.test_server

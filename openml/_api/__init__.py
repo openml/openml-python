@@ -1,7 +1,7 @@
 from .clients import (
     HTTPCache,
     HTTPClient,
-    MinIOClient,
+    S3Client,
 )
 from .resources import (
     API_REGISTRY,
@@ -65,13 +65,13 @@ __all__ = [
     "FlowV2API",
     "HTTPCache",
     "HTTPClient",
-    "MinIOClient",
     "ResourceAPI",
     "ResourceV1API",
     "ResourceV2API",
     "RunAPI",
     "RunV1API",
     "RunV2API",
+    "S3Client",
     "SetupAPI",
     "SetupV1API",
     "SetupV2API",

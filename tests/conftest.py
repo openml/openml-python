@@ -36,7 +36,7 @@ from pathlib import Path  # noqa: E402
 import pytest  # noqa: E402
 
 import openml  # noqa: E402
-from openml._api import HTTPClient, MinIOClient  # noqa: E402
+from openml._api import HTTPClient, S3Client  # noqa: E402
 from openml.enums import APIVersion  # noqa: E402
 from openml.testing import TestBase  # noqa: E402
 
@@ -359,5 +359,5 @@ def http_client_v2() -> HTTPClient:
 
 
 @pytest.fixture
-def minio_client() -> MinIOClient:
-    return MinIOClient()
+def s3_client() -> S3Client:
+    return S3Client()

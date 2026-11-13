@@ -17,9 +17,9 @@ dependencies = [
   "pandas>=1.0.0",
   "scipy>=0.13.3",
   "numpy>=1.6.2",
-  "minio",
+  "boto3>=1.34",
   "pyarrow",
-  "tqdm",  # For MinIO download progress bars
+  "tqdm",  # For download progress bars
 ]
 requires-python = ">=3.10,<3.15"
 maintainers = [
@@ -82,6 +82,7 @@ test=[
     "packaging",
     "pytest-mock",
     "openml-sklearn",
+    "boto3-stubs[s3]",
 ]
 examples=[
     "matplotlib",
@@ -357,6 +358,7 @@ module = [
   "tests.test_api.test_flow",
   "tests.test_api.test_http",
   "tests.test_api.test_run",
+  "tests.test_api.test_s3",
   "tests.test_api.test_setup",
   "tests.test_api.test_study",
   "tests.test_api.test_task",

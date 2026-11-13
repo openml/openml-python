@@ -24,13 +24,13 @@ class DummyTaskV2API(ResourceV2API, DummyTaskAPI):
 
 
 @pytest.fixture
-def dummy_task_v1(http_client_v1, minio_client) -> DummyTaskV1API:
-    return DummyTaskV1API(http=http_client_v1, minio=minio_client)
+def dummy_task_v1(http_client_v1, s3_client) -> DummyTaskV1API:
+    return DummyTaskV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def dummy_task_v2(http_client_v2, minio_client) -> DummyTaskV1API:
-    return DummyTaskV2API(http=http_client_v2, minio=minio_client)
+def dummy_task_v2(http_client_v2, s3_client) -> DummyTaskV1API:
+    return DummyTaskV2API(http=http_client_v2, s3=s3_client)
 
 
 @pytest.fixture

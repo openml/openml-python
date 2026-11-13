@@ -7,13 +7,13 @@ from openml._api import EvaluationMeasureV1API, EvaluationMeasureV2API
 
 
 @pytest.fixture
-def evaluation_measure_v1(http_client_v1, minio_client) -> EvaluationMeasureV1API:
-    return EvaluationMeasureV1API(http=http_client_v1, minio=minio_client)
+def evaluation_measure_v1(http_client_v1, s3_client) -> EvaluationMeasureV1API:
+    return EvaluationMeasureV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def evaluation_measure_v2(http_client_v2, minio_client) -> EvaluationMeasureV2API:
-    return EvaluationMeasureV2API(http=http_client_v2, minio=minio_client)
+def evaluation_measure_v2(http_client_v2, s3_client) -> EvaluationMeasureV2API:
+    return EvaluationMeasureV2API(http=http_client_v2, s3=s3_client)
 
 
 @pytest.mark.test_server
