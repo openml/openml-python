@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import pickle
 from collections import OrderedDict
 from pathlib import Path
@@ -89,10 +88,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
                 qualities_file = self.download_qualities_file(dataset_id)
 
             parquet_file = None
-            skip_parquet = (
-                os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold()
-                == "true"
-            )
+            skip_parquet = openml.config.should_skip_parquet()
             download_parquet = "oml:parquet_url" in description and not skip_parquet
             if download_parquet and (download_data or download_all_files):
                 try:
@@ -934,10 +930,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
                 qualities_file = self.download_qualities_file(dataset_id)
 
             parquet_file = None
-            skip_parquet = (
-                os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold()
-                == "true"
-            )
+            skip_parquet = openml.config.should_skip_parquet()
             download_parquet = "parquet_url" in json_content and not skip_parquet
             if download_parquet and (download_data or download_all_files):
                 try:

@@ -1936,6 +1936,58 @@ def test__get_dataset_parquet_not_cached():
     assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
 
+def test_download_data_skips_parquet_when_configured(monkeypatch):
+    monkeypatch.delenv(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, raising=False)
+    previous_value = openml.config.skip_parquet
+    openml.config.skip_parquet = True
+    dataset = mock.Mock(_parquet_url="https://example.com/dataset.pq", parquet_file=None)
+
+    try:
+        with (
+            mock.patch("openml.datasets.functions._get_dataset_parquet") as get_parquet,
+            mock.patch(
+                "openml.datasets.functions._get_dataset_arff", return_value=Path("dataset.arff")
+            ) as get_arff,
+        ):
+            OpenMLDataset._download_data(dataset)
+
+        get_parquet.assert_not_called()
+        get_arff.assert_called_once_with(dataset)
+        assert dataset.data_file == str(Path("dataset.arff"))
+    finally:
+        openml.config.skip_parquet = previous_value
+
+
+@pytest.mark.parametrize("api_version", [1, 2])
+@pytest.mark.parametrize("skip_parquet", [False, True])
+def test_resource_get_respects_skip_parquet(monkeypatch, api_version, skip_parquet):
+    from openml._api.resources.dataset import DatasetV1API, DatasetV2API
+
+    monkeypatch.delenv(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, raising=False)
+    monkeypatch.setattr(openml.config, "skip_parquet", skip_parquet)
+    resource = mock.Mock()
+    resource._http.get.return_value.text = (
+        '<oml:data_set_description xmlns:oml="http://openml.org/openml">'
+        "<oml:parquet_url>https://example.com/data.pq</oml:parquet_url>"
+        "</oml:data_set_description>"
+    )
+    resource._http.get.return_value.json.return_value = {
+        "parquet_url": "https://example.com/data.pq"
+    }
+    resource.download_dataset_parquet.return_value = Path("dataset.pq")
+    resource.download_dataset_arff.return_value = Path("dataset.arff")
+    api = DatasetV1API if api_version == 1 else DatasetV2API
+
+    api.get(resource, 61, download_data=True)
+
+    if skip_parquet:
+        resource.download_dataset_parquet.assert_not_called()
+        resource.download_dataset_arff.assert_called_once()
+    else:
+        resource.download_dataset_parquet.assert_called_once()
+        resource.download_dataset_arff.assert_not_called()
+
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
 
