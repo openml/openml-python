@@ -201,8 +201,6 @@ def _name_to_id(
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
-    download_qualities : bool, optional (default=True)
-        If `True`, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -247,7 +245,7 @@ def get_datasets(
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
-    download_qualities : bool, optional (default=True)
+    download_qualities : bool, optional (default=False)
         If True, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
