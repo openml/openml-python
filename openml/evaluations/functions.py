@@ -79,8 +79,9 @@ def list_evaluations(
         the evaluation function. e.g., predictive_accuracy
     offset : int, optional
         the number of runs to skip, starting from the first
-    size : int, default 10000
+    size : int, default 1000
         The maximum number of runs to show.
+        Maximum allowed is 1000.
         If set to ``None``, it returns all the results.
 
     tasks : list[int,str], optional
