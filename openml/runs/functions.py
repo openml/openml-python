@@ -1244,7 +1244,7 @@ def list_runs(  # noqa: PLR0913,PLR0917
 
     study : int, optional
 
-    display_errors : bool, optional (default=None)
+    display_errors : bool, optional (default=False)
         Whether to list runs which have an error (for example a missing
         prediction file).
 
