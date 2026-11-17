@@ -22,7 +22,7 @@ from urllib3 import ProxyManager
 
 import openml
 
-from .__version__ import __version__
+from . import __version__
 from .exceptions import (
     OpenMLAuthenticationError,
     OpenMLHashException,
