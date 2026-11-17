@@ -358,7 +358,7 @@ def get_dataset(
 
     if cache_format not in ["feather", "pickle"]:
         raise ValueError(
-            "cache_format must be one of 'feather' or 'pickle. "
+            "cache_format must be one of 'feather' or 'pickle'. "
             f"Invalid format specified: {cache_format}",
         )
 
