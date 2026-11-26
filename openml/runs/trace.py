@@ -41,8 +41,8 @@ class OpenMLTraceIteration:
     iteration : int
         iteration number of optimization procedure
 
-    setup_string : str, optional
-        json string representing the parameters
+    setup_string : str or dict, optional
+        json string or dictionary representing the parameters.
         If not provided, ``parameters`` should be set.
 
     evaluation : double
@@ -54,7 +54,7 @@ class OpenMLTraceIteration:
         selected for making predictions. Per fold/repeat there
         should be only one iteration selected
 
-    parameters : OrderedDict, optional
+    parameters : dict, optional
         Dictionary specifying parameter names and their values.
         If not provided, ``setup_string`` should be set.
     """
@@ -66,7 +66,7 @@ class OpenMLTraceIteration:
     evaluation: float
     selected: bool
 
-    setup_string: dict[str, str] | None = None
+    setup_string: str | dict[str, Any] | None = None
     parameters: dict[str, str | int | float] | None = None
 
     def __post_init__(self) -> None:
@@ -83,22 +83,58 @@ class OpenMLTraceIteration:
 
         if self.parameters is not None and not isinstance(self.parameters, dict):
             raise TypeError(
-                f"argument parameters is not an instance of OrderedDict, but"
-                f" {type(self.parameters)!s}",
+                f"argument parameters is not an instance of dict, but {type(self.parameters)!s}",
+            )
+
+        if self.setup_string is not None and not isinstance(self.setup_string, (str, dict)):
+            raise TypeError(
+                f"argument setup_string is not an instance of str or dict, but"
+                f" {type(self.setup_string)!s}",
             )
 
     def get_parameters(self) -> dict[str, Any]:
         """Get the parameters of this trace iteration."""
         # parameters have prefix 'parameter_'
         if self.setup_string:
-            return {
-                param[len(PREFIX) :]: json.loads(value)
-                for param, value in self.setup_string.items()
-            }
+            if isinstance(self.setup_string, str):
+                try:
+                    setup_dict = json.loads(self.setup_string)
+                except (json.JSONDecodeError, ValueError) as e:
+                    raise ValueError(
+                        f"Could not parse `setup_string` as JSON: {self.setup_string}"
+                    ) from e
+            elif isinstance(self.setup_string, dict):
+                setup_dict = self.setup_string
+            else:
+                raise TypeError(
+                    f"argument setup_string is not an instance of str or dict, but"
+                    f" {type(self.setup_string)!s}",
+                )
+
+            if not isinstance(setup_dict, dict):
+                raise ValueError(
+                    f"`setup_string` must represent a dictionary of parameters, but got "
+                    f"{type(setup_dict)!s}."
+                )
+
+            params = {}
+            for param, value in setup_dict.items():
+                key = param[len(PREFIX) :] if param.startswith(PREFIX) else param
+                if isinstance(value, str):
+                    try:
+                        params[key] = json.loads(value)
+                    except (json.JSONDecodeError, ValueError):
+                        params[key] = value
+                else:
+                    params[key] = value
+            return params
 
         if self.parameters is None:
             raise ValueError("Parameters must be set before calling get_parameters().")
-        return {param[len(PREFIX) :]: value for param, value in self.parameters.items()}
+        return {
+            param[len(PREFIX) :] if param.startswith(PREFIX) else param: value
+            for param, value in self.parameters.items()
+        }
 
 
 class OpenMLRunTrace:

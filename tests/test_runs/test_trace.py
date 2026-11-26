@@ -76,3 +76,114 @@ class TestTrace(TestBase):
             "prefix parameter_",
         ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)
+
+    def test_trace_iteration_get_parameters_with_json_string(self):
+        setup_str = (
+            '{"parameter_alpha": "0.1", "parameter_max_depth": "5", '
+            '"parameter_kernel": "\\"linear\\""}'
+        )
+        t = OpenMLTraceIteration(
+            repeat=0,
+            fold=0,
+            iteration=0,
+            setup_string=setup_str,
+            evaluation=0.95,
+            selected=True,
+        )
+        assert t.get_parameters() == {"alpha": 0.1, "max_depth": 5, "kernel": "linear"}
+
+    def test_trace_iteration_get_parameters_with_dict(self):
+        t = OpenMLTraceIteration(
+            repeat=0,
+            fold=0,
+            iteration=0,
+            setup_string={"parameter_alpha": "0.1", "parameter_max_depth": 5},
+            evaluation=0.95,
+            selected=True,
+        )
+        assert t.get_parameters() == {"alpha": 0.1, "max_depth": 5}
+
+    def test_trace_iteration_get_parameters_with_parameters_dict(self):
+        t = OpenMLTraceIteration(
+            repeat=0,
+            fold=0,
+            iteration=0,
+            parameters={"parameter_alpha": 0.1, "max_depth": 5},
+            evaluation=0.95,
+            selected=True,
+        )
+        assert t.get_parameters() == {"alpha": 0.1, "max_depth": 5}
+
+    def test_trace_iteration_invalid_setup_string(self):
+        t1 = OpenMLTraceIteration(
+            repeat=0,
+            fold=0,
+            iteration=0,
+            setup_string="invalid json",
+            evaluation=0.95,
+            selected=True,
+        )
+        with pytest.raises(ValueError, match="Could not parse `setup_string` as JSON"):
+            t1.get_parameters()
+
+        t2 = OpenMLTraceIteration(
+            repeat=0,
+            fold=0,
+            iteration=0,
+            setup_string="[1, 2, 3]",
+            evaluation=0.95,
+            selected=True,
+        )
+        with pytest.raises(
+            ValueError, match=r"`setup_string` must represent a dictionary of parameters"
+        ):
+            t2.get_parameters()
+
+    def test_trace_iteration_type_errors(self):
+        with pytest.raises(
+            TypeError, match=r"argument parameters is not an instance of dict, but <class 'int'>"
+        ):
+            OpenMLTraceIteration(
+                repeat=0,
+                fold=0,
+                iteration=0,
+                parameters=123,  # type: ignore
+                evaluation=0.95,
+                selected=True,
+            )
+
+        with pytest.raises(
+            TypeError,
+            match=r"argument setup_string is not an instance of str or dict, but <class 'int'>",
+        ):
+            OpenMLTraceIteration(
+                repeat=0,
+                fold=0,
+                iteration=0,
+                setup_string=123,  # type: ignore
+                evaluation=0.95,
+                selected=True,
+            )
+
+    def test_trace_to_arff_with_string_setup_string(self):
+        trace_iterations = {
+            (0, 0, 0): OpenMLTraceIteration(
+                repeat=0,
+                fold=0,
+                iteration=0,
+                setup_string='{"parameter_alpha": "0.1"}',
+                evaluation=0.8,
+                selected=True,
+            )
+        }
+        trace = OpenMLRunTrace(run_id=1, trace_iterations=trace_iterations)
+        arff_dict = trace.trace_to_arff()
+        assert arff_dict["attributes"] == [
+            ("repeat", "NUMERIC"),
+            ("fold", "NUMERIC"),
+            ("iteration", "NUMERIC"),
+            ("evaluation", "NUMERIC"),
+            ("selected", ["true", "false"]),
+            ("parameter_alpha", "STRING"),
+        ]
+        assert arff_dict["data"] == [[0, 0, 0, 0.8, "true", 0.1]]
