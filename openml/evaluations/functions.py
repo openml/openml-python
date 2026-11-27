@@ -158,27 +158,10 @@ def list_evaluation_measures() -> list[str]:
     return openml._backend.evaluation_measure.list()
 
 
-@overload
 def list_estimation_procedures(
-    output_format: Literal["dataframe"],
-) -> pd.DataFrame: ...
-
-
-@overload
-def list_estimation_procedures(
-    output_format: Literal["object"],
-) -> dict[int, OpenMLEstimationProcedure]: ...
-
-
-@overload
-def list_estimation_procedures(
-    output_format: None = None,
-) -> list[str]: ...
-
-
-def list_estimation_procedures(
-    output_format: Literal["object", "dataframe"] | None = None,
-) -> list[str] | dict[int, OpenMLEstimationProcedure] | pd.DataFrame:
+    *,
+    get_procedures: bool = False,
+) -> list[str] | list[OpenMLEstimationProcedure]:
     """Return the estimation procedures available on OpenML.
 
     The function performs an API call to retrieve the entire list of
@@ -186,37 +169,28 @@ def list_estimation_procedures(
 
     Parameters
     ----------
-    output_format : {"object", "dataframe"}, optional
-        The format of the returned procedures. ``"object"`` returns a
-        dictionary mapping procedure IDs to ``OpenMLEstimationProcedure``
-        instances. ``"dataframe"`` returns one row per procedure.
-        If omitted, a list of procedure names is returned for backwards
-        compatibility and a warning is emitted.
+    get_procedures : bool, default=False
+        Return full procedure objects when True. By default, return the
+        procedure names and emit a warning about the future change.
 
     Returns
     -------
-    list[str], dict[int, OpenMLEstimationProcedure], or pandas.DataFrame
-        The available estimation procedures in the requested format.
+    list[str] or list[OpenMLEstimationProcedure]
+        The available estimation procedure names or full procedure objects.
     """
     result = openml._backend.estimation_procedure.list()
 
-    if output_format is None:
-        warnings.warn(
-            "The default output will change from a list of names to a dictionary of "
-            "OpenMLEstimationProcedure objects in a future release. Set "
-            "output_format='object' to use the new format.",
-            FutureWarning,
-            stacklevel=2,
-        )
-        return [procedure.name for procedure in result]
+    if get_procedures:
+        return result
 
-    if output_format == "dataframe":
-        return pd.DataFrame.from_records(procedure._to_dict() for procedure in result)
-
-    if output_format == "object":
-        return {procedure.id: procedure for procedure in result}
-
-    raise ValueError("Invalid output format. Only 'object' and 'dataframe' are applicable.")
+    warnings.warn(
+        "The default output will change from a list of names to a list of "
+        "OpenMLEstimationProcedure objects in a future release. Set "
+        "get_procedures=True to use the new format.",
+        FutureWarning,
+        stacklevel=2,
+    )
+    return [procedure.name for procedure in result]
 
 
 def list_evaluations_setups(
