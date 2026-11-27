@@ -146,7 +146,7 @@ class TestOpenMLDataset(TestBase):
         assert datasets.empty
 
     @pytest.mark.production_server
-    def test_check_datasets_active(self):
+    def test_check_datasets_active(self):  # TODO: Make deactivated dataset on test server
         # Have to test on live because there is no deactivated dataset on the test server.
         self.use_production_server()
         active = openml.datasets.check_datasets_active(
@@ -372,7 +372,14 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_parquet_is_cached(self, patch):
         with tempfile.TemporaryDirectory() as tmp_path:
             tmp_file_path = (
-                Path(tmp_path) / "org" / "openml" / "data" / "s3" / "dataset30" / "dataset_30.pq"
+                Path(tmp_path)
+                / "org"
+                / "openml"
+                / "test"
+                / "datasets"
+                / "0000"
+                / "0030"
+                / "dataset_30.pq"
             )
             tmp_file_path.parent.mkdir(parents=True)
             with tmp_file_path.open(mode="w") as fh:
@@ -384,7 +391,7 @@ class TestOpenMLDataset(TestBase):
             )
 
             description = {
-                "oml:parquet_url": "https://data.openml.org/dataset30/dataset_30.pq",
+                "oml:parquet_url": "https://test.openml.org/datasets/0000/0030/dataset_30.pq",
                 "oml:id": "30",
             }
             path = _get_dataset_parquet(description)
@@ -392,7 +399,7 @@ class TestOpenMLDataset(TestBase):
             assert path == tmp_file_path
             assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
-    def test__get_dataset_parquet_file_does_not_exist(self):
+    def test__get_dataset_parquet_file_does_not_exist(self):  # TODO: Make use test server, weird
         description = {
             "oml:parquet_url": "https://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
@@ -1928,7 +1935,7 @@ def test_get_dataset_with_invalid_id() -> None:
 
 def test__get_dataset_parquet_not_cached():
     description = {
-        "oml:parquet_url": "https://data.openml.org/dataset20/dataset_20.pq",
+        "oml:parquet_url": "https://test.openml.org/datasets/0000/0020/dataset_20.pq",  # Not local?
         "oml:id": "20",
     }
     path = _get_dataset_parquet(description)

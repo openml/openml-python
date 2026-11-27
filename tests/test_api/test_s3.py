@@ -3,16 +3,14 @@ from __future__ import annotations
 import pytest
 from botocore import UNSIGNED
 
-from openml._api.clients.s3 import S3Client
+from openml._api.clients.s3 import ParsedS3URL, S3Client
 
 _ENDPOINT = "http://localhost:8000/s3"
 
 
 def test_make_s3_client(mocker) -> None:
     boto_client = mocker.patch("openml._api.clients.s3.boto3.client")
-
     S3Client._make_s3_client(_ENDPOINT)
-
     kwargs = boto_client.call_args.kwargs
     assert kwargs["endpoint_url"] == _ENDPOINT
     assert kwargs["region_name"] == "eu-central-1"
@@ -23,15 +21,13 @@ def test_make_s3_client(mocker) -> None:
 @pytest.mark.parametrize(
     "proxy",
     [
-        "http://proxy.example.com:443",
-        "https://proxy.example.com:8443",
+        "http://proxy.example.com:80",
+        "https://proxy.example.com:443",
     ],
 )
 def test_make_s3_client_with_proxy(mocker, proxy: str) -> None:
     boto_client = mocker.patch("openml._api.clients.s3.boto3.client")
-
     S3Client._make_s3_client(_ENDPOINT, proxy=proxy)
-
     assert boto_client.call_args.kwargs["config"].proxies == {
         "http": proxy,
         "https": proxy,
@@ -44,22 +40,18 @@ def test_make_s3_client_with_proxy(mocker, proxy: str) -> None:
         # local reverse-proxy mount
         (
             "http://localhost:8000/s3/datasets/0020/dataset_20.pq",
-            ("http://localhost:8000/s3", "datasets", "0020/dataset_20.pq"),
+            ParsedS3URL("http://localhost:8000/s3", "datasets", "0020/dataset_20.pq"),
         ),
         # production: no mount
         (
             "https://data.openml.org/datasets/0020/dataset_20.pq",
-            ("https://data.openml.org", "datasets", "0020/dataset_20.pq"),
-        ),
-        # legacy bucket-first layout
-        (
-            "http://data.openml.org/dataset20/dataset_20.pq",
-            ("http://data.openml.org", "dataset20", "dataset_20.pq"),
+            ParsedS3URL("https://data.openml.org", "datasets", "0020/dataset_20.pq"),
         ),
     ],
 )
-def test_parse_s3_url(url: str, expected: tuple[str, str, str]) -> None:
-    assert S3Client._parse_s3_url(url) == expected
+def test_parse_s3_url(url: str, expected: ParsedS3URL) -> None:
+    result = S3Client._parse_s3_url(url)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

@@ -5,7 +5,7 @@ import shutil
 import urllib
 import zipfile
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import boto3
 import requests
@@ -18,6 +18,12 @@ if TYPE_CHECKING:
 
 import openml
 from openml.utils import ProgressBar
+
+
+class ParsedS3URL(NamedTuple):
+    endpoint: str
+    bucket: str
+    object_key: str
 
 
 class S3Client:
@@ -33,46 +39,48 @@ class S3Client:
     @staticmethod
     def _parse_s3_url(
         source: str,
-    ) -> tuple[str, str, str]:
+        path_prefix: str = "s3",
+    ) -> ParsedS3URL:
         """Split an object storage URL into endpoint, bucket, and object key.
 
-        The optional mount prefix is kept on the
+        The optional path prefix is kept on the
         endpoint URL so path-style S3 requests still go through the reverse
-        proxy. Production URLs have no mount prefix.
+        proxy. Production URLs have no path prefix.
 
         Parameters
         ----------
         source : str
             URL to a file in an S3 bucket, for example:
             ``http://localhost:8000/s3/datasets/0000/0061/dataset_61.pq``
+        path_prefix : str, optional (default = "s3")
+            Optional storage path mount.
 
         Returns
         -------
-        tuple[str, str, str]
-            Endpoint URL, bucket name, object key.
+        ParsedS3URL
+            Object containing attributes endpoint URL, bucket name, object key.
 
         Raises
         ------
         ValueError
             If the URL does not contain both a bucket and an object key.
         """
-        # Parse the URL into sections
         parsed_url = urllib.parse.urlparse(source)
-        parts = [part for part in parsed_url.path.split("/") if part]
-        if len(parts) < 2:  # Bucket and key minimum
-            raise ValueError(f"Object storage URL must contain a bucket and object key: {source!r}")
+        if not parsed_url.scheme or not parsed_url.netloc:
+            raise ValueError(f"Invalid object storage URL: {source!r}.")
 
-        # Handle the endpoint
         endpoint = f"{parsed_url.scheme}://{parsed_url.netloc}"
-        if parts[0] == "s3":  # URL has mount in first index
-            endpoint += f"/{parts.pop(0)}"
+        path = parsed_url.path.strip("/")
+        if path.startswith(f"{path_prefix}/"):
+            endpoint += f"/{path_prefix}"
+            path = path.removeprefix(f"{path_prefix}/")
 
-        # Handle the bucket and object key
-        bucket = parts[0]
-        object_key = "/".join(parts[1:])
-        if not object_key:
-            raise ValueError(f"Object storage URL must contain an object key: {source!r}.")
-        return endpoint, bucket, object_key
+        bucket, _, object_key = path.partition("/")
+        if not bucket or not object_key:
+            raise ValueError(
+                f"Object storage URL must contain a bucket and object key: {source!r}."
+            )
+        return ParsedS3URL(endpoint, bucket, object_key)
 
     @staticmethod
     def _make_s3_client(
@@ -101,8 +109,10 @@ class S3Client:
             proxies=proxies,  # Optional HTTP proxy
             user_agent_extra=openml.config._HEADERS["user-agent"],  # Keep openml-python/<version>
         )
+        # Client requies a region_name but it has no meaning for OpenML,
+        # eu-central-1 was chosen for no particular reason.
         return boto3.client(
-            "s3",
+            service_name="s3",
             endpoint_url=endpoint_url,
             region_name="eu-central-1",
             config=config,
@@ -125,59 +135,56 @@ class S3Client:
         proxy: str, optional (default = "auto")
             Proxy server to use. ``"auto"`` resolves it from the environment.
         """
-        # Parse the source url and get cache location
-        endpoint, bucket, object_key = self._parse_s3_url(source)
+        parsed_url = self._parse_s3_url(source)
         destination = Path(openml.config.get_download_path(source))
 
-        # Ensure the cache does not already exist
         if destination.is_dir():
-            destination = Path(destination, object_key.rsplit("/", 1)[-1])
+            destination = Path(destination, parsed_url.object_key.rsplit("/", 1)[-1])
         if destination.is_file() and not exists_ok:
             raise FileExistsError(f"File already exists in {destination}.")
 
-        # Ensure download location exists
         destination = destination.expanduser()
         destination.parent.mkdir(parents=True, exist_ok=True)
 
-        # Set up the S3 client with the proxy
         if proxy == "auto":
             resolved_proxies = requests.utils.get_environ_proxies(source)
             proxy = requests.utils.select_proxy(source, resolved_proxies)
-        client = self._make_s3_client(endpoint_url=endpoint, proxy=proxy)
+        client = self._make_s3_client(endpoint_url=parsed_url.endpoint, proxy=proxy)
 
-        # Get the download object
         try:
-            # Create a progress bar if required
             callback = None
             if openml.config.show_progress:
-                total_length = client.head_object(Bucket=bucket, Key=object_key)["ContentLength"]
+                total_length = client.head_object(
+                    Bucket=parsed_url.bucket, Key=parsed_url.object_key
+                )["ContentLength"]
                 progress = ProgressBar()
-                progress.set_meta(object_key, total_length)
+                progress.set_meta(parsed_url.object_key, total_length)
                 callback = progress.update
-            # Download object
+
             client.download_file(
-                Bucket=bucket,
-                Key=object_key,
+                Bucket=parsed_url.bucket,
+                Key=parsed_url.object_key,
                 Filename=str(destination),
                 Callback=callback,
             )
-            # Unzip if compressed
+
             if destination.is_file() and destination.suffix == ".zip":
                 with zipfile.ZipFile(destination, "r") as zip_ref:
                     zip_ref.extractall(destination.parent)
 
-        # Error handling and return
         except ClientError as err:
             error = err.response.get("Error", {})
             status = err.response.get("ResponseMetadata", {}).get("HTTPStatusCode")
             if status == 404 or error.get("Code") in {"404", "NoSuchKey", "NotFound"}:
                 raise FileNotFoundError(f"Object at '{source}' does not exist.") from err
             raise FileNotFoundError("Bucket is private or does not exist.") from err
+
         except RecursionError as err:
             raise RuntimeError(
                 f"Redirect loop while fetching {source!r}. "
                 "The endpoint likely redirects HTTP to HTTPS; use an https:// URL."
             ) from err
+
         return destination
 
     def download_bucket(self, source: str) -> None:
@@ -191,29 +198,40 @@ class S3Client:
             URL to a S3 bucket.
         """
         # Parse the source information
-        endpoint, bucket, object_key = self._parse_s3_url(source)
+        parsed_url = self._parse_s3_url(source)
         destination = Path(openml.config.get_download_path(source))
         if destination.suffix:
             destination = destination.parent
-        prefix = object_key.rsplit("/", 1)[0]
+        prefix = parsed_url.object_key.rsplit("/", 1)[0] if "/" in parsed_url.object_key else ""
 
-        # Create S3 client and paginator
-        client = self._make_s3_client(endpoint_url=endpoint)
-        paginator = client.get_paginator("list_objects_v2")  # PageSize caps at 1_000
+        client = self._make_s3_client(endpoint_url=parsed_url.endpoint)
+        # Calls `list_objects_v2`, a method that is defined on the `boto3.client`.
+        # It returns some or all (up to 1,000) of the objects in a bucket with each request.
+        paginator = client.get_paginator("list_objects_v2")
 
         # Iterate over the response pages
-        for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+        for page in paginator.paginate(Bucket=parsed_url.bucket, Prefix=prefix):
             for file_object in page.get("Contents", []):
                 obj_key = file_object["Key"]
-                etag = (file_object.get("ETag") or "").strip('"')
+                etag = file_object.get("ETag", "").strip('"')
 
-                # Check if the object was already downloaded
+                # We avoid redownloading files already in our cache by disallowing
+                # the client's download_file to write to a file that already exists.
+                # However, downloaded archives are automatically removed from disk
+                # after downloading to reduce disk space usage. This means that we can
+                # not rely on the presence of an archive file to avoid redownloading it.
+                # Instead, for archives only, we put a marker in the cache directory
+                # indicating the successful download and extraction of the archive.
+                # We create the marker using the `etag` which is a hash of the file,
+                # this means that if the archive itself changes (but not the filename)
+                # we can still detect an outdated download. So we use the etag-based
+                # marker to determine whether or not to download archives.
                 marker = destination / etag if etag else None
                 if marker is not None and marker.exists():
                     continue
 
                 # Server archive changed?
-                object_source = f"{endpoint}/{bucket}/{obj_key}"
+                object_source = f"{parsed_url.endpoint}/{parsed_url.bucket}/{obj_key}"
                 file_destination = Path(openml.config.get_download_path(object_source))
                 if (file_destination.parent / file_destination.stem).exists():
                     shutil.rmtree(file_destination.parent / file_destination.stem)
