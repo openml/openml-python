@@ -15,13 +15,13 @@ from openml.flows.flow import OpenMLFlow
 
 
 @pytest.fixture
-def flow_v1(http_client_v1, minio_client) -> FlowV1API:
-    return FlowV1API(http=http_client_v1, minio=minio_client)
+def flow_v1(http_client_v1, s3_client) -> FlowV1API:
+    return FlowV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def flow_v2(http_client_v2, minio_client) -> FlowV2API:
-    return FlowV2API(http=http_client_v2, minio=minio_client)
+def flow_v2(http_client_v2, s3_client) -> FlowV2API:
+    return FlowV2API(http=http_client_v2, s3=s3_client)
 
 
 def _validate_flow(flow: OpenMLFlow) -> None:

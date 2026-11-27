@@ -150,7 +150,7 @@ class TestTask(TestBase):
         dataset = openml.datasets.get_dataset(task.dataset_id)
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(  # noqa: PTH110
-            openml.config.get_minio_download_path(dataset._parquet_url)
+            openml.config.get_download_path(dataset._parquet_url)
         )
 
     @pytest.mark.test_server

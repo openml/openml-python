@@ -113,9 +113,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       id: clone-services
       run: |
-        # 2026-11-05: Services switched to SeaweedFS and the MinIO client cannot handle the new URLs.
-        # We use the old stack until we have migrated away from the MinIO client
-        git clone --revision dd8b98a9e0450bf487f973e1711c8b00dc022294 --depth 1 https://github.com/openml/services.git
+        git clone --revision a411948cb41d9d9fd99099e103d7b6871138abf4 --depth 1 https://github.com/openml/services.git
 
     - name: Start Docker Services
       id: start-services

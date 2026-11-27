@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from openml._api.clients import HTTPClient, MinIOClient
+from openml._api.clients import HTTPClient, S3Client
 from openml._api.resources import (
     API_REGISTRY,
     FallbackProxy,
@@ -27,7 +27,7 @@ class APIBackendBuilder:
 
     - HTTPClient for the primary API version
     - Optional HTTPClient for a fallback API version
-    - MinIOClient for file storage operations
+    - S3Client for file storage operations
     - Resource-specific API instances, optionally wrapped with fallback proxies
 
     Parameters
@@ -61,8 +61,8 @@ class APIBackendBuilder:
         Client for HTTP communication using the primary API version.
     fallback_http_client : HTTPClient | None
         Client for HTTP communication using the fallback API version, if provided.
-    minio_client : MinIOClient
-        Client for file storage operations (MinIO/S3).
+    s3_client : S3Client
+        Client for file storage operations (S3).
     """
 
     dataset: ResourceAPI | FallbackProxy
@@ -76,7 +76,7 @@ class APIBackendBuilder:
     setup: ResourceAPI | FallbackProxy
     http_client: HTTPClient
     fallback_http_client: HTTPClient | None
-    minio_client: MinIOClient
+    s3_client: S3Client
 
     def __init__(self, api_version: APIVersion, fallback_api_version: APIVersion | None = None):
         # initialize clients and resource APIs in-place
@@ -86,7 +86,7 @@ class APIBackendBuilder:
         """
         Construct an APIBackendBuilder instance from a configuration.
 
-        This method initializes HTTP and MinIO clients, creates resource-specific
+        This method initializes HTTP and S3 clients, creates resource-specific
         API instances for the primary API version, and optionally wraps them
         with fallback proxies if a fallback API version is configured.
 
@@ -101,16 +101,16 @@ class APIBackendBuilder:
         APIBackendBuilder
             Builder instance with all resource API interfaces initialized.
         """
-        minio_client = MinIOClient()
+        s3_client = S3Client()
         primary_http_client = HTTPClient(api_version=api_version)
 
         self.http_client = primary_http_client
-        self.minio_client = minio_client
+        self.s3_client = s3_client
         self.fallback_http_client = None
 
         resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
         for resource_type, resource_api_cls in API_REGISTRY[api_version].items():
-            resource_apis[resource_type] = resource_api_cls(primary_http_client, minio_client)
+            resource_apis[resource_type] = resource_api_cls(primary_http_client, s3_client)
 
         if fallback_api_version is not None:
             fallback_http_client = HTTPClient(api_version=fallback_api_version)
@@ -119,7 +119,7 @@ class APIBackendBuilder:
             fallback_resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
             for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
                 fallback_resource_apis[resource_type] = resource_api_cls(
-                    fallback_http_client, minio_client
+                    fallback_http_client, s3_client
                 )
 
             resource_apis = {

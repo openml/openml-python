@@ -7,7 +7,7 @@ import openml
 from .builder import APIBackendBuilder
 
 if TYPE_CHECKING:
-    from openml._api.clients import HTTPClient, MinIOClient
+    from openml._api.clients import HTTPClient, S3Client
     from openml._api.resources import (
         DatasetAPI,
         EstimationProcedureAPI,
@@ -121,8 +121,8 @@ class APIBackend:
         return cast("HTTPClient | None", self._backend.fallback_http_client)
 
     @property
-    def minio_client(self) -> MinIOClient:
-        return cast("MinIOClient", self._backend.minio_client)
+    def s3_client(self) -> S3Client:
+        return cast("S3Client", self._backend.s3_client)
 
     @classmethod
     def get_instance(cls) -> APIBackend:

@@ -15,6 +15,7 @@ repos:
         additional_dependencies:
           - types-requests
           - types-python-dateutil
+          - boto3-stubs[s3]
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.38.2
     hooks:

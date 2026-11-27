@@ -9,7 +9,7 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-import minio
+import botocore
 import pandas as pd
 import urllib3
 import xmltodict
@@ -760,19 +760,19 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         else:
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
-        output_file_path = Path(openml.config.get_minio_download_path(url))
+        output_file_path = Path(openml.config.get_download_path(url))
         if download_all_files:
-            self._minio.download_minio_bucket(source=url)
+            self._s3.download_bucket(source=url)
 
         if not output_file_path.is_file():
             try:
-                output_file_path = self._minio.download_minio_file(
+                output_file_path = self._s3.download_file(
                     source=url,
                 )
             except (
                 FileNotFoundError,
                 urllib3.exceptions.MaxRetryError,
-                minio.error.ServerError,
+                botocore.exceptions.BotoCoreError,
             ) as e:
                 logger.warning(f"Could not download file from {url}: {e}")
                 return None
@@ -1501,17 +1501,17 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         else:
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
-        output_file_path = Path(openml.config.get_minio_download_path(url))
+        output_file_path = Path(openml.config.get_download_path(url))
         if download_all_files:
-            self._minio.download_minio_bucket(source=url)
+            self._s3.download_bucket(source=url)
 
         if not output_file_path.is_file():
             try:
-                output_file_path = self._minio.download_minio_file(source=url)
+                output_file_path = self._s3.download_file(source=url)
             except (
                 FileNotFoundError,
                 urllib3.exceptions.MaxRetryError,
-                minio.error.ServerError,
+                botocore.exceptions.BotoCoreError,
             ) as e:
                 logger.warning(f"Could not download file from {url}: {e}")
                 return None

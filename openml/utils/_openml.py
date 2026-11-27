@@ -20,7 +20,6 @@ from typing_extensions import ParamSpec
 
 import numpy as np
 import xmltodict
-from minio.helpers import ProgressType
 from tqdm import tqdm
 
 import openml
@@ -456,8 +455,8 @@ def _create_lockfiles_dir() -> Path:
     return path
 
 
-class ProgressBar(ProgressType):
-    """Progressbar for MinIO function's `progress` parameter."""
+class ProgressBar:
+    """Progressbar for object-storage downloads."""
 
     def __init__(self) -> None:
         self._object_name = ""

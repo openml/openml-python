@@ -20,13 +20,13 @@ from openml.testing import TestBase
 
 
 @pytest.fixture
-def dataset_v1(http_client_v1, minio_client) -> DatasetV1API:
-    return DatasetV1API(http=http_client_v1, minio=minio_client)
+def dataset_v1(http_client_v1, s3_client) -> DatasetV1API:
+    return DatasetV1API(http=http_client_v1, s3=s3_client)
 
 
 @pytest.fixture
-def dataset_v2(http_client_v2, minio_client) -> DatasetV2API:
-    return DatasetV2API(http=http_client_v2, minio=minio_client)
+def dataset_v2(http_client_v2, s3_client) -> DatasetV2API:
+    return DatasetV2API(http=http_client_v2, s3=s3_client)
 
 
 def _wait_for_dataset_being_processed(dataset, did, status="active", n_tries=10, wait_time=10):
