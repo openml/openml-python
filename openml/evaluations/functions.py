@@ -2,6 +2,7 @@
 # ruff: noqa: PLR0913,PLR0917
 from __future__ import annotations
 
+import warnings
 from functools import partial
 from itertools import chain
 from typing import TYPE_CHECKING, Literal
@@ -15,6 +16,7 @@ import openml._api_calls
 import openml.utils
 
 if TYPE_CHECKING:
+    from openml.estimation_procedures import OpenMLEstimationProcedure
     from openml.evaluations import OpenMLEvaluation
 
 
@@ -156,18 +158,39 @@ def list_evaluation_measures() -> list[str]:
     return openml._backend.evaluation_measure.list()
 
 
-def list_estimation_procedures() -> list[str]:
-    """Return list of evaluation procedures available.
+def list_estimation_procedures(
+    *,
+    get_procedures: bool = False,
+) -> list[str] | list[OpenMLEstimationProcedure]:
+    """Return the estimation procedures available on OpenML.
 
     The function performs an API call to retrieve the entire list of
-    evaluation procedures' names that are available.
+    evaluation procedures.
+
+    Parameters
+    ----------
+    get_procedures : bool, default=False
+        Return full procedure objects when True. By default, return the
+        procedure names and emit a warning about the future change.
 
     Returns
     -------
-    list
+    list[str] or list[OpenMLEstimationProcedure]
+        The available estimation procedure names or full procedure objects.
     """
     result = openml._backend.estimation_procedure.list()
-    return [i.name for i in result]
+
+    if get_procedures:
+        return result
+
+    warnings.warn(
+        "The default output will change from a list of names to a list of "
+        "OpenMLEstimationProcedure objects in a future release. Set "
+        "get_procedures=True to use the new format.",
+        FutureWarning,
+        stacklevel=2,
+    )
+    return [procedure.name for procedure in result]
 
 
 def list_evaluations_setups(

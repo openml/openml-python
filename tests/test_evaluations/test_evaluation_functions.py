@@ -1,10 +1,14 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
 
 import openml
 import openml.evaluations
+from openml.estimation_procedures import OpenMLEstimationProcedure
+from openml.tasks import TaskType
 
 
 def _check_list_evaluation_setups(long_version, **kwargs):
@@ -224,6 +228,37 @@ def test_evaluation_list_sort():
     # Compare manual sorting against sorted output
     test_output = sorted(unsorted_output, reverse=True)
     assert test_output[:size] == sorted_output
+
+
+def test_list_estimation_procedures_default_warns_about_future_change() -> None:
+    procedures = [
+        OpenMLEstimationProcedure(
+            id=5,
+            task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+            name="10-fold Crossvalidation",
+            type="crossvalidation",
+        )
+    ]
+    with (
+        patch.object(openml._backend.estimation_procedure, "list", return_value=procedures),
+        pytest.warns(FutureWarning, match="get_procedures=True"),
+    ):
+        result = openml.evaluations.list_estimation_procedures()
+
+    assert result == ["10-fold Crossvalidation"]
+
+
+def test_list_estimation_procedures_returns_objects_when_requested() -> None:
+    procedure = OpenMLEstimationProcedure(
+        id=5,
+        task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+        name="10-fold Crossvalidation",
+        type="crossvalidation",
+    )
+    with patch.object(openml._backend.estimation_procedure, "list", return_value=[procedure]):
+        result = openml.evaluations.list_estimation_procedures(get_procedures=True)
+
+    assert result == [procedure]
 
 
 @pytest.mark.test_server
