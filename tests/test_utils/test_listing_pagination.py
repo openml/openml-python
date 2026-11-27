@@ -100,8 +100,9 @@ def test_list_datasets_pages_preserve_filters() -> None:
         assert filters["data_name"] == "example"
         return pd.DataFrame({"did": range(offset, offset + size)})
 
-    with unittest.mock.patch(
-        "openml.datasets.functions._list_datasets",
+    with unittest.mock.patch.object(
+        openml._backend.dataset,
+        "list",
         side_effect=listing_call,
     ) as page_fetch:
         datasets = openml.datasets.list_datasets(
